@@ -1,0 +1,107 @@
+/* EncryptedImage.css — Componente de Renderização Segura de Imagens Criptografadas */
+.encrypted-image-container {
+  position: relative;
+  overflow: hidden;
+  display: inline-block;
+  vertical-align: middle;
+  border-radius: inherit;
+  background-color: var(--color-bg-subtle, #f1f5f9);
+}
+
+.encrypted-image {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1), filter 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.encrypted-image.is-loading-display {
+  filter: blur(12px);
+  transform: scale(1.04);
+}
+
+.encrypted-image.is-loaded {
+  filter: blur(0);
+  transform: scale(1);
+  opacity: 1;
+}
+
+.encrypted-image-badge-shield {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 8px;
+  background: rgba(15, 23, 42, 0.72);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 9999px;
+  color: #ffffff;
+  font-family: var(--font-ui, sans-serif);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  z-index: 2;
+  pointer-events: none;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.25);
+}
+
+.encrypted-image-badge-shield svg {
+  color: #4ade80; /* verde segurança */
+}
+
+.encrypted-image-print-btn {
+  position: absolute;
+  bottom: 8px;
+  right: 8px;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 5px 10px;
+  background: rgba(255, 255, 255, 0.92);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid rgba(226, 232, 240, 0.8);
+  border-radius: 6px;
+  color: #1e293b;
+  font-family: var(--font-ui, sans-serif);
+  font-size: 11px;
+  font-weight: 700;
+  text-decoration: none;
+  cursor: pointer;
+  z-index: 3;
+  opacity: 0;
+  transform: translateY(4px);
+  transition: opacity 0.2s ease, transform 0.2s ease, background-color 0.2s;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.12);
+}
+
+.encrypted-image-container:hover .encrypted-image-print-btn {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.encrypted-image-print-btn:hover {
+  background: #ffffff;
+  color: var(--color-primary, #F05A47);
+  box-shadow: 0 6px 14px rgba(240, 90, 71, 0.2);
+}
+
+.encrypted-image-fallback {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  min-height: 140px;
+  background: #f8fafc;
+  color: #94a3b8;
+  font-family: var(--font-ui, sans-serif);
+  font-size: 12px;
+  gap: 8px;
+  text-align: center;
+}

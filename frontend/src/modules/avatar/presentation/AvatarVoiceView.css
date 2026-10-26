@@ -1,0 +1,429 @@
+/* AvatarVoiceView.css — Tela Informativa de Funcionalidade em Desenvolvimento */
+
+.av-page-container {
+  max-width: 1040px;
+  margin: 0 auto;
+  padding: 16px 28px 40px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  font-family: var(--font-body, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif);
+  color: #1e293b;
+  animation: avFadeIn 0.3s ease-out;
+}
+
+@keyframes avFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Breadcrumbs */
+.av-breadcrumb {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  color: #64748b;
+  font-weight: 500;
+}
+
+.av-crumb-link {
+  color: #64748b;
+  cursor: pointer;
+  transition: color 0.2s ease;
+  user-select: none;
+}
+
+.av-crumb-link:hover {
+  color: #f05a47;
+}
+
+.av-crumb-sep {
+  color: #cbd5e1;
+  font-size: 11px;
+}
+
+.av-crumb-text {
+  color: #f05a47;
+  font-weight: 600;
+}
+
+/* Header */
+.av-header {
+  margin-bottom: 0;
+}
+
+.av-title {
+  margin: 0 0 4px 0;
+  font-size: 26px;
+  font-weight: 700;
+  color: #0f172a;
+  letter-spacing: -0.02em;
+}
+
+.av-subtitle {
+  margin: 0;
+  font-size: 13.5px;
+  line-height: 1.45;
+  color: #64748b;
+}
+
+/* Card Principal */
+.av-card {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 20px;
+  padding: 28px 32px;
+  box-shadow: 0 4px 20px -2px rgba(15, 23, 42, 0.05);
+}
+
+.av-under-dev-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+  background: linear-gradient(180deg, #ffffff 0%, #fbfcfe 100%);
+}
+
+/* Badge de Status com Pulso */
+.av-status-badge-wrap {
+  margin-bottom: 16px;
+}
+
+.av-dev-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(245, 158, 11, 0.12);
+  color: #b45309;
+  border: 1px solid rgba(245, 158, 11, 0.25);
+  font-size: 11.5px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  padding: 5px 14px;
+  border-radius: 9999px;
+}
+
+.av-badge-pulse-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #f59e0b;
+  box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.7);
+  animation: avPulse 2s infinite;
+}
+
+@keyframes avPulse {
+  0% {
+    transform: scale(0.95);
+    box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.7);
+  }
+  70% {
+    transform: scale(1);
+    box-shadow: 0 0 0 8px rgba(245, 158, 11, 0);
+  }
+  100% {
+    transform: scale(0.95);
+    box-shadow: 0 0 0 0 rgba(245, 158, 11, 0);
+  }
+}
+
+/* Container do Ícone Heroico com Brilho e Órbitas */
+.av-dev-hero-icon-container {
+  position: relative;
+  width: 90px;
+  height: 90px;
+  margin: 0 auto 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.av-dev-icon-glow {
+  position: absolute;
+  inset: -10px;
+  background: radial-gradient(circle, rgba(238, 89, 69, 0.2) 0%, rgba(245, 158, 11, 0.1) 50%, transparent 70%);
+  border-radius: 50%;
+  filter: blur(8px);
+  z-index: 0;
+  animation: avGlowPulse 4s ease-in-out infinite alternate;
+}
+
+@keyframes avGlowPulse {
+  from {
+    transform: scale(0.9);
+    opacity: 0.6;
+  }
+  to {
+    transform: scale(1.1);
+    opacity: 1;
+  }
+}
+
+.av-dev-hero-icon {
+  position: relative;
+  z-index: 1;
+  width: 72px;
+  height: 72px;
+  border-radius: 20px;
+  background: linear-gradient(135deg, #ee5945 0%, #f97316 100%);
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 30px;
+  box-shadow: 0 8px 20px -3px rgba(238, 89, 69, 0.38);
+  transform: rotate(-3deg);
+  transition: transform 0.3s ease;
+}
+
+.av-dev-hero-icon:hover {
+  transform: rotate(0deg) scale(1.05);
+}
+
+.av-dev-orbit-icon {
+  position: absolute;
+  z-index: 2;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.08);
+}
+
+.av-dev-orbit-icon.orbit-1 {
+  top: -3px;
+  right: -4px;
+  background: #fef3c7;
+  color: #d97706;
+  border: 2px solid #ffffff;
+  animation: avFloat 3s ease-in-out infinite;
+}
+
+.av-dev-orbit-icon.orbit-2 {
+  bottom: -3px;
+  left: -4px;
+  background: #fee2e2;
+  color: #dc2626;
+  border: 2px solid #ffffff;
+  animation: avFloat 3s ease-in-out infinite 1.5s;
+}
+
+@keyframes avFloat {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-4px);
+  }
+}
+
+/* Conteúdo e Textos */
+.av-dev-content {
+  max-width: 680px;
+  margin: 0 auto 24px;
+}
+
+.av-dev-main-title {
+  font-size: 22px;
+  font-weight: 700;
+  color: #0f172a;
+  line-height: 1.35;
+  margin: 0 0 10px;
+  letter-spacing: -0.01em;
+}
+
+.av-dev-description {
+  font-size: 14.5px;
+  line-height: 1.6;
+  color: #475569;
+  margin: 0 0 18px;
+}
+
+.av-dev-description strong {
+  color: #1e293b;
+  font-weight: 600;
+}
+
+/* Banner de Aviso Informativo */
+.av-dev-notice-banner {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  text-align: left;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-left: 4px solid #ee5945;
+  border-radius: 12px;
+  padding: 12px 16px;
+}
+
+.av-notice-icon {
+  color: #ee5945;
+  font-size: 16px;
+  margin-top: 2px;
+  flex-shrink: 0;
+}
+
+.av-notice-text {
+  font-size: 13px;
+  line-height: 1.5;
+  color: #334155;
+}
+
+.av-notice-text strong {
+  color: #0f172a;
+}
+
+/* Grid de Pilares / Recursos */
+.av-pillars-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+  width: 100%;
+  max-width: 860px;
+  margin: 0 auto 28px;
+  text-align: left;
+}
+
+.av-pillar-card {
+  background: #ffffff;
+  border: 1px solid #edf2f7;
+  border-radius: 14px;
+  padding: 16px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.02);
+  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+}
+
+.av-pillar-card:hover {
+  transform: translateY(-2px);
+  border-color: #cbd5e1;
+  box-shadow: 0 6px 16px rgba(15, 23, 42, 0.05);
+}
+
+.av-pillar-icon-box {
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  background: rgba(238, 89, 69, 0.08);
+  color: #ee5945;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+}
+
+.av-pillar-title {
+  font-size: 15px;
+  font-weight: 700;
+  color: #1e293b;
+  margin: 0;
+}
+
+.av-pillar-desc {
+  font-size: 13px;
+  line-height: 1.55;
+  color: #64748b;
+  margin: 0;
+}
+
+/* Ações / Botões */
+.av-dev-actions {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  width: 100%;
+}
+
+.av-btn-action {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 22px;
+  border-radius: 12px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  outline: none;
+}
+
+.av-btn-action.primary {
+  background: #ee5945;
+  color: #ffffff;
+  border: 1px solid #ee5945;
+  box-shadow: 0 2px 8px rgba(238, 89, 69, 0.25);
+}
+
+.av-btn-action.primary:hover {
+  background: #d84532;
+  border-color: #d84532;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(238, 89, 69, 0.35);
+}
+
+.av-btn-action.secondary {
+  background: #ffffff;
+  color: #1e293b;
+  border: 1px solid #cbd5e1;
+}
+
+.av-btn-action.secondary:hover {
+  background: #f8fafc;
+  border-color: #94a3b8;
+  transform: translateY(-1px);
+}
+
+.av-btn-action.tertiary {
+  background: transparent;
+  color: #64748b;
+  border: 1px solid transparent;
+}
+
+.av-btn-action.tertiary:hover {
+  background: #f1f5f9;
+  color: #1e293b;
+}
+
+/* Responsividade */
+@media (max-width: 860px) {
+  .av-pillars-grid {
+    grid-template-columns: 1fr;
+    gap: 14px;
+  }
+
+  .av-card {
+    padding: 32px 20px;
+  }
+
+  .av-dev-main-title {
+    font-size: 20px;
+  }
+
+  .av-dev-actions {
+    flex-direction: column;
+    width: 100%;
+  }
+
+  .av-btn-action {
+    width: 100%;
+    justify-content: center;
+  }
+}

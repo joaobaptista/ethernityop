@@ -1,0 +1,524 @@
+/**
+ * MercadoPagoCheckoutModal.css
+ * Estilização minimalista e segura para o checkout Mercado Pago (PIX e Cartão)
+ */
+
+.mp-checkout-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.75);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100000;
+  padding: 16px;
+  animation: mpFadeIn 0.2s ease;
+}
+
+@keyframes mpFadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.mp-checkout-modal {
+  background-color: var(--bg-surface);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  width: 100%;
+  max-width: 480px;
+  box-shadow: var(--shadow-lg);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  animation: mpSlideUp 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes mpSlideUp {
+  from {
+    opacity: 0;
+    transform: translateY(12px) scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.mp-checkout-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--border-color);
+  background-color: var(--bg-surface-subtle);
+}
+
+.mp-header-brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.mp-badge-icon {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  background-color: var(--color-primary-light);
+  color: var(--color-primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+}
+
+.mp-header-brand h3 {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text-main);
+  margin: 0;
+}
+
+.mp-header-brand p {
+  font-size: 11px;
+  color: var(--text-muted);
+  margin: 0;
+}
+
+.btn-close-mp {
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  font-size: 16px;
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 4px;
+  transition: all var(--transition-fast);
+}
+
+.btn-close-mp:hover {
+  color: var(--text-main);
+  background-color: var(--bg-surface);
+}
+
+.mp-amount-summary {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  padding: 12px 20px;
+  background-color: var(--bg-surface);
+  border-bottom: 1px solid var(--border-light);
+}
+
+.mp-summary-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-muted);
+}
+
+.mp-summary-value {
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--color-primary);
+}
+
+.mp-method-tabs {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 4px;
+  padding: 10px 20px;
+  background-color: var(--bg-surface-subtle);
+}
+
+.mp-tab-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 10px;
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: var(--radius-sm);
+  color: var(--text-muted);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.mp-tab-btn:hover {
+  color: var(--text-main);
+}
+
+.mp-tab-btn.active {
+  background-color: var(--bg-surface);
+  color: var(--color-primary);
+  border-color: var(--border-color);
+  font-weight: 700;
+  box-shadow: var(--shadow-sm);
+}
+
+.mp-method-content {
+  padding: 20px;
+}
+
+.mp-loading-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 30px 0;
+  color: var(--text-muted);
+  font-size: 13px;
+}
+
+.mp-loading-state i {
+  font-size: 24px;
+  color: var(--color-primary);
+}
+
+.mp-pix-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  text-align: center;
+}
+
+.mp-pix-instruction {
+  font-size: 12px;
+  color: var(--text-muted);
+  line-height: 1.4;
+  max-width: 360px;
+  margin: 0;
+}
+
+.mp-qr-box {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  background-color: var(--bg-surface-subtle);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  padding: 16px;
+}
+
+.mp-qr-svg {
+  display: block;
+}
+
+.mp-qr-timer {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+.mp-copia-cola-box {
+  display: flex;
+  width: 100%;
+  gap: 8px;
+}
+
+.mp-copia-cola-input {
+  flex: 1;
+  font-family: var(--font-ui);
+  font-size: 11px;
+  padding: 8px 12px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border-color);
+  background-color: var(--bg-surface-subtle);
+  color: var(--text-muted);
+  outline: none;
+}
+
+.btn-copy-pix {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 14px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--color-primary);
+  background-color: var(--color-primary);
+  color: #FFFFFF;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all var(--transition-fast);
+}
+
+.btn-copy-pix:hover {
+  background-color: var(--color-primary-dark);
+}
+
+.btn-copy-pix.copied {
+  background-color: var(--color-success);
+  border-color: var(--color-success);
+}
+
+.mp-card-form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* Seletor de Tipo de Cartão: Crédito vs Débito */
+.mp-card-type-selector {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin-bottom: 4px;
+}
+
+.mp-card-type-pill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 8px 12px;
+  border-radius: var(--radius-sm);
+  border: 1.5px solid var(--border-color);
+  background-color: var(--bg-surface-subtle);
+  color: var(--text-muted);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.mp-card-type-pill:hover {
+  border-color: var(--color-primary-light);
+  color: var(--text-main);
+}
+
+.mp-card-type-pill.active {
+  background-color: var(--color-primary-light);
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+  font-weight: 700;
+  box-shadow: 0 1px 4px rgba(0, 137, 123, 0.15);
+}
+
+.mp-debit-notice {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 14px;
+  background-color: var(--color-primary-light);
+  border: 1px solid var(--color-primary-subtle, rgba(0, 137, 123, 0.2));
+  border-radius: var(--radius-sm);
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--color-primary-dark);
+}
+
+.mp-form-alert {
+  padding: 10px 14px;
+  border-radius: var(--radius-sm);
+  font-size: 12px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.mp-form-alert.error {
+  background-color: rgba(239, 68, 68, 0.1);
+  color: #ef4444;
+  border: 1px solid rgba(239, 68, 68, 0.25);
+}
+
+.mp-input-group {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  text-align: left;
+}
+
+.mp-input-group label {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--text-muted);
+}
+
+.mp-input-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.mp-card-form input,
+.mp-select {
+  width: 100%;
+  padding: 10px 12px;
+  font-size: 13px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border-color);
+  background-color: var(--bg-surface);
+  color: var(--text-main);
+  outline: none;
+  transition: all var(--transition-fast);
+  box-sizing: border-box;
+}
+
+.mp-input-wrapper input {
+  padding-right: 75px;
+}
+
+.mp-card-form input:focus,
+.mp-select:focus {
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 2px rgba(13, 148, 136, 0.15);
+}
+
+.mp-card-brand-tag {
+  position: absolute;
+  right: 10px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 14px;
+  color: var(--color-primary);
+  pointer-events: none;
+}
+
+.mp-card-brand-tag .brand-name {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.mp-form-grid-3 {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1.3fr;
+  gap: 8px;
+}
+
+.mp-security-badge {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  font-size: 11px;
+  color: var(--text-muted);
+  padding: 4px 0;
+}
+
+.mp-security-badge i {
+  color: var(--color-success);
+}
+
+.btn-pay-card {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  padding: 12px 16px;
+  background-color: var(--color-primary);
+  color: #FFFFFF;
+  border: none;
+  border-radius: var(--radius-sm);
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: var(--shadow-sm);
+  transition: all var(--transition-fast);
+}
+
+.btn-pay-card:hover:not(:disabled) {
+  background-color: var(--color-primary-dark);
+  transform: translateY(-1px);
+}
+
+.btn-pay-card:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+.mp-external-option {
+  text-align: center;
+  margin-top: 2px;
+}
+
+.mp-external-link {
+  font-size: 11px;
+  color: var(--text-muted);
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  transition: color var(--transition-fast);
+}
+
+.mp-external-link:hover {
+  color: var(--color-primary);
+  text-decoration: underline;
+}
+
+.mp-checkout-footer {
+  padding: 12px 20px;
+  border-top: 1px solid var(--border-color);
+  background-color: var(--bg-surface-subtle);
+}
+
+.btn-simulate-mp {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 10px 14px;
+  border-radius: var(--radius-sm);
+  border: 1px dashed var(--color-primary);
+  background-color: var(--color-primary-light);
+  color: var(--color-primary-dark);
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.btn-simulate-mp:hover:not(:disabled) {
+  background-color: var(--color-primary);
+  color: #FFFFFF;
+}
+
+.btn-simulate-mp:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Modo Escuro */
+[data-theme="dark"] .mp-card-form input,
+[data-theme="dark"] .mp-select {
+  background-color: var(--bg-canvas);
+  border-color: var(--border-color);
+  color: var(--text-main);
+}
+
+[data-theme="dark"] .mp-copia-cola-input {
+  background-color: var(--bg-canvas);
+  color: var(--text-main);
+}
+
+[data-theme="dark"] .btn-simulate-mp {
+  background-color: rgba(13, 148, 136, 0.12);
+  color: #2dd4bf;
+  border-color: rgba(45, 212, 191, 0.3);
+}
+
+[data-theme="dark"] .btn-simulate-mp:hover:not(:disabled) {
+  background-color: var(--color-primary);
+  color: #000000;
+}
+

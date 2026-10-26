@@ -1,0 +1,547 @@
+/* VaultMediaPickerModal.css — Estilos Premium para Seletor do Cofre */
+
+.vmp-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  background: rgba(18, 12, 11, 0.72);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  animation: vmpFadeIn 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes vmpFadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.vmp-card {
+  width: 100%;
+  max-width: 880px;
+  max-height: 88vh;
+  background: #FDFBF7;
+  border-radius: 20px;
+  border: 1px solid rgba(234, 226, 216, 0.8);
+  box-shadow: 0 24px 60px rgba(45, 27, 24, 0.28), 0 4px 16px rgba(45, 27, 24, 0.08);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  animation: vmpSlideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes vmpSlideUp {
+  from { opacity: 0; transform: translateY(16px) scale(0.98); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+/* Header */
+.vmp-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px 24px;
+  border-bottom: 1px solid #EAE2D8;
+  background: #FFFFFF;
+}
+
+.vmp-header-left {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.vmp-badge-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, rgba(126, 87, 194, 0.15) 0%, rgba(238, 89, 69, 0.15) 100%);
+  color: #7E57C2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  box-shadow: 0 2px 8px rgba(126, 87, 194, 0.12);
+}
+
+.vmp-title {
+  margin: 0;
+  font-size: 19px;
+  font-weight: 700;
+  color: #2D1B18;
+  letter-spacing: -0.3px;
+}
+
+.vmp-subtitle {
+  margin: 2px 0 0 0;
+  font-size: 13px;
+  color: #7C6D69;
+}
+
+.vmp-btn-close {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: 1px solid #EAE2D8;
+  background: transparent;
+  color: #7C6D69;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.vmp-btn-close:hover {
+  background: #F3ECE2;
+  color: #2D1B18;
+}
+
+/* Toolbar */
+.vmp-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 14px 24px;
+  background: #FAF7F2;
+  border-bottom: 1px solid #EAE2D8;
+}
+
+.vmp-filter-tabs {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: #EFE9E0;
+  padding: 4px;
+  border-radius: 12px;
+}
+
+.vmp-tab-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border: none;
+  border-radius: 8px;
+  background: transparent;
+  color: #6C5B57;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.18s ease;
+}
+
+.vmp-tab-btn:hover {
+  color: #2D1B18;
+}
+
+.vmp-tab-btn.active {
+  background: #FFFFFF;
+  color: #2D1B18;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+}
+
+.vmp-search-box {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 14px;
+  background: #FFFFFF;
+  border: 1px solid #E2D9CE;
+  border-radius: 12px;
+  flex: 1;
+  max-width: 340px;
+  transition: border-color 0.2s;
+}
+
+.vmp-search-box:focus-within {
+  border-color: #EE5945;
+  box-shadow: 0 0 0 3px rgba(238, 89, 69, 0.12);
+}
+
+.vmp-search-box i {
+  color: #9C8E8A;
+  font-size: 13px;
+}
+
+.vmp-search-box input {
+  border: none;
+  outline: none;
+  width: 100%;
+  font-size: 13px;
+  color: #2D1B18;
+  background: transparent;
+}
+
+.vmp-search-clear {
+  border: none;
+  background: transparent;
+  color: #9C8E8A;
+  cursor: pointer;
+  padding: 2px;
+}
+
+/* Subbar */
+.vmp-subbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 24px;
+  font-size: 12px;
+  color: #7C6D69;
+  border-bottom: 1px solid #F1E9DF;
+  background: #FCFAF6;
+}
+
+.vmp-btn-text {
+  border: none;
+  background: transparent;
+  color: #EE5945;
+  font-weight: 600;
+  cursor: pointer;
+  font-size: 12px;
+  padding: 2px 6px;
+  border-radius: 6px;
+  transition: background 0.15s;
+}
+
+.vmp-btn-text:hover {
+  background: rgba(238, 89, 69, 0.08);
+}
+
+/* Grid Container */
+.vmp-grid-container {
+  flex: 1;
+  overflow-y: auto;
+  padding: 20px 24px;
+  min-height: 280px;
+}
+
+.vmp-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+  gap: 16px;
+}
+
+/* Item Card */
+.vmp-item-card {
+  position: relative;
+  background: #FFFFFF;
+  border: 1.5px solid #EAE2D8;
+  border-radius: 14px;
+  overflow: hidden;
+  cursor: pointer;
+  transition: all 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+  display: flex;
+  flex-direction: column;
+}
+
+.vmp-item-card:hover {
+  transform: translateY(-2px);
+  border-color: #D6C7B7;
+  box-shadow: 0 6px 16px rgba(45, 27, 24, 0.08);
+}
+
+.vmp-item-card.selected {
+  border-color: #EE5945;
+  box-shadow: 0 0 0 2px rgba(238, 89, 69, 0.25), 0 8px 20px rgba(238, 89, 69, 0.12);
+  background: #FFFDFC;
+}
+
+/* Checkbox */
+.vmp-checkbox-wrapper {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  z-index: 5;
+}
+
+.vmp-checkbox {
+  width: 24px;
+  height: 24px;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.9);
+  border: 1.5px solid rgba(45, 27, 24, 0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  color: #FFFFFF;
+  transition: all 0.18s ease;
+  backdrop-filter: blur(4px);
+}
+
+.vmp-checkbox.checked {
+  background: #EE5945;
+  border-color: #EE5945;
+}
+
+/* Media Preview */
+.vmp-card-media-preview {
+  position: relative;
+  width: 100%;
+  height: 140px;
+  background: #F4EFEA;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.vmp-img-contain-box {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 6px;
+}
+
+.vmp-contain-img {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+  border-radius: 6px;
+}
+
+.vmp-video-preview-box {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #2D1B18;
+}
+
+.vmp-poster-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.vmp-video-icon-art {
+  font-size: 32px;
+  color: rgba(255, 255, 255, 0.4);
+}
+
+.vmp-play-badge {
+  position: absolute;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: rgba(238, 89, 69, 0.9);
+  color: #FFFFFF;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.vmp-audio-preview-box {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #7E57C2 0%, #5E35B1 100%);
+  color: #FFFFFF;
+}
+
+.vmp-audio-waveform-art {
+  font-size: 36px;
+  opacity: 0.6;
+}
+
+.vmp-audio-mic-badge {
+  margin-top: 4px;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+}
+
+.vmp-fallback-icon-box {
+  font-size: 38px;
+  color: #9C8E8A;
+}
+
+.vmp-type-chip {
+  position: absolute;
+  bottom: 8px;
+  right: 8px;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 8px;
+  background: rgba(18, 12, 11, 0.65);
+  color: #FFFFFF;
+  border-radius: 12px;
+  font-size: 11px;
+  font-weight: 600;
+  backdrop-filter: blur(4px);
+}
+
+/* Card Meta */
+.vmp-card-meta {
+  padding: 12px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.vmp-card-title {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 700;
+  color: #2D1B18;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.vmp-card-details {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 11.5px;
+  color: #7C6D69;
+}
+
+.vmp-meta-tag, .vmp-meta-recipient {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Loading & Empty States */
+.vmp-loading-state,
+.vmp-empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 48px 24px;
+  text-align: center;
+  color: #7C6D69;
+}
+
+.vmp-loading-state i {
+  font-size: 32px;
+  color: #EE5945;
+  margin-bottom: 12px;
+}
+
+.vmp-empty-icon {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: #EFE9E0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+  color: #9C8E8A;
+  margin-bottom: 12px;
+}
+
+.vmp-empty-state h4 {
+  margin: 0 0 6px 0;
+  color: #2D1B18;
+  font-size: 16px;
+}
+
+.vmp-empty-state p {
+  margin: 0;
+  font-size: 13px;
+  max-width: 380px;
+}
+
+/* Footer */
+.vmp-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 24px;
+  border-top: 1px solid #EAE2D8;
+  background: #FFFFFF;
+}
+
+.vmp-selected-badge {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #2D1B18;
+}
+
+.vmp-selected-badge i {
+  color: #EE5945;
+}
+
+.vmp-footer-buttons {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.vmp-btn-cancel {
+  padding: 9px 18px;
+  border: 1px solid #EAE2D8;
+  border-radius: 10px;
+  background: #FAF7F2;
+  color: #6C5B57;
+  font-size: 13.5px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.18s;
+}
+
+.vmp-btn-cancel:hover {
+  background: #EFE9E0;
+  color: #2D1B18;
+}
+
+.vmp-btn-confirm {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 9px 20px;
+  border: none;
+  border-radius: 10px;
+  background: #EE5945;
+  color: #FFFFFF;
+  font-size: 13.5px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 4px 12px rgba(238, 89, 69, 0.24);
+}
+
+.vmp-btn-confirm:hover:not(:disabled) {
+  background: #D84836;
+  transform: translateY(-1px);
+  box-shadow: 0 6px 16px rgba(238, 89, 69, 0.32);
+}
+
+.vmp-btn-confirm:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+  box-shadow: none;
+}

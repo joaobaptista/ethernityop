@@ -1,0 +1,397 @@
+/* ==========================================================================
+   Ethernity DMs — RichTextEditor.css
+   Editor de Texto Rico Tipográfico, Acolhedor e Responsivo
+   ========================================================================== */
+
+.rte-container {
+  display: flex;
+  flex-direction: column;
+  background-color: #FFFFFF;
+  border: 1px solid #E2DCD5;
+  border-radius: 14px;
+  overflow: hidden;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  box-sizing: border-box;
+  width: 100%;
+}
+
+.rte-container:focus-within {
+  border-color: #FF5A43;
+  box-shadow: 0 0 0 3px rgba(255, 90, 67, 0.12);
+}
+
+.rte-container.rte-disabled {
+  opacity: 0.65;
+  pointer-events: none;
+  background-color: #F8F6F4;
+}
+
+/* --------------------------------------------------------------------------
+   1. BARRA DE FERRAMENTAS (TOOLBAR)
+   -------------------------------------------------------------------------- */
+
+.rte-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px;
+  padding: 8px 12px;
+  background-color: #FAF8F5;
+  border-bottom: 1px solid #ECE7E1;
+  user-select: none;
+}
+
+.rte-toolbar-group {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+}
+
+.rte-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  border: none;
+  background: transparent;
+  color: #4A3F3D;
+  font-size: 13.5px;
+  border-radius: 7px;
+  cursor: pointer;
+  transition: all 0.15s ease-in-out;
+}
+
+.rte-btn:hover:not(:disabled) {
+  background-color: #EFE9E4;
+  color: #1F1B1A;
+}
+
+.rte-btn.is-active {
+  background-color: #EE5945;
+  color: #FFFFFF;
+  box-shadow: 0 1px 3px rgba(238, 89, 69, 0.25);
+}
+
+.rte-btn:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+.rte-btn-label {
+  font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+  font-weight: 700;
+  font-size: 11.5px;
+  letter-spacing: -0.3px;
+}
+
+.rte-divider {
+  width: 1px;
+  height: 20px;
+  background-color: #E6DFD9;
+  margin: 0 4px;
+}
+
+/* --------------------------------------------------------------------------
+   2. ÁREA DE ESCRITA TIPOGRÁFICA
+   -------------------------------------------------------------------------- */
+
+.rte-content-wrapper {
+  flex: 1;
+  padding: 16px 20px;
+  cursor: text;
+  background-color: #FFFFFF;
+}
+
+.rte-editor-content {
+  outline: none;
+  min-height: 100%;
+}
+
+.rte-editor-content .ProseMirror {
+  outline: none;
+  min-height: 140px;
+  font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-size: 15px;
+  line-height: 1.7;
+  color: #2D1B18;
+}
+
+/* Placeholder acolhedor */
+.rte-editor-content .ProseMirror p.is-editor-empty:first-child::before {
+  content: attr(data-placeholder);
+  float: left;
+  color: #A89F9C;
+  pointer-events: none;
+  height: 0;
+  font-style: normal;
+}
+
+/* Títulos elegantes */
+.rte-editor-content .ProseMirror h2 {
+  font-family: 'Fraunces', Georgia, serif;
+  font-size: 1.35rem;
+  font-weight: 600;
+  color: #2D1B18;
+  margin: 18px 0 8px 0;
+  line-height: 1.3;
+}
+
+.rte-editor-content .ProseMirror h3 {
+  font-family: 'Fraunces', Georgia, serif;
+  font-size: 1.15rem;
+  font-weight: 600;
+  color: #42302D;
+  margin: 14px 0 6px 0;
+  line-height: 1.4;
+}
+
+.rte-editor-content .ProseMirror p {
+  margin: 0 0 10px 0;
+}
+
+.rte-editor-content .ProseMirror p:last-child {
+  margin-bottom: 0;
+}
+
+/* Citações poéticas / memórias em destaque */
+.rte-editor-content .ProseMirror blockquote {
+  border-left: 3.5px solid #EE5945;
+  background-color: #FCF9F6;
+  padding: 12px 18px;
+  margin: 16px 0;
+  border-radius: 0 10px 10px 0;
+  font-style: italic;
+  color: #4A3E3B;
+  quotes: "“" "”";
+}
+
+.rte-editor-content .ProseMirror blockquote p {
+  margin: 0;
+}
+
+/* Listas estilizadas */
+.rte-editor-content .ProseMirror ul,
+.rte-editor-content .ProseMirror ol {
+  padding-left: 24px;
+  margin: 10px 0;
+}
+
+.rte-editor-content .ProseMirror li {
+  margin-bottom: 4px;
+}
+
+.rte-editor-content .ProseMirror hr {
+  border: none;
+  border-top: 1px solid #E8E2DC;
+  margin: 24px 0;
+}
+
+/* Alinhamentos */
+.rte-editor-content .ProseMirror [style*="text-align: right"] {
+  text-align: right;
+}
+
+.rte-editor-content .ProseMirror [style*="text-align: center"] {
+  text-align: center;
+}
+
+.rte-editor-content .ProseMirror [style*="text-align: left"] {
+  text-align: left;
+}
+
+/* --------------------------------------------------------------------------
+   3. RODAPÉ EDITORIAL & STATUS DO AUTO-SAVE
+   -------------------------------------------------------------------------- */
+
+.rte-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 9px 16px;
+  background-color: #FAF8F5;
+  border-top: 1px solid #ECE7E1;
+  font-size: 12.5px;
+  color: #7C6E6B;
+  user-select: none;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.rte-metrics {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.rte-metrics-icon {
+  font-size: 11px;
+  color: #EE5945;
+}
+
+.rte-bullet {
+  color: #C7BCB7;
+}
+
+.rte-autosave-badge {
+  display: flex;
+  align-items: center;
+}
+
+.rte-status-saving {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: #B45309;
+  background-color: #FEF3C7;
+  padding: 3px 10px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.rte-status-saved {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: #166534;
+  background-color: #DCFCE7;
+  padding: 3px 10px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.rte-status-unsaved {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: #854D0E;
+  background-color: #FEF9C3;
+  padding: 3px 10px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+/* --------------------------------------------------------------------------
+   4. TEMA ESCURO (DARK MODE)
+   -------------------------------------------------------------------------- */
+
+[data-theme="dark"] .rte-container {
+  background-color: #1A1614;
+  border-color: #38312C;
+}
+
+[data-theme="dark"] .rte-container:focus-within {
+  border-color: #FF6F61;
+  box-shadow: 0 0 0 3px rgba(255, 111, 97, 0.15);
+}
+
+[data-theme="dark"] .rte-container.rte-disabled {
+  background-color: #151210;
+}
+
+[data-theme="dark"] .rte-toolbar {
+  background-color: #221D1A;
+  border-bottom-color: #332B26;
+}
+
+[data-theme="dark"] .rte-btn {
+  color: #C9BEB7;
+}
+
+[data-theme="dark"] .rte-btn:hover:not(:disabled) {
+  background-color: #312A26;
+  color: #FAF7F2;
+}
+
+[data-theme="dark"] .rte-btn.is-active {
+  background-color: #FF6F61;
+  color: #FFFFFF;
+}
+
+[data-theme="dark"] .rte-divider {
+  background-color: #38312C;
+}
+
+[data-theme="dark"] .rte-content-wrapper {
+  background-color: #1A1614;
+}
+
+[data-theme="dark"] .rte-editor-content .ProseMirror {
+  color: #F5EDE8;
+}
+
+[data-theme="dark"] .rte-editor-content .ProseMirror h2,
+[data-theme="dark"] .rte-editor-content .ProseMirror h3 {
+  color: #FAF7F2;
+}
+
+[data-theme="dark"] .rte-editor-content .ProseMirror blockquote {
+  background-color: #241E1B;
+  border-left-color: #FF6F61;
+  color: #E6D8D2;
+}
+
+[data-theme="dark"] .rte-editor-content .ProseMirror hr {
+  border-top-color: #38312C;
+}
+
+[data-theme="dark"] .rte-footer {
+  background-color: #221D1A;
+  border-top-color: #332B26;
+  color: #9C8F8B;
+}
+
+[data-theme="dark"] .rte-status-saved {
+  background-color: rgba(22, 101, 52, 0.35);
+  color: #86EFAC;
+}
+
+[data-theme="dark"] .rte-status-saving {
+  background-color: rgba(180, 83, 9, 0.35);
+  color: #FDE68A;
+}
+
+[data-theme="dark"] .rte-status-unsaved {
+  background-color: rgba(133, 77, 14, 0.35);
+  color: #FEF08A;
+}
+
+/* --------------------------------------------------------------------------
+   5. RESPONSIVIDADE (MOBILE & TABLET)
+   -------------------------------------------------------------------------- */
+
+@media (max-width: 640px) {
+  .rte-toolbar {
+    gap: 2px;
+    padding: 6px 8px;
+  }
+
+  .rte-btn {
+    width: 29px;
+    height: 29px;
+    font-size: 12.5px;
+  }
+
+  .rte-divider {
+    height: 16px;
+    margin: 0 2px;
+  }
+
+  .rte-content-wrapper {
+    padding: 12px 14px;
+  }
+
+  .rte-editor-content .ProseMirror {
+    font-size: 14px;
+  }
+
+  .rte-footer {
+    padding: 8px 12px;
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}

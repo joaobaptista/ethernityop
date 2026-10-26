@@ -1,0 +1,1099 @@
+/* ==========================================================================
+   NEW MESSAGE VIEW — ETHERNITY DMS (CRIAR NOVA MENSAGEM)
+   ========================================================================== */
+
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+
+.new-message-wrapper {
+  flex: 1;
+  background-color: #FFFFFF;
+  min-height: 100vh;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.new-message-container {
+  width: 100%;
+  max-width: 1060px;
+  margin: 0 auto;
+  padding: 36px 32px 80px;
+  display: flex;
+  flex-direction: column;
+}
+
+/* --------------------------------------------------------------------------
+   1. BREADCRUMBS
+   -------------------------------------------------------------------------- */
+
+.nm-breadcrumb-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+  font-size: 13.5px;
+  font-weight: 500;
+  margin-bottom: 20px;
+}
+
+.nm-breadcrumb-link {
+  color: #7A7270;
+  cursor: pointer;
+  transition: color 0.15s ease;
+}
+
+.nm-breadcrumb-link:hover {
+  color: #FF5A43;
+}
+
+.nm-breadcrumb-sep {
+  color: #B5ACA8;
+  font-size: 12px;
+}
+
+.nm-breadcrumb-current {
+  color: #FF5A43;
+  font-weight: 600;
+}
+
+/* --------------------------------------------------------------------------
+   2. CABEÇALHO DA TELA
+   -------------------------------------------------------------------------- */
+
+.nm-page-header {
+  margin-bottom: 24px;
+}
+
+.nm-page-title {
+  font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+  font-size: 28px;
+  font-weight: 800;
+  color: #1F1B1A;
+  margin: 0 0 6px 0;
+  letter-spacing: -0.3px;
+}
+
+.nm-page-subtitle {
+  font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+  font-size: 14px;
+  color: #8C827F;
+  margin: 0;
+  font-weight: 400;
+}
+
+/* --------------------------------------------------------------------------
+   3. STEPPER (1 Ideação ── 2 Entrega)
+   -------------------------------------------------------------------------- */
+
+.nm-stepper-box {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  background: #FFFFFF;
+  border: 1px solid #ECE7E2;
+  border-radius: 12px;
+  padding: 8px 18px;
+  width: fit-content;
+  margin-bottom: 28px;
+}
+
+.nm-step-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  user-select: none;
+}
+
+.nm-step-number {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: 700;
+  background-color: #F0ECE8;
+  color: #7A7270;
+}
+
+.nm-step-label {
+  font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+  font-size: 13.5px;
+  font-weight: 600;
+  color: #7A7270;
+}
+
+.nm-step-item.active .nm-step-number {
+  background-color: #FF5A43;
+  color: #FFFFFF;
+}
+
+.nm-step-item.active .nm-step-label {
+  color: #FF5A43;
+}
+
+.nm-step-item.completed .nm-step-number {
+  background-color: #10B981;
+  color: #FFFFFF;
+}
+
+.nm-step-divider {
+  width: 28px;
+  height: 1.5px;
+  background-color: #ECE7E2;
+}
+
+.nm-step-divider.active {
+  background-color: #FF5A43;
+}
+
+/* --------------------------------------------------------------------------
+   4. CARD PRINCIPAL CONTAINER
+   -------------------------------------------------------------------------- */
+
+.nm-main-card {
+  background: #FFFFFF;
+  border: 1px solid #EBE5DF;
+  border-radius: 20px;
+  padding: 32px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.02);
+  display: flex;
+  flex-direction: column;
+  gap: 26px;
+}
+
+/* --------------------------------------------------------------------------
+   5. BOX ASSISTENTE DE IDEAÇÃO AI
+   -------------------------------------------------------------------------- */
+
+.nm-ai-assistant-card {
+  background: linear-gradient(180deg, #F6F7FF 0%, #FAF8FF 100%);
+  border: 1px solid #E6E5FA;
+  border-radius: 16px;
+  padding: 22px 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.nm-ai-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+
+.nm-ai-sparkle-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  background-color: #FFFFFF;
+  color: #5D5FEF;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  box-shadow: 0 2px 8px rgba(93, 95, 239, 0.15);
+}
+
+.nm-ai-header-text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  flex: 1;
+}
+
+/* Local AI Toggle Control */
+.nm-ai-local-toggle-wrap {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background-color: #FFFFFF;
+  padding: 6px 12px;
+  border-radius: 20px;
+  border: 1px solid #DFDCF4;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.02);
+}
+
+.nm-ai-toggle-info {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  color: #534D62;
+}
+
+.nm-ai-toggle-info .text-success {
+  color: #10B981 !important;
+}
+
+.nm-switch-label {
+  position: relative;
+  display: inline-block;
+  width: 38px;
+  height: 20px;
+  cursor: pointer;
+}
+
+.nm-switch-label input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.nm-switch-slider {
+  position: absolute;
+  inset: 0;
+  background-color: #D5D1E8;
+  border-radius: 20px;
+  transition: all 0.25s ease;
+}
+
+.nm-switch-slider:before {
+  position: absolute;
+  content: "";
+  height: 14px;
+  width: 14px;
+  left: 3px;
+  bottom: 3px;
+  background-color: #FFFFFF;
+  border-radius: 50%;
+  transition: all 0.25s ease;
+}
+
+.nm-switch-label input:checked + .nm-switch-slider {
+  background-color: #10B981;
+}
+
+.nm-switch-label input:checked + .nm-switch-slider:before {
+  transform: translateX(18px);
+}
+
+/* Local AI Banner Note */
+.nm-ai-local-active-note {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background-color: #F0FDF4;
+  border: 1px solid #DCFCE7;
+  border-radius: 10px;
+  padding: 8px 12px;
+  font-size: 12px;
+  color: #166534;
+}
+
+.nm-ai-local-active-note i {
+  color: #10B981;
+  font-size: 14px;
+}
+
+/* Download / Load Progress Bar */
+.nm-ai-download-progress-box {
+  background: #FFFFFF;
+  border: 1px solid #E6E5FA;
+  border-radius: 10px;
+  padding: 10px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.nm-ai-progress-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 12px;
+  color: #5D5FEF;
+  font-weight: 600;
+}
+
+.nm-ai-progress-bar-bg {
+  width: 100%;
+  height: 6px;
+  background-color: #EDEAF8;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.nm-ai-progress-bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #5D5FEF, #10B981);
+  transition: width 0.2s ease;
+}
+
+.nm-ai-title {
+  font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+  font-size: 15px;
+  font-weight: 700;
+  color: #1F1B1A;
+  margin: 0;
+}
+
+.nm-ai-subtitle {
+  font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+  font-size: 12.5px;
+  color: #7A7585;
+  margin: 0;
+}
+
+.nm-ai-input-wrap {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.nm-ai-details-field {
+  resize: vertical;
+  min-height: 48px;
+  line-height: 1.5;
+}
+
+/* Seletor de qualidade do modelo local */
+.nm-ai-quality-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  font-size: 12px;
+  color: #534D62;
+}
+
+.nm-ai-quality-label {
+  font-weight: 600;
+}
+
+.nm-ai-quality-options {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.nm-ai-quality-btn {
+  background: #FFFFFF;
+  border: 1px solid #DFDCF4;
+  border-radius: 20px;
+  padding: 5px 12px;
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 600;
+  color: #534D62;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.nm-ai-quality-btn small {
+  font-weight: 400;
+  color: #8A8499;
+  margin-left: 4px;
+}
+
+.nm-ai-quality-btn.active {
+  border-color: #5D5FEF;
+  background: #EEEEFD;
+  color: #3F41C9;
+}
+
+.nm-ai-quality-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.nm-ai-input-field {
+  width: 100%;
+  background: #FFFFFF;
+  border: 1px solid #DFDCF4;
+  border-radius: 12px;
+  padding: 13px 18px;
+  font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+  font-size: 13.5px;
+  color: #2D2625;
+  outline: none;
+  transition: all 0.2s ease;
+  box-sizing: border-box;
+}
+
+.nm-ai-input-field:focus {
+  border-color: #5D5FEF;
+  box-shadow: 0 0 0 3px rgba(93, 95, 239, 0.12);
+}
+
+.nm-ai-input-field::placeholder {
+  color: #A39DB0;
+}
+
+.nm-ai-bottom-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.nm-ai-chips-group {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.nm-ai-chip {
+  background: #FFFFFF;
+  border: 1px solid #E0DBF0;
+  color: #534D62;
+  font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+  font-size: 12px;
+  font-weight: 600;
+  padding: 7px 14px;
+  border-radius: 20px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.nm-ai-chip:hover {
+  background: #F0EEFF;
+  border-color: #5D5FEF;
+  color: #5D5FEF;
+}
+
+.btn-gerar-sugestao {
+  background: #5D5FEF;
+  color: #FFFFFF;
+  border: none;
+  border-radius: 12px;
+  padding: 10px 20px;
+  font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  box-shadow: 0 4px 12px rgba(93, 95, 239, 0.28);
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+}
+
+.btn-gerar-sugestao:hover:not(:disabled) {
+  background: #4B4DDC;
+  transform: translateY(-1px);
+}
+
+.btn-gerar-sugestao:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+/* --------------------------------------------------------------------------
+   6. CAMPOS DE FORMULÁRIO (TÍTULO / CONTEÚDO)
+   -------------------------------------------------------------------------- */
+
+.nm-form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 100%;
+}
+
+.nm-form-label {
+  font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+  font-size: 14px;
+  font-weight: 700;
+  color: #1F1B1A;
+}
+
+.nm-form-input {
+  width: 100%;
+  background: #FFFFFF;
+  border: 1px solid #E2DCD5;
+  border-radius: 12px;
+  padding: 14px 18px;
+  font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+  font-size: 14px;
+  color: #1F1B1A;
+  outline: none;
+  transition: border-color 0.2s ease;
+  box-sizing: border-box;
+}
+
+.nm-form-input:focus {
+  border-color: #FF5A43;
+  box-shadow: 0 0 0 3px rgba(255, 90, 67, 0.1);
+}
+
+.nm-form-input::placeholder {
+  color: #A89F9C;
+}
+
+.nm-form-textarea {
+  width: 100%;
+  background: #FFFFFF;
+  border: 1px solid #E2DCD5;
+  border-radius: 12px;
+  padding: 16px 18px;
+  font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+  font-size: 14px;
+  line-height: 1.6;
+  color: #1F1B1A;
+  outline: none;
+  resize: vertical;
+  min-height: 140px;
+  transition: border-color 0.2s ease;
+  box-sizing: border-box;
+}
+
+.nm-form-textarea:focus {
+  border-color: #FF5A43;
+  box-shadow: 0 0 0 3px rgba(255, 90, 67, 0.1);
+}
+
+.nm-form-textarea::placeholder {
+  color: #A89F9C;
+}
+
+/* --------------------------------------------------------------------------
+   7. DROPZONE ARRASTE ARQUIVOS (MÍDIA OPCIONAL)
+   -------------------------------------------------------------------------- */
+
+.nm-dropzone-box {
+  border: 1.5px dashed #FFA496;
+  background-color: #FFFBFB;
+  border-radius: 16px;
+  padding: 36px 24px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.nm-dropzone-box:hover {
+  background-color: #FFF3F0;
+  border-color: #FF5A43;
+}
+
+.nm-upload-circle-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: #FFFFFF;
+  color: #FF5A43;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  margin-bottom: 12px;
+  box-shadow: 0 2px 8px rgba(255, 90, 67, 0.15);
+}
+
+.nm-dropzone-title {
+  font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+  font-size: 14px;
+  font-weight: 700;
+  color: #FF5A43;
+  margin-bottom: 4px;
+}
+
+.nm-dropzone-subtitle {
+  font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+  font-size: 12.5px;
+  color: #8C827F;
+}
+
+.nm-attached-files-list {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-top: 14px;
+}
+
+.nm-attached-file-badge {
+  background: #FFFFFF;
+  border: 1px solid #FFCDC5;
+  border-radius: 8px;
+  padding: 6px 12px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  color: #1F1B1A;
+}
+
+.nm-btn-remove-file {
+  background: transparent;
+  border: none;
+  font-size: 16px;
+  color: #FF5A43;
+  cursor: pointer;
+  padding: 0;
+  line-height: 1;
+}
+
+/* --------------------------------------------------------------------------
+   8. PASSO 2: CONFIGURAÇÃO DE ENTREGA
+   -------------------------------------------------------------------------- */
+
+.nm-delivery-step-content {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.nm-section-title {
+  font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+  font-size: 18px;
+  font-weight: 700;
+  color: #1F1B1A;
+  margin: 0;
+}
+
+.nm-section-subtitle {
+  font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+  font-size: 13.5px;
+  color: #7A7270;
+  margin: 0;
+}
+
+.nm-delivery-options-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.nm-deliv-card {
+  border: 1.5px solid #EBE5DF;
+  border-radius: 14px;
+  padding: 20px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  background: #FFFFFF;
+}
+
+.nm-deliv-card:hover {
+  border-color: #FF8F7E;
+}
+
+.nm-deliv-card.selected {
+  border-color: #FF5A43;
+  background: #FFF9F8;
+}
+
+.nm-deliv-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+  color: #FF5A43;
+  font-size: 20px;
+}
+
+.nm-radio-circle {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  border: 2px solid #D1C7C2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  font-weight: 800;
+  color: #FFFFFF;
+}
+
+.nm-deliv-card.selected .nm-radio-circle {
+  background: #FF5A43;
+  border-color: #FF5A43;
+}
+
+.nm-deliv-card h3 {
+  font-size: 15px;
+  font-weight: 700;
+  margin: 0 0 6px 0;
+  color: #1F1B1A;
+}
+
+.nm-deliv-card p {
+  font-size: 13px;
+  color: #7A7270;
+  margin: 0;
+  line-height: 1.4;
+}
+
+.nm-date-pickers-row {
+  display: flex;
+  gap: 16px;
+}
+
+.nm-delivery-options-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  background: #FAF7F4;
+  padding: 18px 20px;
+  border-radius: 12px;
+}
+
+.nm-checkbox-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 13.5px;
+  font-weight: 500;
+  color: #3D3534;
+  cursor: pointer;
+}
+
+.nm-checkbox-row input {
+  accent-color: #FF5A43;
+  width: 16px;
+  height: 16px;
+}
+
+/* --------------------------------------------------------------------------
+   9. RODAPÉ DE AÇÕES (SALVAR COMO RASCUNHO / SALVAR MENSAGEM)
+   -------------------------------------------------------------------------- */
+
+.nm-card-footer {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 16px;
+  padding-top: 16px;
+  border-top: 1px solid #F0EAE4;
+  margin-top: 6px;
+}
+
+.nm-btn-back-step {
+  background: transparent;
+  border: none;
+  color: #7A7270;
+  font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+  font-size: 13.5px;
+  font-weight: 600;
+  cursor: pointer;
+  margin-right: auto;
+}
+
+.nm-btn-back-step:hover {
+  color: #1F1B1A;
+}
+
+.nm-footer-right-buttons {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.nm-btn-rascunho {
+  background: #FFFFFF;
+  border: 1.5px solid #332E2D;
+  color: #1F1B1A;
+  border-radius: 24px;
+  padding: 12px 24px;
+  font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+  font-size: 13.5px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.nm-btn-rascunho:hover {
+  background-color: #F8F5F2;
+  transform: translateY(-1px);
+}
+
+.nm-btn-salvar {
+  background: #FF5A43;
+  border: none;
+  color: #FFFFFF;
+  border-radius: 24px;
+  padding: 12px 28px;
+  font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+  font-size: 13.5px;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 4px 14px rgba(255, 90, 67, 0.28);
+  transition: all 0.2s ease;
+}
+
+.nm-btn-salvar:hover {
+  background: #E84D37;
+  transform: translateY(-1px);
+  box-shadow: 0 6px 18px rgba(255, 90, 67, 0.35);
+}
+
+/* Toast */
+.nm-toast-banner {
+  position: fixed;
+  top: 24px;
+  right: 24px;
+  background: #1F1B1A;
+  color: #FFFFFF;
+  padding: 12px 20px;
+  border-radius: 10px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 13.5px;
+  font-weight: 600;
+  z-index: 999;
+}
+
+.nm-toast-banner i {
+  color: #10B981;
+}
+
+/* --------------------------------------------------------------------------
+   RESPONSIVIDADE
+   -------------------------------------------------------------------------- */
+
+@media (max-width: 768px) {
+  .new-message-container {
+    padding: 24px 16px 60px;
+  }
+
+  .nm-main-card {
+    padding: 20px 16px;
+  }
+
+  .nm-ai-bottom-row {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .btn-gerar-sugestao {
+    justify-content: center;
+  }
+
+  .nm-delivery-options-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .nm-card-footer {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .nm-footer-right-buttons {
+    flex-direction: column-reverse;
+  }
+
+  .nm-btn-rascunho,
+  .nm-btn-salvar {
+    width: 100%;
+    text-align: center;
+  }
+}
+
+/* --------------------------------------------------------------------------
+   10. BANNER DE RASCUNHO RECUPERADO
+   -------------------------------------------------------------------------- */
+
+.nm-draft-restored-banner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background-color: #FFF8F5;
+  border: 1px solid #FFDDD3;
+  border-radius: 12px;
+  padding: 12px 18px;
+  margin-bottom: 20px;
+  font-size: 13.5px;
+  color: #7A3528;
+  gap: 12px;
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+.nm-draft-banner-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.nm-draft-banner-left i {
+  color: #EE5945;
+  font-size: 15px;
+}
+
+.nm-btn-discard-draft {
+  background: transparent;
+  border: none;
+  color: #C0392B;
+  font-size: 12.5px;
+  font-weight: 600;
+  cursor: pointer;
+  text-decoration: underline;
+  padding: 4px 8px;
+  border-radius: 6px;
+  transition: all 0.15s ease;
+  white-space: nowrap;
+}
+
+.nm-btn-discard-draft:hover {
+  background-color: #FEEBE7;
+}
+
+[data-theme="dark"] .nm-draft-restored-banner {
+  background-color: #261D19;
+  border-color: #4A3326;
+  color: #FFD4C2;
+}
+
+[data-theme="dark"] .nm-btn-discard-draft {
+  color: #FFA596;
+}
+
+[data-theme="dark"] .nm-btn-discard-draft:hover {
+  background-color: #38241D;
+}
+
+/* --------------------------------------------------------------------------
+   9. VINCULAÇÃO DE MÍDIAS DO COFRE CRIPTOGRAFADO (ITEM 5)
+   -------------------------------------------------------------------------- */
+
+.nm-media-label-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+
+.nm-btn-vault-picker-action {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 14px;
+  border: 1px solid rgba(126, 87, 194, 0.35);
+  border-radius: 10px;
+  background: linear-gradient(135deg, rgba(126, 87, 194, 0.08) 0%, rgba(238, 89, 69, 0.06) 100%);
+  color: #7E57C2;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.nm-btn-vault-picker-action:hover {
+  background: linear-gradient(135deg, rgba(126, 87, 194, 0.16) 0%, rgba(238, 89, 69, 0.12) 100%);
+  border-color: #7E57C2;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(126, 87, 194, 0.14);
+}
+
+.nm-vault-pill-tag {
+  background: #7E57C2;
+  color: #FFFFFF;
+  font-size: 10px;
+  font-weight: 700;
+  padding: 2px 6px;
+  border-radius: 6px;
+  letter-spacing: 0.3px;
+}
+
+.nm-vault-attached-section {
+  background: #FBF8F4;
+  border: 1px solid #EAE2D8;
+  border-radius: 12px;
+  padding: 12px 14px;
+  margin-bottom: 12px;
+}
+
+.nm-vault-attached-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+
+.nm-vault-attached-label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12.5px;
+  font-weight: 700;
+  color: #2D1B18;
+}
+
+.nm-vault-attached-label i {
+  color: #7E57C2;
+}
+
+.nm-btn-add-more-vault {
+  background: transparent;
+  border: none;
+  color: #EE5945;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 2px 6px;
+  border-radius: 4px;
+  transition: background 0.15s;
+}
+
+.nm-btn-add-more-vault:hover {
+  background: rgba(238, 89, 69, 0.08);
+}
+
+.nm-vault-attached-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.nm-vault-attached-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 12px;
+  background: #FFFFFF;
+  border: 1px solid #DECFC0;
+  border-radius: 8px;
+  font-size: 12px;
+  color: #2D1B18;
+  box-shadow: 0 1px 4px rgba(45, 27, 24, 0.04);
+}
+
+.nm-vault-attached-chip i {
+  color: #7E57C2;
+}
+
+.nm-vault-chip-title {
+  max-width: 160px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-weight: 500;
+}
+
+.nm-vault-chip-badge {
+  background: rgba(126, 87, 194, 0.14);
+  color: #7E57C2;
+  font-size: 10px;
+  font-weight: 700;
+  padding: 1px 5px;
+  border-radius: 4px;
+  text-transform: uppercase;
+}
+
+.nm-btn-remove-vault-chip {
+  background: transparent;
+  border: none;
+  font-size: 15px;
+  color: #9C8E8A;
+  cursor: pointer;
+  padding: 0;
+  line-height: 1;
+  transition: color 0.15s;
+}
+
+.nm-btn-remove-vault-chip:hover {
+  color: #EE5945;
+}
+

@@ -1,0 +1,1343 @@
+<!DOCTYPE html>
+<html lang="pt-BR" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Design System Interativo — Ethernity DMS</title>
+  
+  <link rel="icon" type="image/svg+xml" href="../frontend/public/favicon.svg">
+  <link rel="icon" type="image/png" sizes="32x32" href="../frontend/public/favicon-32x32.png">
+  
+  <!-- Tipografia Fraunces + Plus Jakarta Sans (Google Fonts) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&amp;family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
+  
+  <!-- FontAwesome 6 Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+  <style>
+    /* ==========================================================================
+       1. TOKENS DO DESIGN SYSTEM — LIGHT & DARK MODE DUAL PALETTES
+       ========================================================================== */
+    :root {
+      --font-display: 'Fraunces', Georgia, serif;
+      --font-ui: 'Plus Jakarta Sans', system-ui, sans-serif;
+      /* Cores Primárias (Coral Terracota Ethernity) */
+      --color-primary: #F05A47;
+      --color-primary-light: #FDF3F1;
+      --color-primary-subtle: #FBE5E1;
+      --color-primary-hover: #E04835;
+      --color-primary-dark: #C63A28;
+
+      /* Cores Secundárias (Tons Terrosos Acolhedores) */
+      --color-secondary: #7E6C66;
+      --color-secondary-light: #F8F4EE;
+      --color-secondary-subtle: #ECE5DC;
+      --color-secondary-dark: #351E19;
+
+      /* Alertas & Perigo */
+      --color-danger: #E53935;
+      --color-danger-light: #FFEBEE;
+      --color-danger-subtle: #FFCDD2;
+      --color-danger-dark: #B71C1C;
+
+      /* Sucesso & Segurança Criptografada */
+      --color-success: #2E7D32;
+      --color-success-light: #E8F5E9;
+      --color-success-subtle: #C8E6C9;
+      --color-success-dark: #1B5E20;
+
+      /* Advertência & Destaque */
+      --color-warning: #D97706;
+      --color-warning-light: #FFFBEB;
+      --color-warning-subtle: #FDE68A;
+      --color-warning-dark: #B45309;
+
+      /* Superfícies & Neutros Acolhedores */
+      --bg-canvas: #FAF7F2;
+      --bg-surface: #FFFFFF;
+      --bg-surface-subtle: #F8F4EE;
+      --bg-surface-elevated: #F2EBE1;
+      --border-color: #ECE5DC;
+      --border-light: #F4EFEA;
+
+      /* Tipografia Neutra Quente */
+      --text-main: #2D1917;
+      --text-muted: #7E6C66;
+      --text-light: #A89892;
+
+      /* Mercado Pago (Azul MP) */
+      --color-mp-blue: #009EE3;
+      --color-mp-light: #E0F7FF;
+      --color-mp-dark: #0074A6;
+
+      /* Sombras Suaves */
+      --shadow-sm: 0 1px 3px rgba(45, 25, 23, 0.03), 0 1px 2px rgba(45, 25, 23, 0.02);
+      --shadow-md: 0 4px 18px rgba(45, 25, 23, 0.05), 0 2px 6px rgba(45, 25, 23, 0.02);
+      --shadow-lg: 0 12px 36px rgba(45, 25, 23, 0.07), 0 4px 12px rgba(45, 25, 23, 0.03);
+      --shadow-pulse: 0 0 0 0 rgba(240, 90, 71, 0.4);
+
+      /* Raios de Borda */
+      --radius-sm: 10px;
+      --radius-md: 16px;
+      --radius-lg: 22px;
+      --radius-full: 9999px;
+
+      /* Transições */
+      --transition-fast: 0.15s ease;
+      --transition-normal: 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    [data-theme="dark"] {
+      /* Cores Primárias Dark */
+      --color-primary: #F05A47;
+      --color-primary-light: rgba(240, 90, 71, 0.14);
+      --color-primary-subtle: rgba(240, 90, 71, 0.24);
+      --color-primary-hover: #F47564;
+      --color-primary-dark: #DE4835;
+
+      /* Cores Secundárias Dark */
+      --color-secondary: #B8ADA7;
+      --color-secondary-light: #1E1A17;
+      --color-secondary-subtle: #292420;
+      --color-secondary-dark: #FAF7F2;
+
+      /* Cores de Alerta Dark */
+      --color-danger: #F87171;
+      --color-danger-light: rgba(248, 113, 113, 0.14);
+      --color-danger-subtle: rgba(248, 113, 113, 0.24);
+      --color-danger-dark: #EF4444;
+
+      /* Cores de Sucesso Dark */
+      --color-success: #4ADE80;
+      --color-success-light: rgba(74, 222, 128, 0.14);
+      --color-success-subtle: rgba(74, 222, 128, 0.24);
+      --color-success-dark: #22C55E;
+
+      /* Mercado Pago Dark */
+      --color-mp-blue: #38BDF8;
+      --color-mp-light: #0C4A6E;
+      --color-mp-dark: #7DD3FC;
+
+      /* Superfícies Dark */
+      --bg-canvas: #14110F;
+      --bg-surface: #1E1A17;
+      --bg-surface-subtle: #292420;
+      --bg-surface-elevated: #36302B;
+      --border-color: #36302B;
+      --border-light: #292420;
+
+      /* Tipografia Neutra Dark */
+      --text-main: #FAF7F2;
+      --text-muted: #B8ADA7;
+      --text-light: #7E6C66;
+
+      /* Sombras de Elevação Dark */
+      --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.4), 0 1px 2px rgba(0, 0, 0, 0.3);
+      --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.45), 0 2px 4px rgba(0, 0, 0, 0.3);
+      --shadow-lg: 0 10px 25px rgba(0, 0, 0, 0.55), 0 4px 10px rgba(0, 0, 0, 0.4);
+    }
+
+    /* ==========================================================================
+       2. RESET & BASE (Plus Jakarta Sans Typography)
+       ========================================================================== */
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: var(--font-ui);
+      background-color: var(--bg-canvas);
+      color: var(--text-main);
+      line-height: 1.5;
+      padding: 32px 24px 80px;
+      -webkit-font-smoothing: antialiased;
+      transition: background-color 0.25s ease, color 0.25s ease;
+    }
+
+    .container {
+      max-width: 1280px;
+      margin: 0 auto;
+    }
+
+    .code-font {
+      font-family: var(--font-ui);
+    }
+
+    /* ==========================================================================
+       3. CABEÇALHO & SEÇÕES
+       ========================================================================== */
+    .header {
+      background-color: var(--bg-surface);
+      border-radius: var(--radius-lg);
+      padding: 28px 32px;
+      box-shadow: var(--shadow-md);
+      margin-bottom: 32px;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: 20px;
+      border-left: 6px solid var(--color-primary);
+      border-top: 1px solid var(--border-color);
+      border-right: 1px solid var(--border-color);
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .header-info h1 {
+      font-size: 26px;
+      font-weight: 700;
+      color: var(--color-primary-dark);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .header-info p {
+      color: var(--text-muted);
+      font-size: 14px;
+      margin-top: 6px;
+    }
+
+    .header-controls {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .btn-toggle-theme {
+      background-color: var(--bg-surface-subtle);
+      color: var(--text-main);
+      border: 1px solid var(--border-color);
+      padding: 8px 18px;
+      border-radius: var(--radius-full);
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transition: all var(--transition-fast);
+    }
+
+    .btn-toggle-theme:hover {
+      background-color: var(--color-primary-light);
+      border-color: var(--color-primary-subtle);
+      color: var(--color-primary-dark);
+    }
+
+    .header-badge {
+      background-color: var(--color-primary-light);
+      color: var(--color-primary-dark);
+      font-size: 12px;
+      font-weight: 700;
+      padding: 6px 14px;
+      border-radius: var(--radius-full);
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .section {
+      background-color: var(--bg-surface);
+      border-radius: var(--radius-lg);
+      padding: 28px 32px;
+      box-shadow: var(--shadow-sm);
+      margin-bottom: 32px;
+      border: 1px solid var(--border-color);
+    }
+
+    .section-title {
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--text-main);
+      margin-bottom: 6px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .section-subtitle {
+      font-size: 13.5px;
+      color: var(--text-muted);
+      margin-bottom: 24px;
+    }
+
+    /* ==========================================================================
+       4. PALETA DE CORES (SWATCHES GRID)
+       ========================================================================== */
+    .color-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
+      gap: 16px;
+    }
+
+    .color-card {
+      border-radius: var(--radius-md);
+      overflow: hidden;
+      border: 1px solid var(--border-color);
+      box-shadow: var(--shadow-sm);
+      transition: transform var(--transition-fast);
+      background: var(--bg-surface);
+    }
+
+    .color-card:hover {
+      transform: translateY(-3px);
+      box-shadow: var(--shadow-md);
+    }
+
+    .color-preview {
+      height: 70px;
+      display: flex;
+      align-items: flex-end;
+      padding: 8px 12px;
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .color-details {
+      padding: 12px;
+      background: var(--bg-surface);
+    }
+
+    .color-name {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-main);
+    }
+
+    .color-hex {
+      font-size: 11px;
+      color: var(--text-muted);
+      font-family: var(--font-ui);
+      margin-top: 2px;
+    }
+
+    .color-usage {
+      font-size: 11px;
+      color: var(--text-light);
+      margin-top: 4px;
+    }
+
+    /* ==========================================================================
+       5. ESCALA TIPOGRÁFICA & ÍCONES
+       ========================================================================== */
+    .typography-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 24px;
+    }
+
+    .typography-table th, .typography-table td {
+      padding: 12px 14px;
+      text-align: left;
+      border-bottom: 1px solid var(--border-light);
+    }
+
+    .typography-table th {
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .icons-category-title {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--text-main);
+      margin: 18px 0 10px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .icons-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+
+    .icon-box {
+      background-color: var(--bg-canvas);
+      border-radius: var(--radius-md);
+      padding: 14px 10px;
+      text-align: center;
+      border: 1px solid var(--border-light);
+      transition: all var(--transition-fast);
+    }
+
+    .icon-box:hover {
+      background-color: var(--color-primary-light);
+      border-color: var(--color-primary-subtle);
+      transform: translateY(-2px);
+    }
+
+    .icon-box i {
+      font-size: 22px;
+      color: var(--color-primary);
+      margin-bottom: 6px;
+    }
+
+    .icon-box span {
+      display: block;
+      font-size: 11px;
+      color: var(--text-muted);
+      font-weight: 500;
+      font-family: var(--font-ui);
+    }
+
+    /* ==========================================================================
+       6. COMPONENTES VITAIS — ETHERNITY DMS
+       ========================================================================== */
+    .components-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(360px, 1fr));
+      gap: 24px;
+    }
+
+    .component-card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-lg);
+      padding: 24px;
+      box-shadow: var(--shadow-sm);
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .component-card-title {
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--text-main);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      border-bottom: 1px solid var(--border-light);
+      padding-bottom: 12px;
+    }
+
+    /* FLOATING INPUTS (MATERIAL / GMAIL STYLE) */
+    .floating-group {
+      position: relative;
+      width: 100%;
+    }
+
+    .floating-input-wrapper {
+      position: relative;
+      display: flex;
+      align-items: center;
+      width: 100%;
+    }
+
+    .floating-prefix-icon {
+      position: absolute;
+      left: 14px;
+      color: var(--text-light);
+      font-size: 14px;
+      pointer-events: none;
+      transition: color var(--transition-fast);
+      z-index: 2;
+    }
+
+    .floating-input {
+      width: 100%;
+      height: 48px;
+      padding: 12px 14px 12px 42px;
+      border-radius: var(--radius-md);
+      border: 1.5px solid var(--border-color);
+      font-size: 14px;
+      font-family: inherit;
+      color: var(--text-main);
+      background-color: transparent;
+      transition: all var(--transition-fast);
+      box-sizing: border-box;
+    }
+
+    .floating-input.has-suffix {
+      padding-right: 44px;
+    }
+
+    .floating-label {
+      position: absolute;
+      left: 42px;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 13.5px;
+      color: var(--text-muted);
+      pointer-events: none;
+      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+      background-color: var(--bg-surface);
+      padding: 0 6px;
+      border-radius: 4px;
+      white-space: nowrap;
+      z-index: 1;
+    }
+
+    .floating-input:focus ~ .floating-label,
+    .floating-input:not(:placeholder-shown) ~ .floating-label {
+      top: 0;
+      left: 14px;
+      transform: translateY(-50%) scale(0.85);
+      transform-origin: left center;
+      font-weight: 600;
+      color: var(--color-primary);
+      background-color: var(--bg-surface);
+      z-index: 3;
+    }
+
+    .floating-input:focus {
+      outline: none;
+      border-color: var(--color-primary);
+      box-shadow: 0 0 0 3px var(--color-primary-light);
+    }
+
+    .floating-input:focus ~ .floating-prefix-icon {
+      color: var(--color-primary);
+    }
+
+    .btn-toggle-eye {
+      position: absolute;
+      right: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      cursor: pointer;
+      padding: 6px;
+      font-size: 14px;
+      border-radius: var(--radius-sm);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 2;
+    }
+
+    /* DEMO QUICKFILL BADGE */
+    .demo-quickfill-box {
+      background-color: var(--color-primary-light);
+      border: 1px dashed var(--color-primary-subtle);
+      border-radius: var(--radius-md);
+      padding: 10px 14px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .demo-quickfill-btn {
+      background-color: var(--color-primary);
+      color: #fff;
+      border: none;
+      border-radius: var(--radius-sm);
+      padding: 6px 12px;
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    /* SECONDARY ACTIONS (LINKS) */
+    .auth-actions-demo {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .link-forgot {
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      font-size: 12.5px;
+      font-weight: 500;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 8px;
+    }
+
+    .link-register {
+      background: transparent;
+      border: none;
+      color: var(--color-primary);
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+      text-decoration: underline;
+      text-underline-offset: 3px;
+    }
+
+    /* SOS QUICK LOCATE CARD */
+    .emergency-card {
+      background: linear-gradient(135deg, var(--bg-surface) 0%, var(--color-danger-light) 100%);
+      border: 1px solid var(--color-danger-subtle);
+      border-radius: var(--radius-lg);
+      padding: 20px;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .emergency-badge {
+      background-color: var(--color-danger);
+      color: #FFFFFF;
+      font-size: 11px;
+      font-weight: 700;
+      padding: 4px 10px;
+      border-radius: var(--radius-full);
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .pulse-radar {
+      position: relative;
+      display: inline-block;
+      width: 10px;
+      height: 10px;
+      background-color: var(--color-danger);
+      border-radius: 50%;
+    }
+
+    .pulse-radar::after {
+      content: '';
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      top: 0;
+      left: 0;
+      background-color: inherit;
+      border-radius: 50%;
+      animation: pulse-ring 1.8s cubic-bezier(0.215, 0.61, 0.355, 1) infinite;
+    }
+
+    @keyframes pulse-ring {
+      0% { transform: scale(0.95); opacity: 0.9; }
+      70% { transform: scale(3.5); opacity: 0; }
+      100% { transform: scale(3.5); opacity: 0; }
+    }
+
+    .btn-sos {
+      width: 100%;
+      background-color: var(--color-danger);
+      color: #FFFFFF;
+      border: none;
+      border-radius: var(--radius-sm);
+      padding: 12px 18px;
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 8px;
+      box-shadow: 0 4px 12px rgba(229, 57, 53, 0.25);
+      transition: all var(--transition-fast);
+      margin-top: 12px;
+    }
+
+    .btn-sos:hover {
+      background-color: var(--color-danger-dark);
+      transform: translateY(-1px);
+    }
+
+    /* TELEMETRY & EISENMENGER VITALS */
+    .vitals-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px;
+    }
+
+    .vital-box {
+      background: var(--bg-canvas);
+      padding: 10px 12px;
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--border-light);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .vital-icon {
+      font-size: 20px;
+    }
+
+    .vital-icon.heart { color: var(--color-danger); }
+    .vital-icon.lungs { color: var(--color-primary); }
+    .vital-icon.battery { color: var(--color-success); }
+    .vital-icon.gps { color: var(--color-secondary); }
+
+    .vital-data .label {
+      font-size: 11px;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      font-weight: 600;
+    }
+
+    .vital-data .value {
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--text-main);
+    }
+
+    /* MOBILE APP SCREEN PREVIEW */
+    .mobile-screen-simulator {
+      max-width: 320px;
+      margin: 0 auto;
+      border: 6px solid var(--border-color);
+      border-radius: 28px;
+      overflow: hidden;
+      background: var(--bg-canvas);
+      box-shadow: var(--shadow-lg);
+      display: flex;
+      flex-direction: column;
+      height: 480px;
+      position: relative;
+    }
+
+    .mobile-header-sim {
+      background: var(--bg-surface);
+      padding: 12px 14px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .mobile-body-sim {
+      flex: 1;
+      padding: 14px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .mobile-bottom-nav-sim {
+      background: var(--bg-surface);
+      border-top: 1px solid var(--border-color);
+      display: flex;
+      justify-content: space-around;
+      padding: 8px 4px;
+    }
+
+    .mobile-nav-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 3px;
+      font-size: 10px;
+      font-weight: 600;
+      color: var(--text-muted);
+      cursor: pointer;
+      position: relative;
+    }
+
+    .mobile-nav-item.active {
+      color: var(--color-primary);
+    }
+
+    .mobile-nav-item i {
+      font-size: 18px;
+    }
+
+    .nav-badge {
+      position: absolute;
+      top: -4px;
+      right: 4px;
+      background: var(--color-danger);
+      color: #fff;
+      font-size: 9px;
+      padding: 1px 5px;
+      border-radius: 10px;
+      font-weight: 700;
+    }
+
+    /* MERCADO PAGO CHECKOUT SIMULATOR */
+    .mp-checkout-box {
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-md);
+      padding: 16px;
+      background: var(--bg-surface);
+    }
+
+    .mp-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background-color: var(--color-mp-light);
+      color: var(--color-mp-blue);
+      font-size: 11px;
+      font-weight: 700;
+      padding: 4px 10px;
+      border-radius: var(--radius-full);
+      margin-bottom: 12px;
+    }
+
+    .pix-qr-demo {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      background: var(--bg-canvas);
+      padding: 12px;
+      border-radius: var(--radius-sm);
+      border: 1px dashed var(--border-color);
+      margin-bottom: 12px;
+    }
+
+    .pix-qr-icon {
+      font-size: 48px;
+      color: var(--color-primary);
+    }
+
+    .btn-copy-pix {
+      background: var(--color-primary);
+      color: #fff;
+      border: none;
+      padding: 8px 14px;
+      border-radius: var(--radius-sm);
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    /* INDOOR ROOMS GRID */
+    .indoor-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+    }
+
+    .room-card {
+      background: var(--bg-canvas);
+      border: 1px solid var(--border-light);
+      border-radius: var(--radius-sm);
+      padding: 10px 8px;
+      text-align: center;
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--text-main);
+    }
+
+    .room-card.active {
+      border-color: var(--color-primary);
+      background: var(--color-primary-light);
+      color: var(--color-primary-dark);
+    }
+
+    /* CHIPS */
+    .chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 10px;
+      border-radius: var(--radius-full);
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.3px;
+    }
+
+    .chip-primary { background: var(--color-primary-light); color: var(--color-primary-dark); }
+    .chip-secondary { background: var(--color-secondary-light); color: var(--color-secondary-dark); }
+    .chip-success { background: var(--color-success-light); color: var(--color-success-dark); }
+    .chip-warning { background: var(--color-warning-light); color: var(--color-warning-dark); }
+    .chip-danger { background: var(--color-danger-light); color: var(--color-danger-dark); }
+
+    /* CHAT DEMO */
+    .chat-bubble-demo {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      padding: 12px;
+      background: var(--bg-canvas);
+      border-radius: var(--radius-md);
+      border: 1px solid var(--border-light);
+    }
+
+    .demo-bubble {
+      max-width: 85%;
+      padding: 8px 12px;
+      border-radius: var(--radius-md);
+      font-size: 12.5px;
+    }
+
+    .demo-bubble.other {
+      align-self: flex-start;
+      background: var(--bg-surface);
+      border: 1px solid var(--border-color);
+      color: var(--text-main);
+    }
+
+    .demo-bubble.me {
+      align-self: flex-end;
+      background: var(--color-primary-light);
+      border: 1px solid var(--color-primary-subtle);
+      color: var(--text-main);
+    }
+
+    @media (max-width: 768px) {
+      body { padding: 16px 12px 60px; }
+      .section { padding: 20px 16px; }
+      .components-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    
+    <!-- CABEÇALHO DO DESIGN SYSTEM COM ALTERNADOR DE TEMA -->
+    <header class="header">
+      <div class="header-info">
+        <h1>
+          <i class="fa-solid fa-heart-pulse" style="color: var(--color-danger);"></i>
+          Ethernity DMS Design System
+        </h1>
+        <p>Design System Oficial — Dual Themes (Light & Dark), Material Design Limpo, Ergonomia Mobile & Checkout Mercado Pago</p>
+      </div>
+      <div class="header-controls">
+        <button type="button" class="btn-toggle-theme" id="themeBtn" onclick="toggleThemeDoc()">
+          <i class="fa-solid fa-moon" id="themeIcon"></i>
+          <span id="themeLabel">Modo Escuro</span>
+        </button>
+        <div class="header-badge">
+          <i class="fa-solid fa-shield-halved"></i>
+          v2.4 • Healthcare Dual Tokens
+        </div>
+      </div>
+    </header>
+
+    <!-- 1. PALETA DE CORES (LIGHT & DARK DUAL TOKENS) -->
+    <section class="section">
+      <h2 class="section-title">
+        <i class="fa-solid fa-palette" style="color: var(--color-primary);"></i>
+        1. Tokens de Cores Duais (Light & Dark Mode)
+      </h2>
+      <p class="section-subtitle">Tons suaves e balanceados com contraste médico certificado para uso diurno e vigília noturna de cuidadores.</p>
+      
+      <div class="color-grid">
+        <!-- Primária -->
+        <div class="color-card">
+          <div class="color-preview" style="background-color: var(--color-primary); color: #fff;">Primary Teal</div>
+          <div class="color-details">
+            <div class="color-name">Teal Saúde</div>
+            <div class="color-hex">--color-primary</div>
+            <div class="color-usage">Ações principais e rotas</div>
+          </div>
+        </div>
+
+        <div class="color-card">
+          <div class="color-preview" style="background-color: var(--color-primary-light); color: var(--color-primary-dark);">Pastel Teal Light</div>
+          <div class="color-details">
+            <div class="color-name">Menta Container</div>
+            <div class="color-hex">--color-primary-light</div>
+            <div class="color-usage">Fundos ativos e chips</div>
+          </div>
+        </div>
+
+        <!-- Secundária -->
+        <div class="color-card">
+          <div class="color-preview" style="background-color: var(--color-secondary); color: #fff;">Secondary Purple</div>
+          <div class="color-details">
+            <div class="color-name">Lavanda Apoio</div>
+            <div class="color-hex">--color-secondary</div>
+            <div class="color-usage">Módulo familiar & cuidadores</div>
+          </div>
+        </div>
+
+        <div class="color-card">
+          <div class="color-preview" style="background-color: var(--color-secondary-light); color: var(--color-secondary-dark);">Pastel Lavender</div>
+          <div class="color-details">
+            <div class="color-name">Lilás Acolhedor</div>
+            <div class="color-hex">--color-secondary-light</div>
+            <div class="color-usage">Cards secundários</div>
+          </div>
+        </div>
+
+        <!-- Emergência SOS -->
+        <div class="color-card">
+          <div class="color-preview" style="background-color: var(--color-danger); color: #fff;">Emergency Coral</div>
+          <div class="color-details">
+            <div class="color-name">Coral SOS</div>
+            <div class="color-hex">--color-danger</div>
+            <div class="color-usage">Botão SOS & alertas críticos</div>
+          </div>
+        </div>
+
+        <div class="color-card">
+          <div class="color-preview" style="background-color: var(--color-danger-light); color: var(--color-danger-dark);">Pastel Rose Light</div>
+          <div class="color-details">
+            <div class="color-name">Rosa Container</div>
+            <div class="color-hex">--color-danger-light</div>
+            <div class="color-usage">Banners de perigo</div>
+          </div>
+        </div>
+
+        <!-- Mercado Pago -->
+        <div class="color-card">
+          <div class="color-preview" style="background-color: var(--color-mp-blue); color: #fff;">Mercado Pago Blue</div>
+          <div class="color-details">
+            <div class="color-name">Azul Mercado Pago</div>
+            <div class="color-hex">--color-mp-blue</div>
+            <div class="color-usage">Checkout Pix & Cartões</div>
+          </div>
+        </div>
+
+        <!-- Advertência -->
+        <div class="color-card">
+          <div class="color-preview" style="background-color: var(--color-warning); color: #fff;">Warning Amber</div>
+          <div class="color-details">
+            <div class="color-name">Âmbar Atenção</div>
+            <div class="color-hex">--color-warning</div>
+            <div class="color-usage">Bateria baixa & satélite oscilando</div>
+          </div>
+        </div>
+
+        <!-- Sucesso -->
+        <div class="color-card">
+          <div class="color-preview" style="background-color: var(--color-success); color: #fff;">Success Green</div>
+          <div class="color-details">
+            <div class="color-name">Verde Segurança</div>
+            <div class="color-hex">--color-success</div>
+            <div class="color-usage">Dentro da cerca segura</div>
+          </div>
+        </div>
+
+        <!-- Canvas -->
+        <div class="color-card">
+          <div class="color-preview" style="background-color: var(--bg-canvas); color: var(--text-main); border-bottom: 1px solid var(--border-color);">Canvas BG</div>
+          <div class="color-details">
+            <div class="color-name">Fundo Canvas</div>
+            <div class="color-hex">--bg-canvas</div>
+            <div class="color-usage">Fundo da aplicação</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 2. TIPOGRAFIA & FONTES -->
+    <section class="section">
+      <h2 class="section-title">
+        <i class="fa-solid fa-font" style="color: var(--color-primary);"></i>
+        2. Tipografia Fraunces & Plus Jakarta Sans
+      </h2>
+      <p class="section-subtitle">Fraunces para títulos editoriais; Plus Jakarta Sans para interface e corpo. Escala completa em DESIGN_SYSTEM.md.</p>
+
+      <table class="typography-table">
+        <thead>
+          <tr>
+            <th>Nível</th>
+            <th>Fonte / Tamanho / Peso</th>
+            <th>Exemplo Visual</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>Display H1</strong></td>
+            <td>Fraunces • 36px / 600 SemiBold</td>
+            <td style="font-family: var(--font-display); font-size: 36px; line-height: 44px; font-weight: 600; color: var(--color-primary-dark);">Conecte suas memórias</td>
+          </tr>
+          <tr>
+            <td><strong>Heading H2</strong></td>
+            <td>Fraunces • 32px / 600 SemiBold</td>
+            <td style="font-family: var(--font-display); font-size: 32px; line-height: 1.25; font-weight: 600;">Pessoas que importam</td>
+          </tr>
+          <tr>
+            <td><strong>Subheading H3</strong></td>
+            <td>Plus Jakarta Sans • 16px / 500 Medium</td>
+            <td style="font-size: 16px; font-weight: 500;">Mariana Silva — Pulseira TRCK-10001</td>
+          </tr>
+          <tr>
+            <td><strong>Body Regular</strong></td>
+            <td>Plus Jakarta Sans • 14px / 400 Regular</td>
+            <td style="font-size: 14px; color: var(--text-main);">O dispositivo reportou satélite estável via GPS/Galileo com precisão de 3.2m.</td>
+          </tr>
+          <tr>
+            <td><strong>Código / UUID / Pix</strong></td>
+            <td>Plus Jakarta Sans • 13px / 600</td>
+            <td class="code-font" style="font-size: 13px; color: var(--color-primary); background: var(--bg-canvas); padding: 4px 8px; border-radius: 4px; display: inline-block;">00020126580014br.gov.bcb.pix0136bd-eisenmenger-2026</td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+
+    <!-- 3. CATÁLOGO DE ÍCONES (FONTAWESOME 6) -->
+    <section class="section">
+      <h2 class="section-title">
+        <i class="fa-solid fa-icons" style="color: var(--color-primary);"></i>
+        3. Catálogo de Ícones FontAwesome 6
+      </h2>
+      <p class="section-subtitle">Ícones vetoriais semânticos categorizados por domínio de aplicação.</p>
+
+      <div class="icons-category-title"><i class="fa-solid fa-heart-pulse" style="color: var(--color-danger);"></i> Saúde & Emergência</div>
+      <div class="icons-grid">
+        <div class="icon-box"><i class="fa-solid fa-heart-pulse"></i><span>fa-heart-pulse</span></div>
+        <div class="icon-box"><i class="fa-solid fa-crosshairs"></i><span>fa-crosshairs</span></div>
+        <div class="icon-box"><i class="fa-solid fa-shield-halved"></i><span>fa-shield-halved</span></div>
+        <div class="icon-box"><i class="fa-solid fa-lungs"></i><span>fa-lungs</span></div>
+        <div class="icon-box"><i class="fa-solid fa-triangle-exclamation"></i><span>fa-triangle-excl.</span></div>
+      </div>
+
+      <div class="icons-category-title"><i class="fa-solid fa-satellite-dish" style="color: var(--color-primary);"></i> Telemetria & Rastreamento</div>
+      <div class="icons-grid">
+        <div class="icon-box"><i class="fa-solid fa-satellite-dish"></i><span>fa-satellite-dish</span></div>
+        <div class="icon-box"><i class="fa-solid fa-location-dot"></i><span>fa-location-dot</span></div>
+        <div class="icon-box"><i class="fa-solid fa-house-signal"></i><span>fa-house-signal</span></div>
+        <div class="icon-box"><i class="fa-solid fa-battery-three-quarters"></i><span>fa-battery-3/4</span></div>
+        <div class="icon-box"><i class="fa-solid fa-route"></i><span>fa-route</span></div>
+      </div>
+
+      <div class="icons-category-title"><i class="fa-solid fa-credit-card" style="color: var(--color-mp-blue);"></i> Pagamentos & Mercado Pago</div>
+      <div class="icons-grid">
+        <div class="icon-box"><i class="fa-brands fa-pix"></i><span>fa-pix</span></div>
+        <div class="icon-box"><i class="fa-solid fa-credit-card"></i><span>fa-credit-card</span></div>
+        <div class="icon-box"><i class="fa-solid fa-qrcode"></i><span>fa-qrcode</span></div>
+        <div class="icon-box"><i class="fa-solid fa-lock"></i><span>fa-lock</span></div>
+        <div class="icon-box"><i class="fa-solid fa-receipt"></i><span>fa-receipt</span></div>
+      </div>
+    </section>
+
+    <!-- 4. DEMO INTERATIVA DE COMPONENTES VITAIS -->
+    <section class="section">
+      <h2 class="section-title">
+        <i class="fa-solid fa-cubes" style="color: var(--color-primary);"></i>
+        4. Componentes Interativos do Sistema
+      </h2>
+      <p class="section-subtitle">Exemplos reais e funcionais dos novos componentes implementados.</p>
+
+      <div class="components-grid">
+        
+        <!-- COMPONENTE: FORMULÁRIO COM FLOATING LABELS & AÇÕES -->
+        <div class="component-card">
+          <div class="component-card-title">
+            <i class="fa-solid fa-right-to-bracket" style="color: var(--color-primary);"></i>
+            Login com Floating Labels & Ações
+          </div>
+
+          <div class="demo-quickfill-box">
+            <div style="font-size: 11.5px; color: var(--color-primary-dark);">
+              <strong>Acesso Demo Rápido</strong><br>Preenche credenciais de teste
+            </div>
+            <button type="button" class="demo-quickfill-btn" onclick="fillDemoForm()">
+              <i class="fa-solid fa-bolt"></i> Preencher
+            </button>
+          </div>
+
+          <div class="floating-group">
+            <div class="floating-input-wrapper">
+              <i class="fa-solid fa-envelope floating-prefix-icon"></i>
+              <input id="demo-email" type="email" class="floating-input" placeholder=" " />
+              <label for="demo-email" class="floating-label">Email de Acesso</label>
+            </div>
+          </div>
+
+          <div class="floating-group">
+            <div class="floating-input-wrapper">
+              <i class="fa-solid fa-lock floating-prefix-icon"></i>
+              <input id="demo-pass" type="password" class="floating-input has-suffix" placeholder=" " />
+              <label for="demo-pass" class="floating-label">Senha de Segurança</label>
+              <button type="button" class="btn-toggle-eye" onclick="toggleDemoPassword()">
+                <i id="eye-icon" class="fa-solid fa-eye"></i>
+              </button>
+            </div>
+          </div>
+
+          <button type="button" class="btn-sos" style="background: var(--color-primary); box-shadow: 0 4px 12px rgba(13,148,136,0.25);" onclick="alert('Login efetuado no simulador!')">
+            <i class="fa-solid fa-arrow-right-to-bracket"></i> Acessar Painel Familiar
+          </button>
+
+          <div class="auth-actions-demo">
+            <button type="button" class="link-forgot" onclick="alert('Modal de Esqueci a Senha!')">
+              <i class="fa-solid fa-key" style="color: var(--color-primary);"></i> Esqueci a senha
+            </button>
+            <div style="font-size: 12.5px; color: var(--text-muted);">
+              Não tem conta? <button type="button" class="link-register" onclick="alert('Alternar para visualização de Cadastro!')">Cadastre-se</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- COMPONENTE: EMERGÊNCIA SOS & VITAIS EISENMENGER -->
+        <div class="component-card">
+          <div class="component-card-title">
+            <i class="fa-solid fa-heart-pulse" style="color: var(--color-danger);"></i>
+            Emergência SOS & Telemetria Eisenmenger
+          </div>
+
+          <div class="emergency-card">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+              <span class="emergency-badge"><span class="pulse-radar"></span> EMERGÊNCIA / SOS</span>
+              <span class="chip chip-success"><i class="fa-solid fa-shield-halved"></i> Perímetro Seguro</span>
+            </div>
+            
+            <button class="btn-sos" onclick="alert('Disparo de Localização de Emergência acionado com sucesso!')">
+              <i class="fa-solid fa-crosshairs"></i> LOCALIZAR ENTE QUERIDO AGORA
+            </button>
+          </div>
+
+          <div class="vitals-grid">
+            <div class="vital-box">
+              <i class="fa-solid fa-lungs vital-icon lungs"></i>
+              <div class="vital-data">
+                <div class="label">Saturação SpO2</div>
+                <div class="value">88% <span style="font-size: 10px; color: var(--color-success);">(Alvo InCor)</span></div>
+              </div>
+            </div>
+            <div class="vital-box">
+              <i class="fa-solid fa-heart-pulse vital-icon heart"></i>
+              <div class="vital-data">
+                <div class="label">Freq. Cardíaca</div>
+                <div class="value">78 bpm</div>
+              </div>
+            </div>
+            <div class="vital-box">
+              <i class="fa-solid fa-battery-three-quarters vital-icon battery"></i>
+              <div class="vital-data">
+                <div class="label">Bateria Rastreador</div>
+                <div class="value">87%</div>
+              </div>
+            </div>
+            <div class="vital-box">
+              <i class="fa-solid fa-satellite vital-icon gps"></i>
+              <div class="vital-data">
+                <div class="label">Satélites Fix</div>
+                <div class="value">11 visíveis</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- COMPONENTE: CHECKOUT MERCADO PAGO (PIX & CARTÃO) -->
+        <div class="component-card">
+          <div class="component-card-title">
+            <i class="fa-solid fa-credit-card" style="color: var(--color-mp-blue);"></i>
+            Checkout Mercado Pago (Pix & Cartão)
+          </div>
+
+          <div class="mp-checkout-box">
+            <span class="mp-badge"><i class="fa-solid fa-shield-halved"></i> Mercado Pago Oficial</span>
+            
+            <div class="pix-qr-demo">
+              <i class="fa-solid fa-qrcode pix-qr-icon"></i>
+              <div style="flex: 1;">
+                <strong style="font-size: 13px; color: var(--text-main);">Pix Instantâneo</strong>
+                <p style="font-size: 11px; color: var(--text-muted);">Aprovação em segundos</p>
+                <div class="code-font" style="font-size: 10px; color: var(--text-light); margin-top: 4px;">00020126580014br.gov.bcb.pix...</div>
+              </div>
+            </div>
+
+            <button type="button" class="btn-copy-pix" style="width: 100%; justify-content: center;" onclick="alert('Código Pix copiado para a área de transferência!')">
+              <i class="fa-solid fa-copy"></i> Copiar Código Pix
+            </button>
+          </div>
+        </div>
+
+        <!-- COMPONENTE: SIMULADOR MOBILE (BOTTOM NAV + HEADER AVATAR) -->
+        <div class="component-card">
+          <div class="component-card-title">
+            <i class="fa-solid fa-mobile-screen-button" style="color: var(--color-primary);"></i>
+            Ergonomia Mobile (Bottom Nav + Avatar Menu)
+          </div>
+
+          <div class="mobile-screen-simulator">
+            <div class="mobile-header-sim">
+              <span style="font-weight: 700; font-size: 13px; color: var(--color-primary);"><i class="fa-solid fa-infinity"></i> Ethernity DMS</span>
+              <button type="button" style="background: var(--color-danger); color: #fff; border: none; padding: 4px 8px; border-radius: 12px; font-size: 10px; font-weight: 700;">SOS</button>
+              <div style="width: 28px; height: 28px; border-radius: 50%; background: var(--color-primary-light); color: var(--color-primary); display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700;">V</div>
+            </div>
+
+            <div class="mobile-body-sim">
+              <div style="font-size: 12px; font-weight: 700; color: var(--text-main);">Presença Residencial (Indoor):</div>
+              <div class="indoor-grid">
+                <div class="room-card active"><i class="fa-solid fa-couch"></i><br>Sala</div>
+                <div class="room-card"><i class="fa-solid fa-bed"></i><br>Quarto</div>
+                <div class="room-card"><i class="fa-solid fa-bath"></i><br>Banheiro</div>
+                <div class="room-card"><i class="fa-solid fa-kitchen-set"></i><br>Cozinha</div>
+                <div class="room-card"><i class="fa-solid fa-tree"></i><br>Jardim</div>
+                <div class="room-card"><i class="fa-solid fa-door-open"></i><br>Entrada</div>
+              </div>
+
+              <div class="chat-bubble-demo" style="margin-top: 6px;">
+                <div class="demo-bubble other"><strong>InCor Cardio:</strong> Mariana acordou bem hoje?</div>
+                <div class="demo-bubble me">Sim! Saturação 88%, sem síncope.</div>
+              </div>
+            </div>
+
+            <div class="mobile-bottom-nav-sim">
+              <div class="mobile-nav-item active">
+                <i class="fa-solid fa-map-location-dot"></i>
+                <span>Mapa</span>
+              </div>
+              <div class="mobile-nav-item">
+                <i class="fa-solid fa-house-signal"></i>
+                <span>Indoor</span>
+              </div>
+              <div class="mobile-nav-item">
+                <i class="fa-solid fa-bell"></i>
+                <span>Alertas</span>
+                <span class="nav-badge">2</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+  </div>
+
+  <script>
+    function toggleThemeDoc() {
+      const htmlEl = document.documentElement;
+      const currentTheme = htmlEl.getAttribute('data-theme') || 'light';
+      const nextTheme = currentTheme === 'light' ? 'dark' : 'light';
+      
+      htmlEl.setAttribute('data-theme', nextTheme);
+      
+      const themeLabel = document.getElementById('themeLabel');
+      const themeIcon = document.getElementById('themeIcon');
+      
+      if (nextTheme === 'dark') {
+        themeLabel.textContent = 'Modo Claro';
+        themeIcon.className = 'fa-solid fa-sun';
+        themeIcon.style.color = '#FBBF24';
+      } else {
+        themeLabel.textContent = 'Modo Escuro';
+        themeIcon.className = 'fa-solid fa-moon';
+        themeIcon.style.color = '';
+      }
+    }
+
+    function fillDemoForm() {
+      document.getElementById('demo-email').value = 'demo@ethernity.com';
+      document.getElementById('demo-pass').value = 'bdCare2026!Demo';
+    }
+
+    function toggleDemoPassword() {
+      const input = document.getElementById('demo-pass');
+      const icon = document.getElementById('eye-icon');
+      if (input.type === 'password') {
+        input.type = 'text';
+        icon.className = 'fa-solid fa-eye-slash';
+      } else {
+        input.type = 'password';
+        icon.className = 'fa-solid fa-eye';
+      }
+    }
+  </script>
+
+</body>
+</html>

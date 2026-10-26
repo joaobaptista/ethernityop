@@ -1,0 +1,534 @@
+/* ==========================================================================
+   PROFILE VIEW — ETHERNITY DMS (PERFIL & CONFIGURAÇÕES DA CONTA)
+   Design System: Plus Jakarta Sans • Bege Creme #FAF7F2 • Coral #FF5A43
+   ========================================================================== */
+
+.profile-screen-wrapper {
+  flex: 1;
+  background-color: #FFFFFF;
+  min-height: 100vh;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.profile-screen-container {
+  width: 100%;
+  max-width: 1140px;
+  margin: 0 auto;
+  padding: 36px 32px 80px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+/* ── Top Bar & Breadcrumbs ───────────────────────────── */
+.prof-top-bar {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
+.prof-top-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding-top: 4px;
+}
+
+.prof-left-title-block {
+  flex: 1;
+}
+
+.prof-breadcrumbs {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+  font-size: 13.5px;
+  font-weight: 500;
+  margin-bottom: 12px;
+}
+
+.prof-crumb-link {
+  color: #7A7270;
+  cursor: pointer;
+  transition: color 0.15s ease;
+}
+
+.prof-crumb-link:hover {
+  color: #FF5A43;
+}
+
+.prof-crumb-sep {
+  color: #B5ACA8;
+  font-size: 12px;
+}
+
+.prof-crumb-current {
+  color: #FF5A43;
+  font-weight: 600;
+}
+
+.prof-main-title {
+  font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+  font-size: 28px;
+  font-weight: 800;
+  color: #1F1B1A;
+  margin: 0 0 6px 0;
+  letter-spacing: -0.3px;
+}
+
+.prof-main-subtitle {
+  font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+  font-size: 14px;
+  color: #8C827F;
+  margin: 0;
+}
+
+/* ── Grid Principal: 2 Colunas ───────────────────────── */
+.prof-grid-layout {
+  display: grid;
+  grid-template-columns: 320px 1fr;
+  gap: 24px;
+  align-items: start;
+}
+
+/* ── Coluna Esquerda: Card de Identidade & Ações Rápidas ── */
+.prof-sidebar-column {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.prof-white-card {
+  background: #FFFFFF;
+  border: 1.5px solid #ECE7E2;
+  border-radius: 20px;
+  padding: 26px 20px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.02);
+}
+
+.prof-avatar-box {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  margin-bottom: 18px;
+}
+
+.prof-photo-circle-wrapper {
+  position: relative;
+  width: 96px;
+  height: 96px;
+  margin-bottom: 12px;
+}
+
+.prof-photo-circle {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  overflow: hidden;
+  background-color: #F8F5F2;
+  border: 3px solid #FF5A43;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 14px rgba(255, 90, 67, 0.15);
+}
+
+.prof-photo-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.prof-photo-initials {
+  font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+  font-size: 32px;
+  font-weight: 800;
+  color: #FF5A43;
+}
+
+.prof-btn-camera-badge {
+  position: absolute;
+  bottom: 0px;
+  right: 0px;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background-color: #FF5A43;
+  color: #FFFFFF;
+  border: 2.5px solid #FFFFFF;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  cursor: pointer;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.18);
+  transition: all 0.2s ease;
+}
+
+.prof-btn-camera-badge:hover {
+  background-color: #E84D37;
+  transform: scale(1.1);
+}
+
+.prof-btn-alterar-foto {
+  background: transparent;
+  border: none;
+  color: #FF5A43;
+  font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 8px;
+  transition: opacity 0.15s ease;
+}
+
+.prof-btn-alterar-foto:hover {
+  opacity: 0.8;
+}
+
+.prof-user-name {
+  font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+  font-size: 18px;
+  font-weight: 800;
+  color: #1F1B1A;
+  margin: 0 0 4px 0;
+}
+
+.prof-user-email {
+  font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+  font-size: 13px;
+  color: #8C827F;
+  margin: 0;
+}
+
+/* Ações Rápidas da Barra Lateral */
+.prof-quick-actions-group {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: 100%;
+}
+
+.prof-action-btn-card {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  width: 100%;
+  padding: 12px 16px;
+  background: #FFFFFF;
+  border: 1.5px solid #ECE7E2;
+  border-radius: 14px;
+  cursor: pointer;
+  text-align: left;
+  transition: all 0.2s ease;
+}
+
+.prof-action-btn-card:hover {
+  border-color: #FFCDC5;
+  background-color: #FFF9F7;
+  transform: translateY(-1px);
+}
+
+.prof-action-icon-box {
+  width: 38px;
+  height: 38px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  flex-shrink: 0;
+}
+
+.prof-action-icon-box.coral {
+  background-color: #FFF0ED;
+  color: #FF5A43;
+}
+
+.prof-action-icon-box.yellow {
+  background-color: #FFF8E6;
+  color: #D97706;
+}
+
+.prof-action-icon-box.purple {
+  background-color: #F4F1FD;
+  color: #7C3AED;
+}
+
+.prof-action-meta {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  line-height: 1.25;
+}
+
+.prof-action-title-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.prof-action-title {
+  font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+  font-size: 13.5px;
+  font-weight: 700;
+  color: #1F1B1A;
+}
+
+.prof-plan-pill-tag {
+  font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+  font-size: 11px;
+  font-weight: 700;
+  background-color: #FFEBE6;
+  color: #FF5A43;
+  padding: 2px 8px;
+  border-radius: 6px;
+}
+
+.prof-action-sub {
+  font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+  font-size: 11.5px;
+  color: #8C827F;
+}
+
+.prof-action-chevron {
+  color: #BDB4AE;
+  font-size: 12px;
+}
+
+/* Botão Sair da Conta */
+.prof-btn-logout-card {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 12px 16px;
+  background-color: #FFF5F5;
+  border: 1.5px solid #FFDCDA;
+  border-radius: 14px;
+  color: #E53935;
+  font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  margin-top: 4px;
+}
+
+.prof-btn-logout-card:hover {
+  background-color: #FEECEB;
+  border-color: #E53935;
+  transform: translateY(-1px);
+}
+
+/* ── Coluna Direita: Formulários & Configurações ───────── */
+.prof-main-form-column {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.prof-form-section-card {
+  background: #FFFFFF;
+  border: 1.5px solid #ECE7E2;
+  border-radius: 20px;
+  padding: 26px 28px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.02);
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.prof-sec-header {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  border-bottom: 1px solid #F0ECE8;
+  padding-bottom: 16px;
+}
+
+.prof-sec-icon-box {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  background-color: #FFF0ED;
+  color: #FF5A43;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 15px;
+  flex-shrink: 0;
+}
+
+.prof-sec-title-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.prof-sec-title {
+  font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+  font-size: 16px;
+  font-weight: 800;
+  color: #1F1B1A;
+  margin: 0;
+}
+
+.prof-sec-desc {
+  font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+  font-size: 12.5px;
+  color: #8C827F;
+  margin: 0;
+}
+
+/* Campos de Formulário */
+.prof-form-grid-2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.prof-form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+
+.prof-form-label {
+  font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+  font-size: 13px;
+  font-weight: 700;
+  color: #2D1917;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.prof-form-input {
+  width: 100%;
+  background: #FFFFFF;
+  border: 1.5px solid #E2DCD5;
+  border-radius: 12px;
+  padding: 13px 16px;
+  font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+  font-size: 14px;
+  color: #1F1B1A;
+  outline: none;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  box-sizing: border-box;
+}
+
+.prof-form-input:focus {
+  border-color: #FF5A43;
+  box-shadow: 0 0 0 3px rgba(255, 90, 67, 0.1);
+}
+
+/* Card Segurança & Senha */
+.prof-security-box {
+  background: #FFFBF9;
+  border: 1px solid #F5EAE4;
+  border-radius: 14px;
+  padding: 18px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.prof-security-top-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.prof-security-label-block {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.prof-security-label-block strong {
+  font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+  font-size: 14px;
+  font-weight: 700;
+  color: #1F1B1A;
+}
+
+.prof-security-sub {
+  font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+  font-size: 12px;
+  color: #8C827F;
+}
+
+.btn-toggle-eye {
+  background: transparent;
+  border: none;
+  color: #7A7270;
+  cursor: pointer;
+  font-size: 14px;
+  padding: 4px;
+}
+
+.btn-toggle-eye:hover {
+  color: #1F1B1A;
+}
+
+/* Rodapé Salvar */
+.prof-form-footer-actions {
+  display: flex;
+  justify-content: flex-end;
+  padding-top: 8px;
+}
+
+.prof-btn-save-main {
+  background: #FF5A43;
+  color: #FFFFFF;
+  border: none;
+  border-radius: 24px;
+  padding: 13px 32px;
+  font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  box-shadow: 0 4px 14px rgba(255, 90, 67, 0.28);
+  transition: all 0.2s ease;
+}
+
+.prof-btn-save-main:hover:not(:disabled) {
+  background: #E84D37;
+  transform: translateY(-1px);
+  box-shadow: 0 6px 18px rgba(255, 90, 67, 0.35);
+}
+
+.prof-btn-save-main:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+}
+
+/* Responsividade */
+@media (max-width: 860px) {
+  .profile-screen-container {
+    padding: 24px 16px 60px;
+  }
+
+  .prof-grid-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .prof-form-grid-2 {
+    grid-template-columns: 1fr;
+  }
+}

@@ -1,0 +1,15 @@
+# Dependências são instaladas dentro da imagem (binários nativos do Linux)
+node_modules
+npm-debug.log*
+
+# Segredos e configuração local: em produção chegam via env_file/environment do compose
+.env
+.env.*
+!.env.example
+
+# Dados locais: em produção ficam nos volumes ethernity_uploads e ethernity_vault
+uploads
+vault_storage
+
+test
+.DS_Store

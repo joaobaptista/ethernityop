@@ -1,0 +1,1401 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "Ethernity DMS — REST & Real-time Telemetry API",
+    "description": "API de Legado Digital, Memórias Vivas, Telemetria Médica, Rastreamento Satelital (GPS), Monitoramento Interno de Saúde (BLE/Indoor), Cercas Virtuais e Assinaturas com Mercado Pago.\n    \n### Recursos Principais:\n* 🔐 **Autenticação JWT** (Bearer Token)\n* 📍 **Gestão de Rastreadores & Dispositivos** (Localização, Bateria, Oximetria, Detecção de Queda)\n* 🛡️ **Cercas Virtuais (Geofencing)** (Áreas circulares com alertas de entrada/saída)\n* 🔔 **Mensageria & Alertas** (Protocolos de emergência SOS, alertas vitais)\n* 👤 **Perfil do Guardião & Protocolo Médico** (Hospital, Contato Médico)\n* 💳 **Assinaturas & Mercado Pago** (PIX Instantâneo, Cartão de Crédito e Débito, Webhooks)\n",
+    "version": "1.2.0",
+    "contact": {
+      "name": "Suporte Ethernity DMS",
+      "email": "suporte@ethernity.com",
+      "url": "https://ethernity.com"
+    },
+    "license": {
+      "name": "Proprietary / Ethernity DMS Tecnologia Assistiva"
+    }
+  },
+  "servers": [
+    {
+      "url": "http://localhost:8000",
+      "description": "Servidor de Desenvolvimento Local (Mock & API)"
+    }
+  ],
+  "tags": [
+    {
+      "name": "Autenticação",
+      "description": "Registro de cuidadores, login e geração de tokens JWT"
+    },
+    {
+      "name": "Perfil do Cuidador",
+      "description": "Dados cadastrais, upload de foto e protocolo médico de emergência"
+    },
+    {
+      "name": "Rastreadores (Dispositivos)",
+      "description": "Gestão de relógios e clips GPS/BLE, telemetria e oximetria"
+    },
+    {
+      "name": "Cercas Virtuais (Áreas)",
+      "description": "Configuração de perímetros seguros (geofencing)"
+    },
+    {
+      "name": "Mensagens & Alertas",
+      "description": "Histórico de notificações, chamados SOS e alertas de telemetria"
+    },
+    {
+      "name": "Assinaturas & Mercado Pago",
+      "description": "Planos SaaS, pagamentos via PIX, Cartão de Crédito/Débito e Webhooks"
+    },
+    {
+      "name": "Sistema & Telemetria",
+      "description": "Health check, métricas Prometheus e dados brutos de geofencing"
+    }
+  ],
+  "paths": {
+    "/register": {
+      "post": {
+        "tags": [
+          "Autenticação"
+        ],
+        "summary": "Cadastrar novo cuidador / usuário",
+        "operationId": "registerUser",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RegisterRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Usuário cadastrado com sucesso",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Email já existente ou dados inválidos",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/login": {
+      "post": {
+        "tags": [
+          "Autenticação"
+        ],
+        "summary": "Autenticar cuidador e gerar Token JWT",
+        "operationId": "loginUser",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LoginRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Login efetuado com sucesso",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LoginResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Credenciais inválidas",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/profile": {
+      "get": {
+        "tags": [
+          "Perfil do Cuidador"
+        ],
+        "summary": "Obter dados do perfil e protocolo médico do usuário autenticado",
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Dados do perfil do cuidador",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserProfile"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Não autorizado"
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Perfil do Cuidador"
+        ],
+        "summary": "Atualizar dados do perfil, senha e protocolo médico",
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProfileUpdateRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Perfil atualizado com sucesso",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserProfile"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Não autorizado"
+          }
+        }
+      }
+    },
+    "/upload/": {
+      "post": {
+        "tags": [
+          "Perfil do Cuidador"
+        ],
+        "summary": "Upload de foto de perfil (Multipart/form-data)",
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "file": {
+                    "type": "string",
+                    "format": "binary"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Upload realizado com sucesso",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "url": {
+                      "type": "string",
+                      "example": "/uploads/photo_123.jpg"
+                    },
+                    "filename": {
+                      "type": "string",
+                      "example": "photo_123.jpg"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Arquivo inválido ou extensão não permitida"
+          }
+        }
+      }
+    },
+    "/devices/": {
+      "get": {
+        "tags": [
+          "Rastreadores (Dispositivos)"
+        ],
+        "summary": "Listar todos os rastreadores e relógios do usuário",
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Lista de dispositivos com telemetria ativa",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Device"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Rastreadores (Dispositivos)"
+        ],
+        "summary": "Cadastrar e parear novo rastreador",
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DeviceCreate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Dispositivo cadastrado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Device"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Device ID já existente ou inválido"
+          }
+        }
+      }
+    },
+    "/devices/{id}": {
+      "put": {
+        "tags": [
+          "Rastreadores (Dispositivos)"
+        ],
+        "summary": "Atualizar informações de um rastreador existente",
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DeviceUpdate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Dispositivo atualizado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Device"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Dispositivo não encontrado"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Rastreadores (Dispositivos)"
+        ],
+        "summary": "Remover rastreador pareado",
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Dispositivo removido com sucesso"
+          },
+          "404": {
+            "description": "Dispositivo não encontrado"
+          }
+        }
+      }
+    },
+    "/areas/": {
+      "get": {
+        "tags": [
+          "Cercas Virtuais (Áreas)"
+        ],
+        "summary": "Listar todas as cercas virtuais configuradas",
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Lista de áreas seguras",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Area"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/areas/{deviceId}": {
+      "post": {
+        "tags": [
+          "Cercas Virtuais (Áreas)"
+        ],
+        "summary": "Criar nova cerca virtual para um dispositivo",
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "deviceId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AreaCreate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Área criada com sucesso",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Area"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Dispositivo não encontrado"
+          }
+        }
+      }
+    },
+    "/areas/{deviceId}/{areaId}": {
+      "put": {
+        "tags": [
+          "Cercas Virtuais (Áreas)"
+        ],
+        "summary": "Atualizar cerca virtual existente",
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "deviceId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "areaId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AreaCreate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Área atualizada",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Area"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Área não encontrada"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Cercas Virtuais (Áreas)"
+        ],
+        "summary": "Remover cerca virtual",
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "deviceId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "areaId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Área removida"
+          },
+          "404": {
+            "description": "Área não encontrada"
+          }
+        }
+      }
+    },
+    "/messages/": {
+      "get": {
+        "tags": [
+          "Mensagens & Alertas"
+        ],
+        "summary": "Listar alertas, notificações e chamados de cuidado",
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Lista de mensagens e alertas",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Message"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Mensagens & Alertas"
+        ],
+        "summary": "Criar nova mensagem de alerta ou chamada médica",
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MessageCreate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Mensagem criada",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Message"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/subscriptions/plans": {
+      "get": {
+        "tags": [
+          "Assinaturas & Mercado Pago"
+        ],
+        "summary": "Listar todos os planos SaaS e métodos de pagamento disponíveis",
+        "responses": {
+          "200": {
+            "description": "Planos disponíveis",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlansResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/subscriptions/current": {
+      "get": {
+        "tags": [
+          "Assinaturas & Mercado Pago"
+        ],
+        "summary": "Obter status da assinatura ativa do usuário e limites de uso",
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Assinatura e limites de uso",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CurrentSubscriptionResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/subscriptions/create-preference": {
+      "post": {
+        "tags": [
+          "Assinaturas & Mercado Pago"
+        ],
+        "summary": "Gerar transação de pagamento no Mercado Pago (PIX ou Checkout Pro)",
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreatePreferenceRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Dados da transação gerada com sucesso (PIX Copia-e-Cola ou Link Checkout Pro)"
+          }
+        }
+      }
+    },
+    "/subscriptions/pay-card": {
+      "post": {
+        "tags": [
+          "Assinaturas & Mercado Pago"
+        ],
+        "summary": "Processar pagamento transparente com Cartão de Crédito ou Débito",
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PayCardRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Pagamento autorizado e assinatura ativada",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Pagamento com cartão de crédito aprovado!"
+                    },
+                    "paymentId": {
+                      "type": "string",
+                      "example": "mp_cc_1788726555"
+                    },
+                    "subscription": {
+                      "$ref": "#/components/schemas/Subscription"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Dados do cartão inválidos ou recusados"
+          }
+        }
+      }
+    },
+    "/subscriptions/webhook": {
+      "post": {
+        "tags": [
+          "Assinaturas & Mercado Pago"
+        ],
+        "summary": "Webhook oficial do Mercado Pago para confirmação de transações",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Webhook processado com sucesso"
+          }
+        }
+      }
+    },
+    "/health": {
+      "get": {
+        "tags": [
+          "Sistema & Telemetria"
+        ],
+        "summary": "Verificação de integridade da API e conexão MQTT",
+        "responses": {
+          "200": {
+            "description": "API operando normalmente",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "string",
+                      "example": "healthy"
+                    },
+                    "mqtt": {
+                      "type": "object",
+                      "properties": {
+                        "status": {
+                          "type": "string",
+                          "example": "connected"
+                        },
+                        "broker": {
+                          "type": "string",
+                          "example": "mock.local"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/metrics": {
+      "get": {
+        "tags": [
+          "Sistema & Telemetria"
+        ],
+        "summary": "Exportador de métricas no padrão Prometheus",
+        "responses": {
+          "200": {
+            "description": "Métricas de telemetria em formato texto",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "BearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT",
+        "description": "Insira o token JWT gerado na rota /login no formato: Bearer <token>"
+      }
+    },
+    "schemas": {
+      "RegisterRequest": {
+        "type": "object",
+        "required": [
+          "email",
+          "password",
+          "name"
+        ],
+        "properties": {
+          "email": {
+            "type": "string",
+            "format": "email",
+            "example": "guardiao@ethernity.com"
+          },
+          "password": {
+            "type": "string",
+            "minLength": 6,
+            "example": "senhaSegura123"
+          },
+          "name": {
+            "type": "string",
+            "example": "Dr. Vagner Ibas"
+          },
+          "phone": {
+            "type": "string",
+            "example": "(11) 98765-4321"
+          }
+        }
+      },
+      "LoginRequest": {
+        "type": "object",
+        "required": [
+          "email",
+          "password"
+        ],
+        "properties": {
+          "email": {
+            "type": "string",
+            "format": "email",
+            "example": "demo@ethernity.com"
+          },
+          "password": {
+            "type": "string",
+            "example": "password123"
+          }
+        }
+      },
+      "LoginResponse": {
+        "type": "object",
+        "properties": {
+          "access_token": {
+            "type": "string",
+            "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+          },
+          "token_type": {
+            "type": "string",
+            "example": "bearer"
+          },
+          "user": {
+            "$ref": "#/components/schemas/UserProfile"
+          }
+        }
+      },
+      "UserProfile": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "example": 1
+          },
+          "email": {
+            "type": "string",
+            "example": "demo@ethernity.com"
+          },
+          "name": {
+            "type": "string",
+            "example": "Demo Caregiver"
+          },
+          "phone": {
+            "type": "string",
+            "example": "(11) 98765-4321"
+          },
+          "photo_url": {
+            "type": "string",
+            "example": "/uploads/profile.jpg"
+          },
+          "doctor_contact": {
+            "type": "string",
+            "example": "Dr. Carlos Mendonça • Tel: (11) 98765-4321"
+          },
+          "hospital_reference": {
+            "type": "string",
+            "example": "Instituto do Coração (InCor) • Pronto-Socorro 24h"
+          },
+          "patient_diagnosis": {
+            "type": "string",
+            "example": "Paciente cianótico crônico (Síndrome de Eisenmenger)."
+          }
+        }
+      },
+      "ProfileUpdateRequest": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string",
+            "format": "email"
+          },
+          "phone": {
+            "type": "string"
+          },
+          "password": {
+            "type": "string",
+            "minLength": 6
+          },
+          "doctor_contact": {
+            "type": "string"
+          },
+          "hospital_reference": {
+            "type": "string"
+          },
+          "patient_diagnosis": {
+            "type": "string"
+          }
+        }
+      },
+      "Device": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "example": 1
+          },
+          "device_id": {
+            "type": "string",
+            "example": "TRCK-10001"
+          },
+          "name": {
+            "type": "string",
+            "example": "Relógio Vô João"
+          },
+          "latitude": {
+            "type": "number",
+            "example": -23.55052
+          },
+          "longitude": {
+            "type": "number",
+            "example": -46.633308
+          },
+          "battery_level": {
+            "type": "integer",
+            "example": 85
+          },
+          "heart_rate": {
+            "type": "integer",
+            "example": 74
+          },
+          "spo2": {
+            "type": "integer",
+            "example": 98
+          },
+          "fall_detected": {
+            "type": "boolean",
+            "example": false
+          },
+          "status": {
+            "type": "string",
+            "example": "online"
+          },
+          "last_seen": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "DeviceCreate": {
+        "type": "object",
+        "required": [
+          "device_id",
+          "name"
+        ],
+        "properties": {
+          "device_id": {
+            "type": "string",
+            "example": "TRCK-30003"
+          },
+          "name": {
+            "type": "string",
+            "example": "Relógio Dona Maria"
+          },
+          "type": {
+            "type": "string",
+            "example": "watch"
+          }
+        }
+      },
+      "DeviceUpdate": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "example": "Relógio Vô João (Casa)"
+          },
+          "device_id": {
+            "type": "string",
+            "example": "TRCK-10001"
+          }
+        }
+      },
+      "Area": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "example": 1
+          },
+          "device_id": {
+            "type": "integer",
+            "example": 1
+          },
+          "name": {
+            "type": "string",
+            "example": "Casa & Jardim"
+          },
+          "center_lat": {
+            "type": "number",
+            "example": -23.55052
+          },
+          "center_lng": {
+            "type": "number",
+            "example": -46.633308
+          },
+          "radius_meters": {
+            "type": "integer",
+            "example": 150
+          },
+          "is_active": {
+            "type": "boolean",
+            "example": true
+          }
+        }
+      },
+      "AreaCreate": {
+        "type": "object",
+        "required": [
+          "name",
+          "center_lat",
+          "center_lng",
+          "radius_meters"
+        ],
+        "properties": {
+          "name": {
+            "type": "string",
+            "example": "Parque Ibirapuera"
+          },
+          "center_lat": {
+            "type": "number",
+            "example": -23.58741
+          },
+          "center_lng": {
+            "type": "number",
+            "example": -46.65763
+          },
+          "radius_meters": {
+            "type": "integer",
+            "example": 300
+          }
+        }
+      },
+      "Message": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "example": 1
+          },
+          "device_id": {
+            "type": "integer",
+            "example": 1
+          },
+          "text": {
+            "type": "string",
+            "example": "Alerta: Paciente saiu da cerca Casa & Jardim"
+          },
+          "timestamp": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "active": {
+            "type": "boolean",
+            "example": true
+          }
+        }
+      },
+      "MessageCreate": {
+        "type": "object",
+        "required": [
+          "device_id",
+          "text"
+        ],
+        "properties": {
+          "device_id": {
+            "type": "integer",
+            "example": 1
+          },
+          "text": {
+            "type": "string",
+            "example": "Alerta médico manual"
+          }
+        }
+      },
+      "PlansResponse": {
+        "type": "object",
+        "properties": {
+          "currency": {
+            "type": "string",
+            "example": "BRL"
+          },
+          "supportedPaymentMethods": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "example": [
+              "pix",
+              "credit_card",
+              "debit_card",
+              "mercado_pago_checkout"
+            ]
+          },
+          "plans": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "string",
+                  "example": "family"
+                },
+                "name": {
+                  "type": "string",
+                  "example": "Cuidado Familiar"
+                },
+                "priceMonthly": {
+                  "type": "number",
+                  "example": 29.9
+                },
+                "priceYearly": {
+                  "type": "number",
+                  "example": 299
+                },
+                "maxDevices": {
+                  "type": "integer",
+                  "example": 3
+                },
+                "maxGeofences": {
+                  "type": "integer",
+                  "example": 999
+                },
+                "historyDays": {
+                  "type": "integer",
+                  "example": 30
+                },
+                "popular": {
+                  "type": "boolean",
+                  "example": true
+                },
+                "features": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "CurrentSubscriptionResponse": {
+        "type": "object",
+        "properties": {
+          "subscription": {
+            "$ref": "#/components/schemas/Subscription"
+          },
+          "usage": {
+            "type": "object",
+            "properties": {
+              "devicesCount": {
+                "type": "integer",
+                "example": 2
+              },
+              "devicesLimit": {
+                "type": "integer",
+                "example": 3
+              },
+              "areasCount": {
+                "type": "integer",
+                "example": 1
+              },
+              "areasLimit": {
+                "type": "integer",
+                "example": 999
+              }
+            }
+          }
+        }
+      },
+      "Subscription": {
+        "type": "object",
+        "properties": {
+          "planId": {
+            "type": "string",
+            "example": "family"
+          },
+          "planName": {
+            "type": "string",
+            "example": "Cuidado Familiar"
+          },
+          "status": {
+            "type": "string",
+            "example": "active"
+          },
+          "cycle": {
+            "type": "string",
+            "example": "monthly"
+          },
+          "maxDevices": {
+            "type": "integer",
+            "example": 3
+          },
+          "maxGeofences": {
+            "type": "integer",
+            "example": 999
+          },
+          "historyDays": {
+            "type": "integer",
+            "example": 30
+          },
+          "expiresAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "paymentMethod": {
+            "type": "string",
+            "example": "mercado_pago_pix"
+          }
+        }
+      },
+      "CreatePreferenceRequest": {
+        "type": "object",
+        "required": [
+          "planId"
+        ],
+        "properties": {
+          "planId": {
+            "type": "string",
+            "example": "family"
+          },
+          "cycle": {
+            "type": "string",
+            "enum": [
+              "monthly",
+              "yearly"
+            ],
+            "default": "monthly"
+          },
+          "paymentType": {
+            "type": "string",
+            "enum": [
+              "pix",
+              "checkout_pro"
+            ],
+            "default": "pix"
+          }
+        }
+      },
+      "PayCardRequest": {
+        "type": "object",
+        "required": [
+          "planId",
+          "cardData"
+        ],
+        "properties": {
+          "planId": {
+            "type": "string",
+            "example": "family"
+          },
+          "cycle": {
+            "type": "string",
+            "enum": [
+              "monthly",
+              "yearly"
+            ],
+            "default": "monthly"
+          },
+          "cardData": {
+            "type": "object",
+            "required": [
+              "cardNumber",
+              "holderName",
+              "expiry",
+              "cvv"
+            ],
+            "properties": {
+              "cardNumber": {
+                "type": "string",
+                "example": "4532117088991234"
+              },
+              "holderName": {
+                "type": "string",
+                "example": "VAGNER IBAS"
+              },
+              "expiry": {
+                "type": "string",
+                "example": "12/28"
+              },
+              "cvv": {
+                "type": "string",
+                "example": "123"
+              },
+              "cpf": {
+                "type": "string",
+                "example": "12345678909"
+              },
+              "brand": {
+                "type": "string",
+                "example": "Visa"
+              },
+              "cardType": {
+                "type": "string",
+                "enum": [
+                  "credit",
+                  "debit"
+                ],
+                "default": "credit"
+              },
+              "installments": {
+                "type": "integer",
+                "default": 1
+              }
+            }
+          }
+        }
+      },
+      "ErrorResponse": {
+        "type": "object",
+        "properties": {
+          "detail": {
+            "type": "string",
+            "example": "Mensagem de erro detalhada"
+          }
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,134 @@
+/**
+ * LivePhotoViewer.css
+ * Estilos para o componente de visualização de Apple Live Photos
+ */
+
+.live-photo-container {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  min-height: 200px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #0f1115;
+  border-radius: 12px;
+  overflow: hidden;
+  user-select: none;
+}
+
+.live-photo-still {
+  width: 100%;
+  height: 100%;
+  object-fit: contain; /* Mandatório AGENTS.md §1 */
+  display: block;
+  transition: opacity 0.25s ease-in-out;
+}
+
+.live-photo-video {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: contain; /* Mandatório AGENTS.md §1 */
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.25s ease-in-out;
+}
+
+.live-photo-video.visible {
+  opacity: 1;
+}
+
+/* Badge Oficial Apple Live Photo */
+.live-photo-badge {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  background: rgba(18, 20, 26, 0.75);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 20px;
+  color: #f3f4f6;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.8px;
+  cursor: pointer;
+  z-index: 5;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.live-photo-badge:hover {
+  background: rgba(235, 178, 64, 0.2);
+  border-color: rgba(235, 178, 64, 0.6);
+  color: #ffc542;
+  transform: scale(1.04);
+}
+
+.live-photo-badge.active {
+  background: rgba(235, 178, 64, 0.3);
+  border-color: #f59e0b;
+  color: #f59e0b;
+}
+
+/* Círculos concêntricos do ícone Live Photo */
+.live-icon-rings {
+  position: relative;
+  width: 14px;
+  height: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.live-icon-rings .ring {
+  position: absolute;
+  border-radius: 50%;
+  border: 1.5px solid currentColor;
+}
+
+.live-icon-rings .ring-outer {
+  width: 14px;
+  height: 14px;
+  opacity: 0.4;
+  border-style: dotted;
+}
+
+.live-icon-rings .ring-inner {
+  width: 9px;
+  height: 9px;
+  opacity: 0.8;
+}
+
+.live-icon-rings .ring-dot {
+  width: 3.5px;
+  height: 3.5px;
+  background: currentColor;
+  border: none;
+}
+
+.live-photo-badge.active .ring-outer {
+  animation: liveRingPulse 1.8s infinite ease-out;
+}
+
+@keyframes liveRingPulse {
+  0% {
+    transform: scale(0.9);
+    opacity: 0.8;
+  }
+  50% {
+    transform: scale(1.3);
+    opacity: 0.2;
+  }
+  100% {
+    transform: scale(0.9);
+    opacity: 0.8;
+  }
+}

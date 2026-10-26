@@ -1,0 +1,184 @@
+/* EncryptedVideoPlayer.css — Player de Vídeo Estilo YouTube com Suporte a Range Requests HTTP 206 */
+.encrypted-video-player-wrapper {
+  position: relative;
+  width: 100%;
+  max-width: 900px;
+  margin: 0 auto;
+  background: #000000;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+  font-family: var(--font-ui, sans-serif);
+  user-select: none;
+}
+
+.encrypted-video-element {
+  display: block;
+  width: 100%;
+  height: auto;
+  max-height: 520px;
+  background: #000;
+  cursor: pointer;
+}
+
+.encrypted-video-overlay-play {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 68px;
+  height: 68px;
+  border-radius: 50%;
+  background: rgba(240, 90, 71, 0.9);
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 4px 20px rgba(240, 90, 71, 0.5);
+  transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), background-color 0.2s;
+  z-index: 4;
+}
+
+.encrypted-video-overlay-play:hover {
+  transform: translate(-50%, -50%) scale(1.1);
+  background: #f05a47;
+}
+
+.encrypted-video-controls-bar {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.85) 0%, rgba(0, 0, 0, 0.4) 60%, transparent 100%);
+  padding: 12px 16px 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  opacity: 0;
+  transform: translateY(6px);
+  transition: opacity 0.25s ease, transform 0.25s ease;
+  z-index: 5;
+}
+
+.encrypted-video-player-wrapper:hover .encrypted-video-controls-bar,
+.encrypted-video-controls-bar.is-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.encrypted-video-scrubber-container {
+  position: relative;
+  width: 100%;
+  height: 6px;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 3px;
+  cursor: pointer;
+  transition: height 0.15s ease;
+}
+
+.encrypted-video-scrubber-container:hover {
+  height: 8px;
+}
+
+.encrypted-video-scrubber-buffered {
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  background: rgba(255, 255, 255, 0.4);
+  border-radius: 3px;
+  pointer-events: none;
+}
+
+.encrypted-video-scrubber-progress {
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  background: var(--color-primary, #F05A47);
+  border-radius: 3px;
+  pointer-events: none;
+}
+
+.encrypted-video-scrubber-thumb {
+  position: absolute;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: 12px;
+  height: 12px;
+  background: #ffffff;
+  border: 2px solid var(--color-primary, #F05A47);
+  border-radius: 50%;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.4);
+  pointer-events: none;
+}
+
+.encrypted-video-controls-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  color: #ffffff;
+}
+
+.encrypted-video-controls-left,
+.encrypted-video-controls-right {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.encrypted-video-btn {
+  background: none;
+  border: none;
+  color: #ffffff;
+  cursor: pointer;
+  padding: 4px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px;
+  transition: color 0.15s, transform 0.1s;
+}
+
+.encrypted-video-btn:hover {
+  color: var(--color-primary, #F05A47);
+  transform: scale(1.08);
+}
+
+.encrypted-video-time-display {
+  font-size: 12px;
+  font-weight: 500;
+  color: #e2e8f0;
+  letter-spacing: 0.02em;
+}
+
+.encrypted-video-badge-security {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11px;
+  font-weight: 600;
+  color: #4ade80;
+  background: rgba(0, 0, 0, 0.5);
+  padding: 2px 8px;
+  border-radius: 12px;
+  border: 1px solid rgba(74, 222, 128, 0.3);
+}
+
+.encrypted-video-rate-select {
+  background: rgba(255, 255, 255, 0.15);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  color: #ffffff;
+  font-size: 11px;
+  font-weight: 600;
+  border-radius: 4px;
+  padding: 2px 6px;
+  cursor: pointer;
+  outline: none;
+}
+
+.encrypted-video-rate-select option {
+  background: #1e293b;
+  color: #ffffff;
+}

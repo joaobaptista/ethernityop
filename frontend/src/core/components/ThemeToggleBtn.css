@@ -1,0 +1,46 @@
+/**
+ * ThemeToggleBtn.css
+ * Botão circular para alternância de tema no cabeçalho
+ */
+.header-circle-btn {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--bg-surface, #ffffff);
+  border: 1px solid var(--border-color, #e2e8f0);
+  color: var(--color-primary, #00897b);
+  font-size: 15px;
+  cursor: pointer;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  position: relative;
+  flex-shrink: 0;
+}
+
+.header-circle-btn:hover {
+  transform: scale(1.08);
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.12);
+  background-color: var(--bg-surface-subtle, #f1f5f9);
+  border-color: var(--color-primary);
+}
+
+.header-circle-btn:active {
+  transform: scale(0.95);
+}
+
+/* Modo Escuro */
+[data-theme="dark"] .header-circle-btn {
+  background-color: var(--bg-surface, #111115);
+  border-color: var(--border-color, #22222a);
+  color: var(--color-primary, #2dd4bf);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.6);
+}
+
+[data-theme="dark"] .header-circle-btn:hover {
+  background-color: var(--bg-surface-subtle, #18181e);
+  border-color: var(--color-primary, #2dd4bf);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.8);
+}

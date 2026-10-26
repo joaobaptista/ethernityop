@@ -1,0 +1,266 @@
+/**
+ * NotificationBell.css
+ * Estilos do botão de sino estilo Facebook e Popover de notificações
+ */
+
+.notification-bell-container {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+}
+
+.notification-bell-btn {
+  position: relative;
+}
+
+/* Badge estilo Facebook com contador e cor vermelha vibrante */
+.notification-badge-fb {
+  position: absolute;
+  top: -3px;
+  right: -3px;
+  min-width: 17px;
+  height: 17px;
+  padding: 0 4px;
+  border-radius: 9999px;
+  background-color: #ef4444; /* Vermelho Facebook/Alert */
+  color: #ffffff;
+  font-size: 10px;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid var(--bg-surface, #ffffff);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  line-height: 1;
+}
+
+.animate-badge-pulse {
+  animation: badgePulse 2s infinite ease-in-out;
+}
+
+@keyframes badgePulse {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.1);
+  }
+}
+
+/* Popover Flutuante de Notificações */
+.notification-popover {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  width: 320px;
+  max-height: 420px;
+  background-color: var(--bg-surface, #ffffff);
+  border: 1px solid var(--border-color, #e2e8f0);
+  border-radius: var(--radius-md, 12px);
+  box-shadow: 0 12px 36px rgba(0, 0, 0, 0.18), 0 4px 12px rgba(0, 0, 0, 0.08);
+  z-index: 99999;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  animation: notifPopIn 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes notifPopIn {
+  from {
+    opacity: 0;
+    transform: translateY(-8px) scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.notif-popover-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--border-color, #e2e8f0);
+  background-color: var(--bg-surface-subtle, #f8fafc);
+}
+
+.notif-header-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.notif-header-title h4 {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text-main, #1e293b);
+  margin: 0;
+}
+
+.notif-unread-count-pill {
+  font-size: 10px;
+  font-weight: 700;
+  padding: 2px 6px;
+  border-radius: 10px;
+  background-color: rgba(239, 68, 68, 0.12);
+  color: #ef4444;
+}
+
+.btn-mark-all-read {
+  background: transparent;
+  border: none;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--color-primary, #00897b);
+  cursor: pointer;
+  padding: 2px 4px;
+  border-radius: 4px;
+  transition: all 0.15s ease;
+}
+
+.btn-mark-all-read:hover {
+  text-decoration: underline;
+}
+
+.notif-popover-list {
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  max-height: 350px;
+}
+
+.notif-popover-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--border-color, #e2e8f0);
+  cursor: pointer;
+  background-color: transparent;
+  transition: background-color 0.15s ease;
+  text-align: left;
+}
+
+.notif-popover-item:last-child {
+  border-bottom: none;
+}
+
+.notif-popover-item:hover {
+  background-color: var(--bg-surface-subtle, #f1f5f9);
+}
+
+.notif-popover-item.unread {
+  background-color: rgba(13, 148, 136, 0.04);
+}
+
+.notif-popover-item.unread:hover {
+  background-color: rgba(13, 148, 136, 0.08);
+}
+
+.notif-item-icon-wrapper {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background-color: var(--bg-surface-subtle, #f1f5f9);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.notif-item-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.notif-item-title-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+}
+
+.notif-item-title {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--text-main, #1e293b);
+  line-height: 1.3;
+}
+
+.notif-unread-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background-color: var(--color-primary, #00897b);
+  flex-shrink: 0;
+}
+
+.notif-item-desc {
+  font-size: 11px;
+  color: var(--text-muted, #64748b);
+  line-height: 1.35;
+  margin: 0;
+}
+
+.notif-item-time {
+  font-size: 10px;
+  color: var(--text-light, #94a3b8);
+  margin-top: 2px;
+}
+
+.notif-empty-state {
+  padding: 32px 16px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  color: var(--text-muted, #64748b);
+  font-size: 12px;
+}
+
+.notif-empty-state i {
+  font-size: 24px;
+  color: var(--text-light, #94a3b8);
+}
+
+/* Modo Escuro */
+[data-theme="dark"] .notification-badge-fb {
+  border-color: #111115;
+}
+
+[data-theme="dark"] .notification-popover {
+  background-color: #111115;
+  border-color: #22222a;
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.85);
+}
+
+[data-theme="dark"] .notif-popover-header {
+  background-color: #18181e;
+  border-color: #22222a;
+}
+
+[data-theme="dark"] .notif-popover-item {
+  border-color: #1a1a22;
+}
+
+[data-theme="dark"] .notif-popover-item:hover {
+  background-color: #18181e;
+}
+
+[data-theme="dark"] .notif-popover-item.unread {
+  background-color: rgba(45, 212, 191, 0.06);
+}
+
+[data-theme="dark"] .notif-popover-item.unread:hover {
+  background-color: rgba(45, 212, 191, 0.1);
+}
+
+[data-theme="dark"] .notif-item-icon-wrapper {
+  background-color: #18181e;
+}

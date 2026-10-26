@@ -1,0 +1,354 @@
+/* SelectPeopleGrid.css — Pessoas que importam (Grid de Faces) */
+
+.people-discovery-container {
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+  width: 100%;
+  max-width: 1040px;
+  margin: 0 auto;
+  padding: 24px 20px 80px;
+  box-sizing: border-box;
+}
+
+.people-discovery-header {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.discovery-header-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.discovery-title {
+  font-family: var(--font-display, 'Playfair Display', Georgia, serif);
+  font-size: 32px;
+  font-weight: 700;
+  color: #2D1917;
+  letter-spacing: -0.5px;
+  margin: 0;
+}
+
+.discovery-subtitle {
+  font-size: 14.5px;
+  color: #7E6C66;
+  line-height: 1.55;
+  max-width: 780px;
+  margin: 6px 0 0;
+}
+
+.btn-upload-direct {
+  background-color: #FFFFFF;
+  color: #32231F;
+  border: 1.5px solid #EFEAE2;
+  padding: 9px 18px;
+  font-size: 13.5px;
+  font-weight: 600;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 6px rgba(45, 25, 23, 0.03);
+}
+
+.btn-upload-direct:hover {
+  border-color: #F05A47;
+  color: #F05A47;
+  transform: translateY(-1px);
+}
+
+.btn-upload-direct.primary {
+  background-color: #F05A47;
+  color: #FFFFFF;
+  border-color: #F05A47;
+  box-shadow: 0 4px 14px rgba(240, 90, 71, 0.25);
+}
+
+.btn-upload-direct.primary:hover {
+  background-color: #D94836;
+}
+
+.discovery-stats-badge {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13.5px;
+  font-weight: 600;
+  margin-top: 4px;
+}
+
+.discovery-book-icon {
+  color: #F05A47;
+  font-size: 14px;
+}
+
+.stats-main {
+  color: #2D1917;
+}
+
+.stats-dot {
+  color: #C2B6B0;
+}
+
+.stats-highlight {
+  color: #F05A47;
+  font-weight: 700;
+}
+
+/* Estado de Análise */
+.analyzing-faces-box {
+  padding: 60px 20px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  background-color: #FFFFFF;
+  border-radius: 20px;
+  border: 1px dashed #ECE5DC;
+}
+
+.analyzing-spinner {
+  width: 44px;
+  height: 44px;
+  border: 3.5px solid #F05A47;
+  border-top-color: transparent;
+  border-radius: 50%;
+  animation: spin-discovery 0.9s linear infinite;
+}
+
+@keyframes spin-discovery {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.analyzing-title {
+  font-size: 18px;
+  font-weight: 600;
+  color: #32231F;
+  margin: 0;
+}
+
+.analyzing-subtitle {
+  font-size: 14px;
+  color: #7E6C66;
+  margin: 0;
+  max-width: 480px;
+}
+
+/* Estado Vazio */
+.no-people-box {
+  padding: 60px 20px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  background-color: #FFFFFF;
+  border-radius: 20px;
+  border: 1px dashed #ECE5DC;
+}
+
+.no-people-icon {
+  font-size: 42px;
+  color: #D9CAC3;
+}
+
+.no-people-title {
+  font-size: 17px;
+  font-weight: 600;
+  color: #32231F;
+  margin: 0;
+}
+
+.no-people-desc {
+  font-size: 13.5px;
+  color: #7E6C66;
+  max-width: 420px;
+  margin: 0;
+  line-height: 1.5;
+}
+
+/* Grid de Pessoas */
+.people-faces-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 18px;
+}
+
+@media (max-width: 880px) {
+  .people-faces-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 580px) {
+  .people-faces-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.person-face-card {
+  background-color: #FFFFFF;
+  border: 1.5px solid #EFEAE2;
+  border-radius: 20px;
+  padding: 20px 22px 18px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  min-height: 124px;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 2px 6px rgba(45, 25, 23, 0.02);
+  user-select: none;
+}
+
+.person-face-card:hover {
+  border-color: #DECEBD;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(45, 25, 23, 0.05);
+}
+
+.person-face-card.selected {
+  border: 2px solid #F05A47;
+  background-color: #FFFFFF;
+  box-shadow: 0 4px 14px rgba(240, 90, 71, 0.12);
+}
+
+.face-card-top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+}
+
+.face-avatar-img {
+  width: 54px;
+  height: 54px;
+  border-radius: 50%;
+  object-fit: cover;
+  background-color: #F8F4EE;
+  border: 2px solid #FBE5E1;
+}
+
+.face-check-circle {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  border: 1.5px solid #E2DCD5;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: transparent;
+  transition: all 0.15s ease;
+}
+
+.face-check-circle.checked {
+  background-color: #F05A47;
+  border-color: #F05A47;
+  color: #FFFFFF;
+  font-size: 11px;
+}
+
+.face-card-bottom {
+  margin-top: 16px;
+}
+
+.face-photos-count {
+  font-size: 13px;
+  font-weight: 500;
+  color: #8A7D77;
+}
+
+/* Barra Fixa de Ação no Rodapé */
+.people-discovery-action-bar {
+  position: sticky;
+  bottom: 24px;
+  background-color: #FFFFFF;
+  border: 1px solid #ECE5DC;
+  border-radius: 20px;
+  padding: 16px 28px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  box-shadow: 0 10px 32px rgba(45, 25, 23, 0.08);
+  z-index: 20;
+}
+
+.selected-count-label {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.count-red-dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background-color: #F05A47;
+}
+
+.count-text {
+  font-size: 14px;
+  color: #2D1917;
+}
+
+.plan-limit-text {
+  margin-left: 8px;
+  font-size: 12px;
+  color: #8C7E77;
+  font-weight: 500;
+}
+
+.action-bar-buttons {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.btn-skip-discovery {
+  background: none;
+  border: none;
+  font-size: 13.5px;
+  font-weight: 500;
+  color: #7E6C66;
+  text-decoration: underline;
+  cursor: pointer;
+  padding: 8px 12px;
+  transition: color 0.2s ease;
+}
+
+.btn-skip-discovery:hover {
+  color: #F05A47;
+}
+
+.btn-create-selected {
+  background-color: #F05A47;
+  color: #FFFFFF;
+  font-size: 14px;
+  font-weight: 600;
+  padding: 11px 22px;
+  border-radius: 12px;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 14px rgba(240, 90, 71, 0.25);
+}
+
+.btn-create-selected:hover:not(:disabled) {
+  background-color: #D94836;
+  transform: translateY(-1px);
+}
+
+.btn-create-selected:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+  box-shadow: none;
+}

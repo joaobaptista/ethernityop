@@ -1,0 +1,127 @@
+{
+  "id": "/?v=20260909",
+  "name": "Ethernity DMs — Legado Digital Seguro e Privado",
+  "short_name": "Ethernity DMs",
+  "description": "Sistema que mantém as memórias e legados das pessoas durante a vida e após a morte, com mensagens de voz, vídeo e cápsulas do tempo.",
+  "lang": "pt-BR",
+  "dir": "ltr",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "display_override": [
+    "window-controls-overlay",
+    "standalone",
+    "minimal-ui",
+    "browser"
+  ],
+  "orientation": "portrait-primary",
+  "background_color": "#FAF7F2",
+  "theme_color": "#FF6F61",
+  "categories": [
+    "lifestyle",
+    "family",
+    "utilities"
+  ],
+  "icons": [
+    {
+      "src": "/pwa-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/pwa-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/favicon.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "/android-chrome-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/android-chrome-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/maskable-icon-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Mapa Satelital",
+      "short_name": "Mapa",
+      "description": "Ver localização em tempo real no mapa satelital",
+      "url": "/#map",
+      "icons": [
+        {
+          "src": "/pwa-192x192.png",
+          "sizes": "192x192",
+          "type": "image/png"
+        }
+      ]
+    },
+    {
+      "name": "Rastreadores",
+      "short_name": "Relógios",
+      "description": "Gerenciar relógios inteligentes e telemetria",
+      "url": "/#tracker",
+      "icons": [
+        {
+          "src": "/pwa-192x192.png",
+          "sizes": "192x192",
+          "type": "image/png"
+        }
+      ]
+    },
+    {
+      "name": "Monitoramento Interno",
+      "short_name": "Interno",
+      "description": "Planta baixa dos cômodos da residência",
+      "url": "/#indoor",
+      "icons": [
+        {
+          "src": "/pwa-192x192.png",
+          "sizes": "192x192",
+          "type": "image/png"
+        }
+      ]
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "/screenshots/desktop-preview.png",
+      "sizes": "1280x720",
+      "type": "image/png",
+      "form_factor": "wide",
+      "label": "Ethernity DMs Dashboard e Legado Digital no Computador"
+    },
+    {
+      "src": "/screenshots/mobile-preview.png",
+      "sizes": "540x960",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "Ethernity DMs Memórias Vivas e Cápsulas no Celular"
+    }
+  ],
+  "prefer_related_applications": false
+}

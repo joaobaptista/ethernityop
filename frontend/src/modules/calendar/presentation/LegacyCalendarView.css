@@ -1,0 +1,145 @@
+/* ==========================================================================
+   LEGACY CALENDAR VIEW — ETHERNITY DMS
+   ========================================================================== */
+
+.legacy-calendar-container {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 32px 24px 60px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.calendar-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background-color: var(--color-primary-light);
+  color: var(--color-primary);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.8px;
+  padding: 4px 10px;
+  border-radius: var(--radius-full);
+  margin-bottom: 8px;
+}
+
+.calendar-title-wrap h1 {
+  font-family: var(--font-display);
+  font-size: 32px;
+  font-weight: 700;
+  color: var(--text-main);
+  margin-bottom: 6px;
+}
+
+.calendar-title-wrap p {
+  font-size: 14px;
+  color: var(--text-muted);
+  max-width: 620px;
+}
+
+.calendar-timeline {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  position: relative;
+  padding-left: 20px;
+  border-left: 2px solid var(--border-color);
+  margin-left: 10px;
+}
+
+.timeline-item {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  position: relative;
+}
+
+.timeline-date-bubble {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--color-primary);
+}
+
+.timeline-card {
+  background-color: var(--bg-surface);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  box-shadow: var(--shadow-sm);
+}
+
+.timeline-tag {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  color: var(--color-primary);
+}
+
+.timeline-card h3 {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--text-main);
+}
+
+.timeline-card p {
+  font-size: 13px;
+  color: var(--text-muted);
+}
+
+/* ==========================================================================
+   EMPTY STATE DO CALENDÁRIO DE LEGADO
+   ========================================================================== */
+.calendar-empty-state-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 56px 24px;
+  background-color: var(--bg-surface);
+  border: 1.5px dashed var(--border-color);
+  border-radius: var(--radius-lg, 18px);
+  margin-top: 12px;
+}
+
+.calendar-empty-icon-wrapper {
+  width: 68px;
+  height: 68px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, rgba(240, 90, 71, 0.12) 0%, rgba(222, 72, 53, 0.05) 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 18px;
+}
+
+.calendar-empty-icon-wrapper i {
+  font-size: 28px;
+  color: var(--color-primary);
+}
+
+.calendar-empty-title {
+  font-family: var(--font-display, inherit);
+  font-size: 19px;
+  font-weight: 700;
+  color: var(--text-main);
+  margin: 0 0 8px 0;
+}
+
+.calendar-empty-desc {
+  font-size: 13.5px;
+  color: var(--text-muted);
+  max-width: 440px;
+  line-height: 1.5;
+  margin: 0;
+}
+

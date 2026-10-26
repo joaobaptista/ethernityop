@@ -1,0 +1,62 @@
+# ==========================================
+# Ethernity DMs - Monorepo .gitignore
+# ==========================================
+
+# Dependencies
+node_modules/
+/frontend/node_modules/
+/backend/node_modules/
+
+# Production build directories
+dist/
+build/
+/frontend/dist/
+/backend/dist/
+
+# Temporary and Logs
+tmp/
+.temp/
+.tmp/
+logs/
+*.log
+npm-debug.log*
+pnpm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Environment Variables
+.env
+.env.*
+!.env.example
+!.env.template
+
+# Databases
+*.sqlite
+*.sqlite3
+*.db
+*.db-journal
+/backend/data/
+
+# Uploads / Local Data
+/backend/uploads/
+/backend/storage/
+/backend/vault_storage/
+
+# Frontend / Vite specific
+.eslintcache
+.vite/
+/frontend/.vite/
+
+# Editor / OS / IDE
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+.vscode/
+.idea/
+*.swp
+*.swo
+*.sublime-workspace

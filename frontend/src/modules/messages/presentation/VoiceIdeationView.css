@@ -1,0 +1,1574 @@
+/* ==========================================================================
+   VOICE IDEATION VIEW — ETHERNITY DMS (PREPARAR, GRAVAR & ENTREGAR)
+   ========================================================================== */
+
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+
+.voice-ideation-wrapper {
+  flex: 1;
+  background-color: #FFFFFF;
+  min-height: 100vh;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.voice-ideation-container {
+  width: 100%;
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 36px 32px 80px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+/* --------------------------------------------------------------------------
+   1. HEADER SUPERIOR COM BREADCRUMB & STEPPER
+   -------------------------------------------------------------------------- */
+
+.vi-top-bar {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 24px;
+  flex-wrap: wrap;
+}
+
+.vi-left-title-block {
+  flex: 1;
+  min-width: 320px;
+}
+
+.vi-breadcrumbs {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+  font-size: 13.5px;
+  font-weight: 500;
+  margin-bottom: 12px;
+}
+
+.vi-crumb-link {
+  color: #7A7270;
+  cursor: pointer;
+  transition: color 0.15s ease;
+}
+
+.vi-crumb-link:hover {
+  color: #FF5A43;
+}
+
+.vi-crumb-sep {
+  color: #B5ACA8;
+  font-size: 12px;
+}
+
+.vi-crumb-current {
+  color: #FF5A43;
+  font-weight: 600;
+}
+
+.vi-main-title {
+  font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+  font-size: 28px;
+  font-weight: 800;
+  color: #1F1B1A;
+  margin: 0 0 6px 0;
+  letter-spacing: -0.3px;
+}
+
+.vi-main-subtitle {
+  font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+  font-size: 14px;
+  color: #8C827F;
+  margin: 0;
+}
+
+/* Stepper Pill Topo */
+.vi-stepper-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  background: #FFFFFF;
+  border: 1px solid #ECE7E2;
+  border-radius: 14px;
+  padding: 8px 18px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.02);
+}
+
+.vi-stepper-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  user-select: none;
+}
+
+.vi-stepper-badge {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: 700;
+  background-color: #F0ECE8;
+  color: #7A7270;
+}
+
+.vi-stepper-text {
+  font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+  font-size: 13.5px;
+  font-weight: 600;
+  color: #7A7270;
+}
+
+.vi-stepper-item.active .vi-stepper-badge {
+  background-color: #FF5A43;
+  color: #FFFFFF;
+}
+
+.vi-stepper-item.active .vi-stepper-text {
+  color: #FF5A43;
+}
+
+.vi-stepper-item.completed .vi-stepper-badge {
+  background-color: #FFC436;
+  color: #FFFFFF;
+}
+
+.vi-stepper-item.completed .vi-stepper-text {
+  color: #1F1B1A;
+}
+
+.vi-stepper-line {
+  width: 28px;
+  height: 1.5px;
+  background-color: #ECE7E2;
+}
+
+.vi-stepper-line.active {
+  background-color: #FF5A43;
+}
+
+/* --------------------------------------------------------------------------
+   2. GRID PRINCIPAL (2 COLUNAS)
+   -------------------------------------------------------------------------- */
+
+.vi-two-col-grid {
+  display: grid;
+  grid-template-columns: 1.25fr 0.85fr;
+  gap: 24px;
+}
+
+.vi-col-primary,
+.vi-col-secondary {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* Cards Brancos com Borda Suave */
+.vi-white-card {
+  background: #FFFFFF;
+  border: 1px solid #ECE7E2;
+  border-radius: 18px;
+  padding: 24px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.02);
+}
+
+.vi-card-label {
+  display: block;
+  font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+  font-size: 14px;
+  font-weight: 700;
+  color: #1F1B1A;
+  margin-bottom: 8px;
+}
+
+.vi-card-input {
+  width: 100%;
+  background: #FFFFFF;
+  border: 1px solid #E2DCD5;
+  border-radius: 12px;
+  padding: 13px 16px;
+  font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+  font-size: 14px;
+  color: #1F1B1A;
+  outline: none;
+  transition: border-color 0.2s ease;
+  box-sizing: border-box;
+}
+
+.vi-card-input:focus {
+  border-color: #FF5A43;
+  box-shadow: 0 0 0 3px rgba(255, 90, 67, 0.1);
+}
+
+/* --------------------------------------------------------------------------
+   3. BOX ASSISTENTE DE IDEAÇÃO IA (PURPLE TINT - PASSO 1)
+   -------------------------------------------------------------------------- */
+
+.vi-ai-purple-card {
+  background: linear-gradient(180deg, #F6F7FF 0%, #FAF8FF 100%);
+  border: 1px solid #E4E3F7;
+  border-radius: 18px;
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.vi-ai-card-header {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.vi-ai-icon-box {
+  width: 38px;
+  height: 38px;
+  border-radius: 10px;
+  background-color: #FFFFFF;
+  color: #5D5FEF;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  box-shadow: 0 2px 8px rgba(93, 95, 239, 0.15);
+  flex-shrink: 0;
+}
+
+.vi-ai-title {
+  font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+  font-size: 15px;
+  font-weight: 700;
+  color: #1F1B1A;
+  margin: 0 0 2px 0;
+}
+
+.vi-ai-subtitle {
+  font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+  font-size: 12.5px;
+  color: #7A7585;
+  margin: 0;
+  line-height: 1.4;
+}
+
+.vi-ai-prompt-box {
+  width: 100%;
+}
+
+.vi-ai-prompt-input {
+  width: 100%;
+  background: #FFFFFF;
+  border: 1px solid #DFDCF4;
+  border-radius: 12px;
+  padding: 13px 18px;
+  font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+  font-size: 13.5px;
+  color: #2D2625;
+  outline: none;
+  box-sizing: border-box;
+}
+
+.vi-ai-prompt-input:focus {
+  border-color: #5D5FEF;
+  box-shadow: 0 0 0 3px rgba(93, 95, 239, 0.12);
+}
+
+.vi-ai-chips-and-btn-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+
+.vi-chips-group {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.vi-chip-btn {
+  background: #FFFFFF;
+  border: 1px solid #E0DBF0;
+  color: #534D62;
+  font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+  font-size: 12px;
+  font-weight: 600;
+  padding: 7px 14px;
+  border-radius: 20px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.vi-chip-btn:hover {
+  background: #F0EEFF;
+  border-color: #5D5FEF;
+  color: #5D5FEF;
+}
+
+.vi-btn-gerar-roteiro {
+  background: #5D5FEF;
+  color: #FFFFFF;
+  border: none;
+  border-radius: 12px;
+  padding: 10px 20px;
+  font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  box-shadow: 0 4px 12px rgba(93, 95, 239, 0.28);
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+}
+
+.vi-btn-gerar-roteiro:hover:not(:disabled) {
+  background: #4B4DDC;
+  transform: translateY(-1px);
+}
+
+/* --------------------------------------------------------------------------
+   4. SEU ROTEIRO (EDITÁVEL - PASSO 1)
+   -------------------------------------------------------------------------- */
+
+.vi-script-card {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.vi-script-header-row {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.vi-script-title {
+  font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+  font-size: 16px;
+  font-weight: 700;
+  color: #1F1B1A;
+  margin: 0 0 4px 0;
+}
+
+.vi-script-subtitle {
+  font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+  font-size: 12.5px;
+  color: #8C827F;
+  margin: 0;
+}
+
+.vi-badge-salvo {
+  font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+  font-size: 11.5px;
+  font-weight: 700;
+  background-color: #FFF2E6;
+  color: #FF7338;
+  padding: 4px 10px;
+  border-radius: 8px;
+  white-space: nowrap;
+}
+
+.vi-script-textarea {
+  width: 100%;
+  background: #FFFFFF;
+  border: 1px solid #E2DCD5;
+  border-radius: 12px;
+  padding: 16px;
+  font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+  font-size: 13.5px;
+  line-height: 1.6;
+  color: #2D1917;
+  outline: none;
+  resize: vertical;
+  box-sizing: border-box;
+}
+
+/* --------------------------------------------------------------------------
+   5. ETAPA 2: TELEPROMPTER & CONTROLE DE GRAVAÇÃO
+   -------------------------------------------------------------------------- */
+
+.vi-step2-layout {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.vi-step2-top-grid {
+  display: grid;
+  grid-template-columns: 1.25fr 0.9fr;
+  gap: 24px;
+}
+
+.vi-teleprompter-box-card {
+  background: #FDF4EC;
+  border: 1px solid #F5DFD0;
+  border-radius: 20px;
+  padding: 28px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.02);
+}
+
+.vi-teleprompter-card-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.vi-teleprompter-title {
+  font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+  font-size: 16px;
+  font-weight: 800;
+  color: #1F1B1A;
+  margin: 0 0 4px 0;
+}
+
+.vi-teleprompter-desc {
+  font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+  font-size: 13px;
+  color: #8A7A72;
+  margin: 0;
+}
+
+.vi-badge-rolagem {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: #FDE8DC;
+  border: 1px solid #F0C4AE;
+  color: #E65A40;
+  font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+  font-size: 11.5px;
+  font-weight: 700;
+  padding: 5px 12px;
+  border-radius: 12px;
+  white-space: nowrap;
+}
+
+.vi-dot-pulse {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background-color: #E65A40;
+  box-shadow: 0 0 0 2px rgba(230, 90, 64, 0.25);
+  animation: pulseDot 1.5s infinite;
+}
+
+.vi-teleprompter-content-box {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  position: relative;
+  padding-right: 20px;
+  max-height: 290px;
+  overflow-y: auto;
+  scroll-behavior: smooth;
+}
+
+.vi-teleprompter-content-box::after {
+  content: '';
+  position: absolute;
+  right: 0;
+  top: 10px;
+  bottom: 10px;
+  width: 4.5px;
+  background: #FF7B68;
+  border-radius: 4px;
+}
+
+.vi-tele-p {
+  font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+  font-size: 14px;
+  line-height: 1.6;
+  color: #8C7B73;
+  margin: 0;
+}
+
+.vi-tele-highlight-box {
+  background: #FFFFFF;
+  border: 1.5px solid #FF8270;
+  border-radius: 12px;
+  padding: 16px 18px;
+  box-shadow: 0 4px 14px rgba(255, 123, 104, 0.08);
+}
+
+.vi-tele-highlight-box p {
+  font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+  font-size: 14.5px;
+  line-height: 1.55;
+  color: #1F1B1A;
+  margin: 0;
+}
+
+.vi-record-control-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: 28px 24px;
+  gap: 20px;
+}
+
+.vi-control-title {
+  font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+  font-size: 16px;
+  font-weight: 800;
+  color: #1F1B1A;
+  margin: 0;
+  align-self: flex-start;
+}
+
+.vi-audio-timer-display-box {
+  width: 100%;
+  background: #FFF9F6;
+  border-radius: 16px;
+  padding: 24px 16px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+}
+
+.vi-timer-digits-row {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+}
+
+.vi-timer-active-num {
+  font-size: 30px;
+  font-weight: 800;
+  color: #FF5A43;
+}
+
+.vi-timer-total-num {
+  font-size: 16px;
+  font-weight: 600;
+  color: #6E7B91;
+}
+
+.vi-waveform-visualizer-live {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4.5px;
+  height: 44px;
+}
+
+.vi-wave-bar {
+  width: 3.5px;
+  background-color: #FF5A43;
+  border-radius: 3px;
+  display: inline-block;
+  transition: height 0.15s ease;
+}
+
+.vi-wave-bar.animating {
+  animation: wavePulse 1s ease-in-out infinite alternate;
+}
+
+.vi-studio-controls-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 18px;
+}
+
+.vi-btn-circle-action {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: #F7F4F0;
+  border: none;
+  color: #4D4543;
+  font-size: 16px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+
+.vi-btn-circle-action:hover {
+  background: #EBE5DF;
+  color: #1F1B1A;
+  transform: scale(1.06);
+}
+
+.vi-btn-main-record-stop {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background-color: #FF5A43;
+  border: 6px solid #FFE4E0;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 16px rgba(255, 90, 67, 0.35);
+  transition: all 0.2s ease;
+}
+
+.vi-btn-main-record-stop:hover {
+  transform: scale(1.08);
+  background-color: #E84D37;
+}
+
+.vi-stop-square-icon {
+  width: 18px;
+  height: 18px;
+  background-color: #FFFFFF;
+  border-radius: 4px;
+}
+
+.vi-rec-status-indicator {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+  font-size: 13px;
+  color: #6E6462;
+  font-weight: 500;
+}
+
+.vi-status-dot.live-red {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background-color: #FF5A43;
+  display: inline-block;
+  animation: pulseDot 1.2s infinite;
+}
+
+.vi-avatar-banner-card {
+  background: #FFFFFF;
+  border: 1px solid #ECE7E2;
+  border-radius: 18px;
+  padding: 20px 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.02);
+}
+
+.vi-avatar-banner-left {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.vi-avatar-mic-icon-box {
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  background-color: #F0F4FF;
+  color: #3B82F6;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  flex-shrink: 0;
+}
+
+.vi-avatar-banner-title {
+  font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+  font-size: 15px;
+  font-weight: 700;
+  color: #1F1B1A;
+  margin: 0 0 3px 0;
+}
+
+.vi-avatar-banner-subtitle {
+  font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+  font-size: 13px;
+  color: #7A7270;
+  margin: 0;
+}
+
+.vi-ios-toggle {
+  width: 46px;
+  height: 26px;
+  background-color: #E2DDD8;
+  border-radius: 14px;
+  padding: 2px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  position: relative;
+  flex-shrink: 0;
+}
+
+.vi-ios-toggle.active {
+  background-color: #FF5A43;
+}
+
+.vi-ios-toggle-knob {
+  width: 22px;
+  height: 22px;
+  background-color: #FFFFFF;
+  border-radius: 50%;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  transition: transform 0.2s ease;
+}
+
+.vi-ios-toggle.active .vi-ios-toggle-knob {
+  transform: translateX(20px);
+}
+
+.vi-saved-takes-section {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.vi-saved-section-title {
+  font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+  font-size: 16px;
+  font-weight: 700;
+  color: #1F1B1A;
+  margin: 0 0 4px 0;
+}
+
+.vi-saved-take-row {
+  background: #FFFFFF;
+  border: 1px solid #ECE7E2;
+  border-radius: 16px;
+  padding: 16px 22px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  transition: all 0.15s ease;
+}
+
+.vi-saved-take-row.active-selected {
+  border-color: #FFCDC5;
+  background: #FFFFFF;
+}
+
+.vi-take-left {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  min-width: 240px;
+}
+
+.vi-take-icon-box {
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  flex-shrink: 0;
+}
+
+.vi-take-icon-box.coral-tint {
+  background-color: #FFF2F0;
+  color: #FF7361;
+}
+
+.vi-take-icon-box.gray-tint {
+  background-color: #F4F1ED;
+  color: #7A7270;
+}
+
+.vi-take-title {
+  font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+  font-size: 14.5px;
+  font-weight: 700;
+  color: #1F1B1A;
+  margin: 0 0 2px 0;
+}
+
+.vi-take-meta {
+  font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+  font-size: 12.5px;
+  color: #8C827F;
+}
+
+.vi-take-waveform-preview {
+  color: #D6CEC8;
+  letter-spacing: 2px;
+  font-size: 13px;
+  user-select: none;
+  overflow: hidden;
+  text-overflow: clip;
+  white-space: nowrap;
+  flex: 1;
+  text-align: center;
+}
+
+.btn-take-action-selected {
+  background: #FF5A43;
+  color: #FFFFFF;
+  border: none;
+  border-radius: 10px;
+  padding: 9px 20px;
+  font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(255, 90, 67, 0.25);
+  transition: all 0.15s ease;
+  flex-shrink: 0;
+}
+
+.btn-take-action-secondary {
+  background: #FFFFFF;
+  color: #3D3534;
+  border: 1px solid #DCD5CE;
+  border-radius: 10px;
+  padding: 9px 20px;
+  font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  flex-shrink: 0;
+}
+
+.vi-btn-main-record-start {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  background: #FF5A43;
+  color: #FFFFFF;
+  border: none;
+  border-radius: 30px;
+  padding: 14px 28px;
+  font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 4px 16px rgba(255, 90, 67, 0.35);
+  transition: all 0.2s ease;
+}
+
+.vi-btn-main-record-start:hover {
+  background: #E84D37;
+  transform: scale(1.03);
+}
+
+.vi-badge-rolagem {
+  cursor: pointer;
+  user-select: none;
+  transition: all 0.15s ease;
+}
+
+.vi-badge-rolagem.paused {
+  background: #F3EFEA;
+  border-color: #E2DDD7;
+  color: #8C827F;
+}
+
+.vi-dot-pulse.paused {
+  background-color: #8C827F;
+  box-shadow: none;
+  animation: none;
+}
+
+.vi-mic-error-banner {
+  background: #FFF5F5;
+  border: 1px solid #FED7D7;
+  color: #C53030;
+  padding: 12px 16px;
+  border-radius: 12px;
+  font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+  font-size: 13px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+}
+
+.vi-take-actions-right {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.vi-take-play-btn {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  background: #FFF2F0;
+  border: 1.5px solid #FFD5CE;
+  color: #FF5A43;
+  font-size: 14px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: all 0.2s ease;
+}
+
+.vi-take-play-btn:hover {
+  background: #FF5A43;
+  color: #FFFFFF;
+  transform: scale(1.08);
+}
+
+.vi-take-play-btn.playing {
+  background: #FF5A43;
+  color: #FFFFFF;
+  animation: pulseDot 1.4s infinite;
+}
+
+.btn-take-delete {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  background: transparent;
+  border: 1px solid transparent;
+  color: #B5ACA8;
+  font-size: 14px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.15s ease;
+}
+
+.btn-take-delete:hover {
+  background: #FFF0F0;
+  border-color: #FED7D7;
+  color: #E53E3E;
+}
+
+.vi-saved-takes-header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 4px;
+  flex-wrap: wrap;
+}
+
+.vi-saved-takes-hint {
+  font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+  font-size: 12.5px;
+  color: #8C827F;
+}
+
+.vi-no-takes-card {
+  background: #FAF8F5;
+  border: 1.5px dashed #E2DDD7;
+  border-radius: 16px;
+  padding: 28px 20px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+
+.vi-no-takes-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: #ECE7E2;
+  color: #8C827F;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  margin-bottom: 4px;
+}
+
+.vi-no-takes-card h4 {
+  font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+  font-size: 15px;
+  font-weight: 700;
+  color: #1F1B1A;
+  margin: 0;
+}
+
+.vi-no-takes-card p {
+  font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+  font-size: 13px;
+  color: #8C827F;
+  margin: 0;
+  max-width: 440px;
+}
+
+/* --------------------------------------------------------------------------
+   6. ETAPA 3: CONFIGURAR ENTREGA (NOVO MOCKUP EXATO)
+   -------------------------------------------------------------------------- */
+
+.vi-delivery-step-layout {
+  display: grid;
+  grid-template-columns: 1.35fr 0.85fr;
+  gap: 24px;
+}
+
+.vi-delivery-left-column {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.vi-deliv-card-section {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.vi-deliv-sec-title {
+  font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+  font-size: 15.5px;
+  font-weight: 800;
+  color: #1F1B1A;
+  margin: 0;
+}
+
+.vi-deliv-sec-desc {
+  font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+  font-size: 13px;
+  color: #8C827F;
+  margin: -6px 0 4px 0;
+}
+
+/* 1. Tipo de Entrega - 2 Caixas */
+.vi-deliv-trigger-cards-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.vi-deliv-trigger-box {
+  background: #FFFFFF;
+  border: 1.5px solid #EBE5DF;
+  border-radius: 14px;
+  padding: 18px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.vi-deliv-trigger-box:hover {
+  border-color: #FFA596;
+}
+
+.vi-deliv-trigger-box.selected {
+  border-color: #FF5A43;
+  background-color: #FFFFFF;
+}
+
+.vi-deliv-trigger-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 4px;
+}
+
+.vi-trigger-icon {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+}
+
+.vi-trigger-icon.coral-light {
+  background-color: #FFF0ED;
+  color: #FF5A43;
+}
+
+.vi-radio-circle-indicator {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  border: 1.5px solid #D6CBC6;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #FFFFFF;
+}
+
+.vi-deliv-trigger-box.selected .vi-radio-circle-indicator {
+  border-color: #FF5A43;
+}
+
+.vi-radio-inner-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background-color: #FF5A43;
+}
+
+.vi-trigger-card-title {
+  font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+  font-size: 14.5px;
+  font-weight: 700;
+  color: #1F1B1A;
+  margin: 0;
+}
+
+.vi-trigger-card-desc {
+  font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+  font-size: 12.5px;
+  line-height: 1.45;
+  color: #8C827F;
+  margin: 0;
+}
+
+/* 2. Canal de Entrega */
+.vi-channels-options-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.vi-channel-row-item {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.vi-custom-checkbox-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  user-select: none;
+}
+
+.vi-custom-checkbox-label input {
+  display: none;
+}
+
+.vi-checkbox-box {
+  width: 20px;
+  height: 20px;
+  border-radius: 5px;
+  border: 1.5px solid #D6CBC6;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #FFFFFF;
+  color: #FFFFFF;
+  font-size: 11px;
+  transition: all 0.15s ease;
+  flex-shrink: 0;
+}
+
+.vi-custom-checkbox-label input:checked + .vi-checkbox-box {
+  background-color: #FF5A43;
+  border-color: #FF5A43;
+}
+
+.vi-checkbox-box.coral-check {
+  background-color: #FF5A43;
+  border-color: #FF5A43;
+}
+
+.vi-checkbox-text {
+  font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+  color: #1F1B1A;
+}
+
+.vi-channel-input {
+  width: 100%;
+  background: #FFFFFF;
+  border: 1px solid #E2DCD5;
+  border-radius: 10px;
+  padding: 12px 16px;
+  font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+  font-size: 13.5px;
+  color: #1F1B1A;
+  outline: none;
+  box-sizing: border-box;
+}
+
+/* 3. Guardião Responsável */
+.vi-guardian-assigned-box {
+  background: #FFFFFF;
+  border: 1px solid #ECE7E2;
+  border-radius: 14px;
+  padding: 16px 18px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.vi-guardian-left-info {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.vi-guardian-thumb {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  object-fit: cover;
+  flex-shrink: 0;
+}
+
+.vi-guardian-name {
+  font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+  font-size: 14.5px;
+  font-weight: 700;
+  color: #1F1B1A;
+  margin: 0 0 2px 0;
+}
+
+.vi-guardian-meta-line {
+  font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+  font-size: 12px;
+  color: #8C827F;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.vi-guardian-meta-sep {
+  color: #BDB4AE;
+}
+
+.vi-guardian-status-green {
+  color: #10B981;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  font-size: 11px;
+}
+
+.btn-alterar-guardiao {
+  background: transparent;
+  border: none;
+  color: #FF5A43;
+  font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  padding: 6px 10px;
+  border-radius: 8px;
+  transition: all 0.15s ease;
+}
+
+.btn-alterar-guardiao:hover {
+  background: #FFF0ED;
+}
+
+/* Curiosidade não libera o cofre */
+.vi-curiosity-shield-card {
+  background: #FFF9F2;
+  border: 1px solid #FFE7D1;
+  border-radius: 14px;
+  padding: 18px 20px;
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.vi-shield-text-content {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.vi-shield-title {
+  font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+  font-size: 14px;
+  font-weight: 800;
+  color: #1F1B1A;
+  margin: 0;
+}
+
+.vi-shield-desc {
+  font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+  font-size: 12.5px;
+  line-height: 1.5;
+  color: #857064;
+  margin: 0;
+}
+
+/* 4. Mensagem de Acompanhamento */
+.vi-deliv-toggle-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.vi-followup-textarea-box {
+  margin-top: 6px;
+}
+
+.vi-followup-textarea {
+  width: 100%;
+  background: #FFF9F6;
+  border: 1px solid #F5E5DC;
+  border-radius: 12px;
+  padding: 16px;
+  font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+  font-size: 13.5px;
+  line-height: 1.55;
+  color: #2D1917;
+  outline: none;
+  resize: vertical;
+  box-sizing: border-box;
+}
+
+/* --------------------------------------------------------------------------
+   7. COLUNA DIREITA: RESUMO DO ENVIO (STEP 3)
+   -------------------------------------------------------------------------- */
+
+.vi-summary-side-card {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 26px;
+}
+
+.vi-summary-card-title {
+  font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+  font-size: 16px;
+  font-weight: 800;
+  color: #1F1B1A;
+  margin: 0;
+}
+
+.vi-summary-card-subtitle {
+  font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+  font-size: 13px;
+  color: #8C827F;
+  margin: -10px 0 2px 0;
+}
+
+.vi-summary-media-banner {
+  background: #FFF8F6;
+  border: 1px solid #FFEBE6;
+  border-radius: 14px;
+  padding: 14px 16px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.vi-summary-media-icon {
+  width: 38px;
+  height: 38px;
+  border-radius: 10px;
+  background-color: #FFF0ED;
+  color: #FF5A43;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  flex-shrink: 0;
+}
+
+.vi-summary-media-title {
+  font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+  font-size: 14px;
+  font-weight: 700;
+  color: #1F1B1A;
+  margin: 0 0 2px 0;
+}
+
+.vi-summary-media-sub {
+  font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+  font-size: 12px;
+  color: #8C827F;
+}
+
+/* Tabela de Resumo */
+.vi-summary-table-rows {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 12px 0;
+  border-top: 1px solid #F0ECE8;
+  border-bottom: 1px solid #F0ECE8;
+}
+
+.vi-sum-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.vi-sum-label {
+  font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+  font-size: 13px;
+  color: #8C827F;
+}
+
+.vi-sum-value {
+  font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+  font-size: 13px;
+  font-weight: 700;
+  color: #1F1B1A;
+  text-align: right;
+}
+
+/* Nota de Segurança */
+.vi-summary-security-note {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+  font-size: 12px;
+  line-height: 1.45;
+  color: #7A7270;
+}
+
+.vi-summary-security-note i {
+  color: #8C827F;
+  font-size: 14px;
+  margin-top: 2px;
+}
+
+.vi-summary-security-note p {
+  margin: 0;
+}
+
+/* --------------------------------------------------------------------------
+   8. RODAPÉ DE AÇÕES
+   -------------------------------------------------------------------------- */
+
+.vi-bottom-actions-row {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 16px;
+  padding-top: 20px;
+  border-top: 1px solid #ECE7E2;
+  margin-top: 12px;
+}
+
+.vi-footer-buttons-right {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.vi-btn-rascunho {
+  background: #FFFFFF;
+  border: 1.5px solid #332E2D;
+  color: #1F1B1A;
+  border-radius: 24px;
+  padding: 12px 24px;
+  font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+  font-size: 13.5px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.vi-btn-rascunho:hover {
+  background-color: #F8F5F2;
+  transform: translateY(-1px);
+}
+
+.vi-btn-ir-gravacao {
+  background: #FF5A43;
+  border: none;
+  color: #FFFFFF;
+  border-radius: 24px;
+  padding: 12px 28px;
+  font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+  font-size: 13.5px;
+  font-weight: 700;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  box-shadow: 0 4px 14px rgba(255, 90, 67, 0.28);
+  transition: all 0.2s ease;
+}
+
+.vi-btn-ir-gravacao:hover {
+  background: #E84D37;
+  transform: translateY(-1px);
+  box-shadow: 0 6px 18px rgba(255, 90, 67, 0.35);
+}
+
+/* Toast */
+.vi-toast-banner {
+  position: fixed;
+  top: 24px;
+  right: 24px;
+  background: #1F1B1A;
+  color: #FFFFFF;
+  padding: 12px 20px;
+  border-radius: 10px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 13.5px;
+  font-weight: 600;
+  z-index: 999;
+}
+
+.vi-toast-banner i {
+  color: #10B981;
+}
+
+/* --------------------------------------------------------------------------
+   RESPONSIVIDADE
+   -------------------------------------------------------------------------- */
+
+@media (max-width: 860px) {
+  .voice-ideation-container {
+    padding: 24px 16px 60px;
+  }
+
+  .vi-delivery-step-layout,
+  .vi-step2-top-grid,
+  .vi-two-col-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .vi-deliv-trigger-cards-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .vi-take-waveform-preview {
+    display: none;
+  }
+
+  .vi-bottom-actions-row {
+    flex-direction: column-reverse;
+    align-items: stretch;
+  }
+
+  .vi-footer-buttons-right {
+    flex-direction: column;
+  }
+
+  .vi-btn-rascunho,
+  .vi-btn-ir-gravacao {
+    width: 100%;
+    justify-content: center;
+  }
+}

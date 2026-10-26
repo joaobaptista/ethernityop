@@ -1,0 +1,328 @@
+/* SpecialPersonFormCard.css — Tela "Quem é essa pessoa especial?" */
+
+.special-person-wrapper {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 24px 20px 48px;
+  box-sizing: border-box;
+}
+
+/* Barra Superior com Voltar e Contador */
+.special-person-topbar {
+  width: 100%;
+  max-width: 540px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 22px;
+}
+
+.btn-back-to-people {
+  background: none;
+  border: none;
+  color: #7E6C66;
+  font-size: 13.5px;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 0;
+  transition: color 0.2s ease, transform 0.2s ease;
+}
+
+.btn-back-to-people:hover {
+  color: #F05A47;
+  transform: translateX(-3px);
+}
+
+.person-counter-badge {
+  background-color: #FDECE9;
+  color: #F05A47;
+  font-size: 11.5px;
+  font-weight: 700;
+  padding: 4px 14px;
+  border-radius: 12px;
+  letter-spacing: 0.2px;
+}
+
+/* Card Central Principal */
+.special-person-card {
+  background-color: #FFFFFF;
+  border-radius: 28px;
+  max-width: 540px;
+  width: 100%;
+  padding: 36px 36px 30px;
+  box-shadow: 0 12px 36px rgba(45, 25, 23, 0.06);
+  border: 1px solid #ECE5DC;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  box-sizing: border-box;
+}
+
+/* Topo do Card com Avatar Central */
+.modal-person-top {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}
+
+.modal-avatar-wrapper {
+  width: 96px;
+  height: 96px;
+  border-radius: 50%;
+  padding: 3px;
+  background: radial-gradient(circle, #FBE5E1 0%, #F05A47 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 6px 18px rgba(240, 90, 71, 0.2);
+}
+
+.modal-avatar-image {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2.5px solid #FFFFFF;
+  background-color: #F8F4EE;
+}
+
+.modal-photos-badge {
+  background-color: #FDF0ED;
+  color: #E05A47;
+  font-size: 11.5px;
+  font-weight: 600;
+  padding: 4px 14px;
+  border-radius: 12px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Títulos do Card */
+.modal-person-heading {
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.modal-person-title {
+  font-family: var(--font-display, 'Playfair Display', Georgia, serif);
+  font-size: 26px;
+  font-weight: 700;
+  color: #2D1917;
+  letter-spacing: -0.3px;
+  line-height: 1.25;
+  margin: 0;
+}
+
+.modal-person-subtitle {
+  font-size: 13.5px;
+  line-height: 1.55;
+  color: #7E6C66;
+  margin: 0;
+  padding: 0 6px;
+}
+
+/* Caixa de Aviso Seguro com Escudo */
+.modal-future-notice {
+  background-color: #FFF6F4;
+  border: 1px solid #F6B1A8;
+  border-radius: 14px;
+  padding: 13px 16px;
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.notice-icon {
+  width: 20px;
+  height: 20px;
+  color: #F05A47;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
+.notice-text {
+  font-size: 12.5px;
+  line-height: 1.45;
+  color: #4D3A36;
+  margin: 0;
+}
+
+/* Formulário de Dados */
+.modal-person-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.person-form-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.person-label {
+  font-size: 13px;
+  font-weight: 600;
+  color: #2D1917;
+}
+
+.required-star {
+  color: #F05A47;
+  font-weight: 700;
+}
+
+.optional-tag {
+  color: #8C7E77;
+  font-size: 11.5px;
+  font-weight: 400;
+}
+
+.person-input {
+  width: 100%;
+  padding: 12px 16px;
+  border: 1px solid #ECE5DC;
+  border-radius: 12px;
+  background-color: #FFFFFF;
+  color: #2D1917;
+  font-size: 14px;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  box-sizing: border-box;
+}
+
+.person-input:focus {
+  outline: none;
+  border-color: #F05A47;
+  box-shadow: 0 0 0 3px rgba(240, 90, 71, 0.12);
+}
+
+.person-input.icon-padded {
+  padding-left: 42px;
+}
+
+.person-input-with-icon {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.input-icon {
+  position: absolute;
+  left: 15px;
+  color: #A89892;
+  font-size: 14px;
+  pointer-events: none;
+}
+
+/* Select de Relação com Ícone de Coração e Borda Coral */
+.person-select-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.person-select-wrapper.active-relation .person-select {
+  border: 1.5px solid #F05A47;
+  padding-left: 42px;
+  padding-right: 36px;
+}
+
+.relation-heart-icon {
+  position: absolute;
+  left: 15px;
+  color: #F05A47;
+  font-size: 15px;
+  pointer-events: none;
+}
+
+.relation-chevron-icon {
+  position: absolute;
+  right: 15px;
+  color: #2D1917;
+  font-size: 12px;
+  pointer-events: none;
+}
+
+.person-select {
+  width: 100%;
+  padding: 12px 16px;
+  border: 1px solid #ECE5DC;
+  border-radius: 12px;
+  background-color: #FFFFFF;
+  color: #2D1917;
+  font-size: 14px;
+  font-weight: 500;
+  appearance: none;
+  cursor: pointer;
+  box-sizing: border-box;
+}
+
+.person-select:focus {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(240, 90, 71, 0.12);
+}
+
+/* Footer do Formulário: Pular esta pessoa / Próxima Pessoa */
+.modal-person-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 10px;
+  padding-top: 16px;
+  border-top: 1px solid #F4EFEA;
+}
+
+.btn-skip-person {
+  font-size: 13.5px;
+  font-weight: 500;
+  color: #7E6C66;
+  text-decoration: underline;
+  cursor: pointer;
+  background: transparent;
+  border: none;
+  padding: 8px 4px;
+  transition: color 0.2s ease;
+}
+
+.btn-skip-person:hover {
+  color: #F05A47;
+}
+
+.btn-next-person {
+  background-color: #F05A47;
+  color: #FFFFFF;
+  font-size: 14px;
+  font-weight: 600;
+  padding: 12px 24px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.2s ease, transform 0.15s ease, opacity 0.2s ease;
+  box-shadow: 0 4px 14px rgba(240, 90, 71, 0.25);
+}
+
+.btn-next-person:hover:not(:disabled) {
+  background-color: #D94836;
+  transform: translateY(-1px);
+}
+
+.btn-next-person:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+  box-shadow: none;
+}

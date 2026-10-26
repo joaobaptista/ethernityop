@@ -1,0 +1,313 @@
+/* ==========================================================================
+   DESIGN SYSTEM GLOBALS — ETHERNITY DMS (LEGADO DIGITAL & MEMÓRIAS VIVAS)
+   Paleta Exata: Coral Terracota #F05A47 • Bege Creme #FAF7F2 • Espresso #2D1917
+   ========================================================================== */
+
+:root {
+  --font-display: 'Fraunces', Georgia, serif;
+  --font-ui: 'Plus Jakarta Sans', system-ui, sans-serif;
+  --font-weight-regular: 400;
+  --font-weight-medium: 500;
+  --font-weight-semibold: 600;
+  --font-weight-bold: 700;
+  --font-weight-extrabold: 800;
+  --text-display-xl: 600 72px/80px var(--font-display);
+  --text-display-lg: 600 56px/64px var(--font-display);
+  --text-display-md: 600 48px/56px var(--font-display);
+  --text-display-sm: 600 40px/48px var(--font-display);
+  --text-display-xs: 600 36px/44px var(--font-display);
+  --text-heading-xl: 600 32px/1.25 var(--font-display);
+  --text-heading-lg: 600 28px/1.25 var(--font-display);
+  --text-heading-md: 700 28px/1.25 var(--font-display);
+  --text-heading-sm: 600 24px/1.25 var(--font-display);
+  --text-heading-xs: 600 22px/1.25 var(--font-display);
+  --text-subtitle-lg: 600 20px/28px var(--font-display);
+  --text-subtitle-md: 600 18px/1.3 var(--font-display);
+  --text-subtitle-sm: 600 16px/1.3 var(--font-display);
+  --text-title-hero: 800 80px/1.05 var(--font-ui);
+  --text-title-xl: 800 72px/1.05 var(--font-ui);
+  --text-title-lg: 800 56px/1.1 var(--font-ui);
+  --text-title-md: 800 48px/1.2 var(--font-ui);
+  --text-title-sm: 800 44px/1.2 var(--font-ui);
+  --text-title-xs: 800 40px/1.2 var(--font-ui);
+  --text-title-section: 800 36px/1.2 var(--font-ui);
+  --text-title-card: 800 28px/1.2 var(--font-ui);
+  --text-title-card-sm: 800 24px/1.2 var(--font-ui);
+  --text-title-subsection: 800 22px/1.2 var(--font-ui);
+  --text-title-feature: 800 20px/1.2 var(--font-ui);
+  --text-title-sidebar: 800 18px/1.2 var(--font-ui);
+  --text-body-xl: 400 22px/1.5 var(--font-ui);
+  --text-body-lg: 400 18px/1.6 var(--font-ui);
+  --text-body-md: 400 16px/1.6 var(--font-ui);
+  --text-body-sm: 400 15px/1.6 var(--font-ui);
+  --text-body-xs: 400 14px/22px var(--font-ui);
+  --text-body-caption: 400 13px/1.5 var(--font-ui);
+  --text-ui-nav: 500 14px/1.4 var(--font-ui);
+  --text-ui-button-primary: 800 16px/1.4 var(--font-ui);
+  --text-ui-button-default: 600 15px/1.4 var(--font-ui);
+  --text-ui-button-bold: 700 16px/1.4 var(--font-ui);
+  --text-ui-label: 600 14px/1.4 var(--font-ui);
+  --text-ui-label-bold: 700 14px/1.4 var(--font-ui);
+  --text-ui-value: 400 14px/1.5 var(--font-ui);
+  --text-ui-tag: 700 13px/1.4 var(--font-ui);
+  --text-ui-tag-semibold: 600 13px/1.4 var(--font-ui);
+  --text-ui-small: 400 12px/1.5 var(--font-ui);
+  --text-ui-small-bold: 700 12px/1.5 var(--font-ui);
+  --text-ui-small-semibold: 600 12px/1.5 var(--font-ui);
+  --text-ui-badge: 700 11px/1.4 var(--font-ui);
+  --text-ui-micro: 700 10px/1.4 var(--font-ui);
+  /* Cores Primárias (Coral Terracota Ethernity) */
+  --color-primary: #F05A47;
+  --color-primary-light: #FDF3F1;
+  --color-primary-subtle: #FBE5E1;
+  --color-primary-hover: #E04835;
+  --color-primary-dark: #C63A28;
+
+  /* Cores Secundárias (Tons Terrosos Acolhedores) */
+  --color-secondary: #7E6C66;
+  --color-secondary-light: #F8F4EE;
+  --color-secondary-subtle: #ECE5DC;
+  --color-secondary-dark: #351E19;
+
+  /* Alertas & Perigo */
+  --color-danger: #E53935;
+  --color-danger-light: #FFEBEE;
+  --color-danger-subtle: #FFCDD2;
+  --color-danger-dark: #B71C1C;
+
+  /* Sucesso & Segurança Criptografada */
+  --color-success: #2E7D32;
+  --color-success-light: #E8F5E9;
+  --color-success-subtle: #C8E6C9;
+  --color-success-dark: #1B5E20;
+
+  /* Advertência & Destaque */
+  --color-warning: #D97706;
+  --color-warning-light: #FFFBEB;
+  --color-warning-subtle: #FDE68A;
+  --color-warning-dark: #B45309;
+
+  /* Superfícies & Neutros Acolhedores */
+  --bg-canvas: #FAF7F2;              /* Bege Creme suave da Sidebar e Fundo */
+  --bg-surface: #FFFFFF;             /* Branco puro dos Cards */
+  --bg-surface-subtle: #F8F4EE;      /* Fundo suave para caixas de ícones e inputs */
+  --bg-surface-elevated: #F2EBE1;    /* Fundo para hover e containers */
+  --border-color: #ECE5DC;           /* Bordas refinadas sutis */
+  --border-light: #F4EFEA;
+
+  /* Tipografia Neutra Quente */
+  --text-main: #2D1917;              /* Espresso / Chocolate Escuro */
+  --text-muted: #7E6C66;             /* Cinza-marrom acolhedor */
+  --text-light: #A89892;             /* Rótulos terciários */
+
+  /* Sombras Suaves */
+  --shadow-sm: 0 1px 3px rgba(45, 25, 23, 0.03), 0 1px 2px rgba(45, 25, 23, 0.02);
+  --shadow-md: 0 4px 18px rgba(45, 25, 23, 0.05), 0 2px 6px rgba(45, 25, 23, 0.02);
+  --shadow-lg: 0 12px 36px rgba(45, 25, 23, 0.07), 0 4px 12px rgba(45, 25, 23, 0.03);
+
+  /* Raios de Borda */
+  --radius-sm: 10px;
+  --radius-md: 16px;
+  --radius-lg: 22px;
+  --radius-full: 9999px;
+
+  /* Transições */
+  --transition-fast: 0.15s ease;
+  --transition-normal: 0.25s ease;
+}
+
+[data-theme="dark"] {
+  /* Cores Primárias Dark */
+  --color-primary: #F05A47;
+  --color-primary-light: rgba(240, 90, 71, 0.14);
+  --color-primary-subtle: rgba(240, 90, 71, 0.24);
+  --color-primary-hover: #F47564;
+  --color-primary-dark: #DE4835;
+
+  /* Cores Secundárias Dark */
+  --color-secondary: #B8ADA7;
+  --color-secondary-light: #1E1A17;
+  --color-secondary-subtle: #292420;
+  --color-secondary-dark: #FAF7F2;
+
+  /* Cores de Alerta Dark */
+  --color-danger: #F87171;
+  --color-danger-light: rgba(248, 113, 113, 0.14);
+  --color-danger-subtle: rgba(248, 113, 113, 0.24);
+  --color-danger-dark: #EF4444;
+
+  /* Cores de Sucesso Dark */
+  --color-success: #4ADE80;
+  --color-success-light: rgba(74, 222, 128, 0.14);
+  --color-success-subtle: rgba(74, 222, 128, 0.24);
+  --color-success-dark: #22C55E;
+
+  /* Superfícies Dark */
+  --bg-canvas: #14110F;
+  --bg-surface: #1E1A17;
+  --bg-surface-subtle: #292420;
+  --bg-surface-elevated: #36302B;
+  --color-bg-card: #1E1A17;
+  --color-bg-surface-subtle: #292420;
+
+  /* Bordas Dark */
+  --border-color: #332D28;
+  --border-light: #25201C;
+  --color-border: #332D28;
+
+  /* Tipografia Dark */
+  --text-main: #FAF7F2;
+  --text-muted: #B8ADA7;
+  --text-light: #8A7E78;
+  --color-text: #FAF7F2;
+  --color-text-muted: #B8ADA7;
+}
+
+/* Reset Global */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html,
+body {
+  height: 100%;
+  width: 100%;
+  font-family: var(--font-ui);
+  background-color: var(--bg-canvas);
+  color: var(--text-main);
+  font-size: 14px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+#root {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Editorial headings; functional controls always use the UI family. */
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-display);
+  font-optical-sizing: auto;
+}
+
+.brand-title {
+  font: var(--text-subtitle-md);
+}
+
+.brand-wordmark {
+  display: inline-flex;
+  flex-direction: column;
+  justify-content: center;
+  flex-shrink: 0;
+  color: var(--text-main);
+  text-align: left;
+  white-space: nowrap;
+}
+
+.brand-wordmark .brand-wordmark-name {
+  font: 600 22px/1.1 var(--font-display);
+  letter-spacing: -0.5px;
+}
+
+.brand-wordmark-name > span {
+  color: var(--color-primary);
+}
+
+.brand-wordmark .brand-wordmark-tagline {
+  font: 700 9px/1.4 var(--font-ui);
+  letter-spacing: 1.5px;
+  color: var(--color-primary);
+}
+
+.brand-wordmark.login-logo-text {
+  width: auto;
+  height: auto;
+}
+
+.brand-wordmark.login-logo-text .brand-wordmark-name {
+  font-size: clamp(28px, 6vw, 36px);
+}
+
+[data-theme="dark"] .brand-wordmark {
+  filter: none;
+}
+
+button {
+  font-family: var(--font-ui);
+  cursor: pointer;
+  border: none;
+  background: transparent;
+  outline: none;
+  transition: all var(--transition-fast);
+}
+
+input,
+select,
+textarea {
+  font-family: var(--font-ui);
+  font-size: inherit;
+  color: var(--text-main);
+  background-color: var(--bg-surface);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm);
+  outline: none;
+  transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+input:focus,
+select:focus,
+textarea:focus {
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px rgba(240, 90, 71, 0.15);
+}
+
+
+
+/* ==========================================================================
+   PADRÃO GLOBAL: MODAIS EM TELA CHEIA E RIGOROSAMENTE CENTRALIZADOS (FULLSCREEN OVERLAY)
+   Sobrepõem toda a viewport (100vw x 100vh), cobrindo sidebar, cabeçalho e conteúdo
+   ========================================================================== */
+.capsule-delete-modal-overlay,
+.curator-modal-overlay,
+.gp-modal-overlay,
+.voice-modal-overlay,
+.video-modal-overlay,
+.login-modal-overlay,
+.modal-overlay {
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+  bottom: 0 !important;
+  width: 100vw !important;
+  height: 100vh !important;
+  background-color: rgba(26, 19, 17, 0.72) !important;
+  backdrop-filter: blur(8px) !important;
+  -webkit-backdrop-filter: blur(8px) !important;
+  z-index: 999999 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  padding: 24px !important;
+  box-sizing: border-box !important;
+  margin: 0 !important;
+}
+
+.capsule-delete-modal-box,
+.curator-modal-card,
+.gp-modal-container,
+.voice-modal-card,
+.video-modal-card,
+.login-modal-card,
+.modal-card {
+  margin: auto !important;
+  max-height: 90vh !important;
+  box-sizing: border-box !important;
+}

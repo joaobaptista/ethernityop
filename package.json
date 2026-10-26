@@ -1,0 +1,20 @@
+{
+  "name": "ethernity-dms",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Ethernity DMs — Legado Digital, Cofre Criptografado & Memórias Vivas (Backend API + Frontend React/Vite)",
+  "scripts": {
+    "start": "npm --prefix backend start",
+    "dev": "npm --prefix frontend run dev",
+    "dev:backend": "npm --prefix backend run dev",
+    "dev:frontend": "npm --prefix frontend run dev",
+    "db:init": "node scripts/init-unified-db.mjs",
+    "db:setup": "node scripts/init-unified-db.mjs",
+    "test": "npm --prefix backend test && npm --prefix frontend test",
+    "test:backend": "npm --prefix backend test",
+    "test:frontend": "npm --prefix frontend test",
+    "test:qa": "node qa-agent.mjs",
+    "lint:frontend": "npm --prefix frontend run lint",
+    "ci": "npm run test:frontend && npm run test:backend && npm run lint:frontend"
+  }
+}

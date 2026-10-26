@@ -1,0 +1,34 @@
+{
+  "name": "ethernity-backend",
+  "version": "1.0.0",
+  "description": "Ethernity DMS Backend API — Node.js & Express (MySQL, Socket.io, Google Photos & Mercado Pago)",
+  "private": true,
+  "type": "module",
+  "main": "src/server.js",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "node --watch src/server.js",
+    "test": "node --test 'test/**/*.test.js'",
+    "token": "node scripts/mint-token.mjs"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "dependencies": {
+    "@ffmpeg-installer/ffmpeg": "^1.1.0",
+    "@ffprobe-installer/ffprobe": "^2.1.2",
+    "bcryptjs": "^3.0.3",
+    "cors": "^2.8.5",
+    "dotenv": "^18.0.4",
+    "express": "^4.21.2",
+    "fluent-ffmpeg": "^2.1.3",
+    "jsonwebtoken": "^9.0.2",
+    "multer": "^2.3.0",
+    "mysql2": "^3.24.4",
+    "sharp": "^0.35.5",
+    "socket.io": "^4.8.3"
+  },
+  "devDependencies": {
+    "supertest": "^7.0.0"
+  }
+}

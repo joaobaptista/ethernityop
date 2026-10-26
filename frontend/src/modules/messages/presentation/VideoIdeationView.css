@@ -1,0 +1,1682 @@
+/* ==========================================================================
+   VIDEO IDEATION VIEW — ETHERNITY DMS (PREPARAR & GRAVAR VÍDEO)
+   ========================================================================== */
+
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+
+.video-ideation-wrapper {
+  flex: 1;
+  background-color: #FFFFFF;
+  min-height: 100vh;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.video-ideation-container {
+  width: 100%;
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 36px 32px 80px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+/* --------------------------------------------------------------------------
+   1. HEADER SUPERIOR COM BREADCRUMB & STEPPER
+   -------------------------------------------------------------------------- */
+
+.vid-top-bar {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 24px;
+  flex-wrap: wrap;
+}
+
+.vid-left-title-block {
+  flex: 1;
+  min-width: 320px;
+}
+
+.vid-breadcrumbs {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+  font-size: 13.5px;
+  font-weight: 500;
+  margin-bottom: 12px;
+}
+
+.vid-crumb-link {
+  color: #7A7270;
+  cursor: pointer;
+  transition: color 0.15s ease;
+}
+
+.vid-crumb-link:hover {
+  color: #FF5A43;
+}
+
+.vid-crumb-sep {
+  color: #B5ACA8;
+  font-size: 12px;
+}
+
+.vid-crumb-current {
+  color: #FF5A43;
+  font-weight: 600;
+}
+
+.vid-main-title {
+  font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+  font-size: 28px;
+  font-weight: 800;
+  color: #1F1B1A;
+  margin: 0 0 6px 0;
+  letter-spacing: -0.3px;
+}
+
+.vid-main-subtitle {
+  font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+  font-size: 14px;
+  color: #8C827F;
+  margin: 0;
+}
+
+/* Stepper Pill Topo */
+.vid-stepper-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  background: #FFFFFF;
+  border: 1px solid #ECE7E2;
+  border-radius: 14px;
+  padding: 8px 18px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.02);
+}
+
+.vid-stepper-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  user-select: none;
+}
+
+.vid-stepper-badge {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: 700;
+  background-color: #F0ECE8;
+  color: #7A7270;
+}
+
+.vid-stepper-text {
+  font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+  font-size: 13.5px;
+  font-weight: 600;
+  color: #7A7270;
+}
+
+.vid-stepper-item.active .vid-stepper-badge {
+  background-color: #FF5A43;
+  color: #FFFFFF;
+}
+
+.vid-stepper-item.active .vid-stepper-text {
+  color: #FF5A43;
+}
+
+.vid-stepper-item.completed .vid-stepper-badge {
+  background-color: #FFC436;
+  color: #FFFFFF;
+}
+
+.vid-stepper-item.completed .vid-stepper-text {
+  color: #1F1B1A;
+}
+
+.vid-stepper-line {
+  width: 28px;
+  height: 1.5px;
+  background-color: #ECE7E2;
+}
+
+.vid-stepper-line.active {
+  background-color: #FF5A43;
+}
+
+/* --------------------------------------------------------------------------
+   2. GRID PRINCIPAL (2 COLUNAS)
+   -------------------------------------------------------------------------- */
+
+.vid-two-col-grid {
+  display: grid;
+  grid-template-columns: 1.25fr 0.85fr;
+  gap: 24px;
+}
+
+.vid-col-primary,
+.vid-col-secondary {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* Cards Brancos com Borda Suave */
+.vid-white-card {
+  background: #FFFFFF;
+  border: 1px solid #ECE7E2;
+  border-radius: 18px;
+  padding: 24px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.02);
+}
+
+.vid-card-label {
+  display: block;
+  font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+  font-size: 14px;
+  font-weight: 700;
+  color: #1F1B1A;
+  margin-bottom: 8px;
+}
+
+.vid-card-input {
+  width: 100%;
+  background: #FFFFFF;
+  border: 1px solid #E2DCD5;
+  border-radius: 12px;
+  padding: 13px 16px;
+  font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+  font-size: 14px;
+  color: #1F1B1A;
+  outline: none;
+  transition: border-color 0.2s ease;
+  box-sizing: border-box;
+}
+
+.vid-card-input:focus {
+  border-color: #FF5A43;
+  box-shadow: 0 0 0 3px rgba(255, 90, 67, 0.1);
+}
+
+/* --------------------------------------------------------------------------
+   3. BOX ASSISTENTE DE IDEAÇÃO IA (PURPLE TINT - PASSO 1)
+   -------------------------------------------------------------------------- */
+
+.vid-ai-purple-card {
+  background: linear-gradient(180deg, #F6F7FF 0%, #FAF8FF 100%);
+  border: 1px solid #E4E3F7;
+  border-radius: 18px;
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.vid-ai-card-header {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.vid-ai-icon-box {
+  width: 38px;
+  height: 38px;
+  border-radius: 10px;
+  background-color: #FFFFFF;
+  color: #5D5FEF;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  box-shadow: 0 2px 8px rgba(93, 95, 239, 0.15);
+  flex-shrink: 0;
+}
+
+.vid-ai-title {
+  font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+  font-size: 15px;
+  font-weight: 700;
+  color: #1F1B1A;
+  margin: 0 0 2px 0;
+}
+
+.vid-ai-subtitle {
+  font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+  font-size: 12.5px;
+  color: #7A7585;
+  margin: 0;
+  line-height: 1.4;
+}
+
+.vid-ai-prompt-box {
+  width: 100%;
+}
+
+.vid-ai-prompt-input {
+  width: 100%;
+  background: #FFFFFF;
+  border: 1px solid #DFDCF4;
+  border-radius: 12px;
+  padding: 13px 18px;
+  font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+  font-size: 13.5px;
+  color: #2D2625;
+  outline: none;
+  box-sizing: border-box;
+}
+
+.vid-ai-prompt-input:focus {
+  border-color: #5D5FEF;
+  box-shadow: 0 0 0 3px rgba(93, 95, 239, 0.12);
+}
+
+.vid-ai-chips-and-btn-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+
+.vid-chips-group {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.vid-chip-btn {
+  background: #FFFFFF;
+  border: 1px solid #E0DBF0;
+  color: #534D62;
+  font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+  font-size: 12px;
+  font-weight: 600;
+  padding: 7px 14px;
+  border-radius: 20px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.vid-chip-btn:hover {
+  background: #F0EEFF;
+  border-color: #5D5FEF;
+  color: #5D5FEF;
+}
+
+.vid-btn-gerar-roteiro {
+  background: #5D5FEF;
+  color: #FFFFFF;
+  border: none;
+  border-radius: 12px;
+  padding: 10px 20px;
+  font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  box-shadow: 0 4px 12px rgba(93, 95, 239, 0.28);
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+}
+
+.vid-btn-gerar-roteiro:hover:not(:disabled) {
+  background: #4B4DDC;
+  transform: translateY(-1px);
+}
+
+/* --------------------------------------------------------------------------
+   4. SEU ROTEIRO (EDITÁVEL - PASSO 1)
+   -------------------------------------------------------------------------- */
+
+.vid-script-card {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.vid-script-header-row {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.vid-script-title {
+  font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+  font-size: 16px;
+  font-weight: 700;
+  color: #1F1B1A;
+  margin: 0 0 4px 0;
+}
+
+.vid-script-subtitle {
+  font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+  font-size: 12.5px;
+  color: #8C827F;
+  margin: 0;
+}
+
+.vid-badge-salvo {
+  font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+  font-size: 11.5px;
+  font-weight: 700;
+  background-color: #FFF2E6;
+  color: #FF7338;
+  padding: 4px 10px;
+  border-radius: 8px;
+  white-space: nowrap;
+}
+
+.vid-script-textarea {
+  width: 100%;
+  background: #FFFFFF;
+  border: 1px solid #E2DCD5;
+  border-radius: 12px;
+  padding: 16px;
+  font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+  font-size: 13.5px;
+  line-height: 1.6;
+  color: #2D1917;
+  outline: none;
+  resize: vertical;
+  box-sizing: border-box;
+}
+
+/* --------------------------------------------------------------------------
+   5. COLUNA DIREITA: ANÁLISE, DICAS & TOGGLE AVATAR DIGITAL
+   -------------------------------------------------------------------------- */
+
+.vid-analysis-card {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.vid-analysis-top-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.vid-analysis-title {
+  font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+  font-size: 16px;
+  font-weight: 700;
+  color: #1F1B1A;
+  margin: 0;
+}
+
+.vid-roteiro-ia-pill {
+  font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+  font-size: 11.5px;
+  font-weight: 700;
+  background-color: #EEF2FF;
+  color: #4F46E5;
+  padding: 4px 10px;
+  border-radius: 8px;
+}
+
+.vid-analysis-items-list {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.vid-analysis-step-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.vid-step-circle {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background-color: #FFF2E6;
+  color: #FF7338;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: 700;
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
+.vid-analysis-step-item p {
+  font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+  font-size: 12.5px;
+  line-height: 1.45;
+  color: #4D4543;
+  margin: 0;
+}
+
+.vid-analysis-metrics-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-top: 16px;
+  border-top: 1px solid #F0ECE8;
+  margin-top: 4px;
+}
+
+.vid-metric-block {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.vid-metric-block.text-right {
+  text-align: right;
+}
+
+.vid-metric-label {
+  font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+  font-size: 11.5px;
+  color: #8C827F;
+  font-weight: 500;
+}
+
+.vid-metric-value-large {
+  font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+  font-size: 18px;
+  font-weight: 800;
+  color: #1F1B1A;
+}
+
+/* Card Dicas para Gravação de Vídeo */
+.vid-tips-card {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.vid-tips-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.vid-tips-icon-box {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  background-color: #FFF0ED;
+  color: #FF5A43;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+}
+
+.vid-tips-title {
+  font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+  font-size: 15px;
+  font-weight: 700;
+  color: #1F1B1A;
+  margin: 0;
+}
+
+.vid-tips-bullets {
+  margin: 0;
+  padding-left: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.vid-tips-bullets li {
+  font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+  font-size: 12.5px;
+  line-height: 1.45;
+  color: #5C5452;
+}
+
+/* Toggle Avatar Digital Card */
+.vid-avatar-toggle-card {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.vid-avatar-toggle-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.vid-avatar-toggle-title {
+  font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+  font-size: 14.5px;
+  font-weight: 700;
+  color: #1F1B1A;
+  margin: 0;
+}
+
+.vid-avatar-toggle-desc {
+  font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+  font-size: 12.5px;
+  color: #8C827F;
+  margin: 0;
+  line-height: 1.45;
+}
+
+.vid-ios-toggle {
+  width: 46px;
+  height: 26px;
+  background-color: #E2DDD8;
+  border-radius: 14px;
+  padding: 2px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  position: relative;
+  flex-shrink: 0;
+}
+
+.vid-ios-toggle.active {
+  background-color: #FF5A43;
+}
+
+.vid-ios-toggle-knob {
+  width: 22px;
+  height: 22px;
+  background-color: #FFFFFF;
+  border-radius: 50%;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  transition: transform 0.2s ease;
+}
+
+.vid-ios-toggle.active .vid-ios-toggle-knob {
+  transform: translateX(20px);
+}
+
+/* --------------------------------------------------------------------------
+   6. ETAPA 2: GRAVAÇÃO DE VÍDEO & TELEPROMPTER INTEGRADO
+   -------------------------------------------------------------------------- */
+
+.vid-step2-layout {
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+  width: 100%;
+}
+
+.vid-video-player-card {
+  border-radius: 20px;
+  overflow: hidden;
+  background-color: #382422;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  display: flex;
+  flex-direction: column;
+}
+
+.vid-camera-feed-box {
+  position: relative;
+  width: 100%;
+  height: 380px;
+  background-color: #1A1312;
+  overflow: hidden;
+}
+
+.vid-camera-feed-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.vid-camera-feed-placeholder {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: radial-gradient(circle at center, #2D1D1C 0%, #150F0E 100%);
+  color: rgba(255, 255, 255, 0.7);
+  gap: 12px;
+}
+
+.vid-camera-feed-placeholder i {
+  font-size: 3.5rem;
+  color: #F05A47;
+}
+
+.vid-camera-feed-placeholder span {
+  font-size: 0.95rem;
+  letter-spacing: 0.5px;
+}
+
+.vid-video-top-badges {
+  position: absolute;
+  top: 14px;
+  left: 16px;
+  right: 16px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  z-index: 10;
+}
+
+.vid-rec-badge {
+  background: #E53935;
+  color: #FFFFFF;
+  font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.4px;
+  padding: 5px 12px;
+  border-radius: 20px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.vid-rec-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #FFFFFF;
+  animation: pulseDot 1.2s infinite ease-in-out;
+}
+
+.vid-quality-badge {
+  background: rgba(30, 20, 20, 0.7);
+  backdrop-filter: blur(4px);
+  color: #FFFFFF;
+  font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+  font-size: 11.5px;
+  font-weight: 600;
+  padding: 4px 10px;
+  border-radius: 6px;
+}
+
+.vid-video-bottom-overlay {
+  position: absolute;
+  bottom: 14px;
+  left: 16px;
+  right: 16px;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  z-index: 10;
+}
+
+.vid-timer-badge {
+  background: rgba(26, 18, 17, 0.85);
+  backdrop-filter: blur(4px);
+  padding: 6px 12px;
+  border-radius: 8px;
+  font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+  font-size: 13.5px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+}
+
+.vid-timer-coral {
+  color: #FF7338;
+}
+
+.vid-timer-total {
+  color: #FFFFFF;
+  font-weight: 500;
+}
+
+.vid-author-tag {
+  background: rgba(26, 18, 17, 0.85);
+  backdrop-filter: blur(4px);
+  color: #FFFFFF;
+  font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+  font-size: 12px;
+  font-weight: 600;
+  padding: 6px 12px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.vid-author-mic-icon {
+  font-size: 12px;
+  color: #FFFFFF;
+}
+
+/* Painel Dark Teleprompter Integrado */
+.vid-teleprompter-dark-panel {
+  background-color: #3C2927;
+  padding: 20px 22px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.vid-tele-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.vid-tele-label {
+  font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.5px;
+  color: #FF5A43;
+}
+
+.vid-tele-speed {
+  font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+  font-size: 11.5px;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.vid-tele-text {
+  font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+  font-size: 14px;
+  line-height: 1.6;
+  font-weight: 500;
+  color: #FFFFFF;
+  margin: 0;
+}
+
+/* --------------------------------------------------------------------------
+   COLUNA DIREITA: CONTROLE DE VÍDEO
+   -------------------------------------------------------------------------- */
+
+.vid-control-card {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.vid-control-title {
+  font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+  font-size: 16px;
+  font-weight: 800;
+  color: #1F1B1A;
+  margin: 0;
+}
+
+/* Sinal de Áudio de Entrada */
+.vid-audio-signal-container {
+  background: #FFF7F5;
+  border-radius: 14px;
+  padding: 16px 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+
+.vid-audio-signal-label {
+  font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+  font-size: 12px;
+  font-weight: 600;
+  color: #7A7270;
+}
+
+.vid-waveform-visual {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  height: 38px;
+  width: 100%;
+}
+
+.vid-wave-bar {
+  width: 3.5px;
+  background-color: #FF5A43;
+  border-radius: 3px;
+  transition: height 0.15s ease;
+  animation: waveMotion 1.5s infinite ease-in-out;
+}
+
+@keyframes waveMotion {
+  0%, 100% {
+    transform: scaleY(0.7);
+  }
+  50% {
+    transform: scaleY(1.2);
+  }
+}
+
+/* Botões Circulares de Controle */
+.vid-controls-btns-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 24px;
+  padding: 4px 0;
+}
+
+.vid-ctrl-circle-btn {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: #F7F4F0;
+  border: none;
+  color: #3D3534;
+  font-size: 15px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.15s ease;
+}
+
+.vid-ctrl-circle-btn:hover {
+  background: #ECE7E2;
+  transform: scale(1.05);
+}
+
+.vid-ctrl-stop-main-btn {
+  width: 68px;
+  height: 68px;
+  border-radius: 50%;
+  background-color: #FF5A43;
+  border: 7px solid #FFE4E0;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 6px 18px rgba(255, 90, 67, 0.35);
+  transition: all 0.2s ease;
+}
+
+.vid-ctrl-stop-main-btn:hover {
+  transform: scale(1.05);
+  box-shadow: 0 8px 22px rgba(255, 90, 67, 0.45);
+}
+
+.vid-stop-square-icon {
+  width: 22px;
+  height: 22px;
+  background-color: #FFFFFF;
+  border-radius: 4px;
+}
+
+/* Selects Dropdown (Câmera & Qualidade) */
+.vid-select-controls-group {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  width: 100%;
+}
+
+.vid-select-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  width: 100%;
+}
+
+.vid-select-label {
+  font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: #615856;
+}
+
+.vid-custom-select-wrapper {
+  position: relative;
+  width: 100%;
+  display: flex;
+  align-items: center;
+}
+
+.vid-select-icon-left {
+  position: absolute;
+  left: 14px;
+  color: #5C5452;
+  font-size: 14px;
+  pointer-events: none;
+}
+
+.vid-custom-select {
+  width: 100%;
+  background: #FFFFFF;
+  border: 1px solid #E2DCD5;
+  border-radius: 12px;
+  padding: 12px 38px 12px 40px;
+  font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+  font-size: 13.5px;
+  font-weight: 500;
+  color: #1F1B1A;
+  outline: none;
+  appearance: none;
+  -webkit-appearance: none;
+  cursor: pointer;
+  transition: border-color 0.2s ease;
+}
+
+.vid-custom-select:focus {
+  border-color: #FF5A43;
+}
+
+.vid-select-arrow {
+  position: absolute;
+  right: 14px;
+  color: #7A7270;
+  font-size: 12px;
+  pointer-events: none;
+}
+
+/* Card Interno Toggle Avatar Digital */
+.vid-avatar-toggle-inner-card {
+  background: #FFF9F6;
+  border: 1px solid #F8ECE7;
+  border-radius: 14px;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.vid-avatar-toggle-top-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.vid-avatar-toggle-inner-title {
+  font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+  font-size: 14px;
+  font-weight: 700;
+  color: #1F1B1A;
+  margin: 0;
+}
+
+.vid-avatar-toggle-inner-desc {
+  font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+  font-size: 12px;
+  line-height: 1.45;
+  color: #8C827F;
+  margin: 0;
+}
+
+/* --------------------------------------------------------------------------
+   GRAVAÇÕES DE VÍDEO SALVAS (CARD LIST)
+   -------------------------------------------------------------------------- */
+
+.vid-saved-takes-section {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  width: 100%;
+  margin-top: 8px;
+}
+
+.vid-saved-title {
+  font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+  font-size: 16px;
+  font-weight: 800;
+  color: #1F1B1A;
+  margin: 0;
+}
+
+.vid-takes-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: 100%;
+}
+
+.vid-take-card {
+  background: #FFFFFF;
+  border: 1.5px solid #ECE7E2;
+  border-radius: 16px;
+  padding: 14px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.vid-take-card.is-selected {
+  border-color: #FF5A43;
+  background: #FFFFFF;
+}
+
+.vid-take-thumb-wrapper {
+  position: relative;
+  width: 68px;
+  height: 48px;
+  border-radius: 8px;
+  overflow: hidden;
+  flex-shrink: 0;
+  background-color: #1F1B1A;
+}
+
+.vid-take-thumb-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.vid-take-play-mini {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.25);
+  color: #FFFFFF;
+  font-size: 11px;
+}
+
+.vid-take-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.vid-take-name {
+  font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+  font-size: 14px;
+  font-weight: 700;
+  color: #1F1B1A;
+  margin: 0;
+}
+
+.vid-take-details {
+  font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+  font-size: 12.5px;
+  color: #8C827F;
+  margin: 0;
+}
+
+.vid-take-action-wrap {
+  flex-shrink: 0;
+}
+
+.btn-take-coral-selected {
+  background: #FF5A43;
+  color: #FFFFFF;
+  border: none;
+  border-radius: 20px;
+  padding: 9px 22px;
+  font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+  font-size: 12.5px;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(255, 90, 67, 0.25);
+}
+
+.btn-take-outline-action {
+  background: #FFFFFF;
+  color: #332E2D;
+  border: 1.5px solid #DCD5CE;
+  border-radius: 20px;
+  padding: 8px 20px;
+  font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+  font-size: 12.5px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.btn-take-outline-action:hover {
+  background-color: #F8F5F2;
+  border-color: #C5BCB4;
+}
+
+/* --------------------------------------------------------------------------
+   7. ETAPA 3: ENTREGA DE VÍDEO
+   -------------------------------------------------------------------------- */
+
+.vid-delivery-step-layout {
+  display: grid;
+  grid-template-columns: 1.35fr 0.85fr;
+  gap: 24px;
+}
+
+.vid-delivery-left-column {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.vid-deliv-card-section {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.vid-deliv-sec-title {
+  font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+  font-size: 15.5px;
+  font-weight: 800;
+  color: #1F1B1A;
+  margin: 0;
+}
+
+.vid-deliv-sec-desc {
+  font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+  font-size: 13px;
+  color: #8C827F;
+  margin: -6px 0 4px 0;
+}
+
+.vid-deliv-trigger-cards-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.vid-deliv-trigger-box {
+  background: #FFFFFF;
+  border: 1.5px solid #EBE5DF;
+  border-radius: 14px;
+  padding: 18px;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.vid-deliv-trigger-box.selected {
+  border-color: #FF5A43;
+}
+
+.vid-deliv-trigger-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 4px;
+}
+
+.vid-trigger-icon {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+}
+
+.vid-trigger-icon.coral-light {
+  background-color: #FFF0ED;
+  color: #FF5A43;
+}
+
+.vid-radio-circle-indicator {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  border: 1.5px solid #D6CBC6;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.vid-deliv-trigger-box.selected .vid-radio-circle-indicator {
+  border-color: #FF5A43;
+}
+
+.vid-radio-inner-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background-color: #FF5A43;
+}
+
+.vid-trigger-card-title {
+  font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+  font-size: 14.5px;
+  font-weight: 700;
+  color: #1F1B1A;
+  margin: 0;
+}
+
+.vid-trigger-card-desc {
+  font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+  font-size: 12.5px;
+  line-height: 1.45;
+  color: #8C827F;
+  margin: 0;
+}
+
+.vid-channels-options-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.vid-channel-row-item {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.vid-custom-checkbox-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  user-select: none;
+}
+
+.vid-custom-checkbox-label input {
+  display: none;
+}
+
+.vid-checkbox-box {
+  width: 20px;
+  height: 20px;
+  border-radius: 5px;
+  border: 1.5px solid #D6CBC6;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #FFFFFF;
+  color: #FFFFFF;
+  font-size: 11px;
+}
+
+.vid-custom-checkbox-label input:checked + .vid-checkbox-box {
+  background-color: #FF5A43;
+  border-color: #FF5A43;
+}
+
+.vid-checkbox-box.coral-check {
+  background-color: #FF5A43;
+  border-color: #FF5A43;
+}
+
+.vid-checkbox-text {
+  font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+  color: #1F1B1A;
+}
+
+.vid-channel-input {
+  width: 100%;
+  background: #FFFFFF;
+  border: 1px solid #E2DCD5;
+  border-radius: 10px;
+  padding: 12px 16px;
+  font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+  font-size: 13.5px;
+  color: #1F1B1A;
+  outline: none;
+  box-sizing: border-box;
+}
+
+.vid-guardian-assigned-box {
+  background: #FFFFFF;
+  border: 1px solid #ECE7E2;
+  border-radius: 14px;
+  padding: 16px 18px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.vid-guardian-left-info {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.vid-guardian-thumb {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.vid-guardian-name {
+  font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+  font-size: 14.5px;
+  font-weight: 700;
+  color: #1F1B1A;
+  margin: 0 0 2px 0;
+}
+
+.vid-guardian-meta-line {
+  font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+  font-size: 12px;
+  color: #8C827F;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.vid-guardian-meta-sep {
+  color: #BDB4AE;
+}
+
+.vid-guardian-status-green {
+  color: #10B981;
+  font-weight: 700;
+  font-size: 11px;
+}
+
+.btn-alterar-guardiao {
+  background: transparent;
+  border: none;
+  color: #FF5A43;
+  font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  padding: 6px 10px;
+  border-radius: 8px;
+}
+
+.btn-alterar-guardiao:hover {
+  background: #FFF0ED;
+}
+
+.vid-curiosity-shield-card {
+  background: #FFF9F2;
+  border: 1px solid #FFE7D1;
+  border-radius: 14px;
+  padding: 18px 20px;
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.vid-shield-text-content {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.vid-shield-title {
+  font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+  font-size: 14px;
+  font-weight: 800;
+  color: #1F1B1A;
+  margin: 0;
+}
+
+.vid-shield-desc {
+  font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+  font-size: 12.5px;
+  line-height: 1.5;
+  color: #857064;
+  margin: 0;
+}
+
+.vid-deliv-toggle-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.vid-followup-textarea-box {
+  margin-top: 6px;
+}
+
+.vid-followup-textarea {
+  width: 100%;
+  background: #FFF9F6;
+  border: 1px solid #F5E5DC;
+  border-radius: 12px;
+  padding: 16px;
+  font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+  font-size: 13.5px;
+  line-height: 1.55;
+  color: #2D1917;
+  outline: none;
+  resize: vertical;
+  box-sizing: border-box;
+}
+
+/* Coluna Direita Resumo */
+.vid-delivery-right-column {
+  display: flex;
+  flex-direction: column;
+}
+
+.vid-summary-side-card {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 26px;
+}
+
+.vid-summary-card-title {
+  font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+  font-size: 16px;
+  font-weight: 800;
+  color: #1F1B1A;
+  margin: 0;
+}
+
+.vid-summary-card-subtitle {
+  font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+  font-size: 13px;
+  color: #8C827F;
+  margin: -10px 0 2px 0;
+}
+
+.vid-summary-media-banner {
+  background: #FFF8F6;
+  border: 1px solid #FFEBE6;
+  border-radius: 14px;
+  padding: 14px 16px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.vid-summary-media-icon {
+  width: 38px;
+  height: 38px;
+  border-radius: 10px;
+  background-color: #FFF0ED;
+  color: #FF5A43;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  flex-shrink: 0;
+}
+
+.vid-summary-media-title {
+  font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+  font-size: 14px;
+  font-weight: 700;
+  color: #1F1B1A;
+  margin: 0 0 2px 0;
+}
+
+.vid-summary-media-sub {
+  font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+  font-size: 12px;
+  color: #8C827F;
+}
+
+.vid-summary-table-rows {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 12px 0;
+  border-top: 1px solid #F0ECE8;
+  border-bottom: 1px solid #F0ECE8;
+}
+
+.vid-sum-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.vid-sum-label {
+  font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+  font-size: 13px;
+  color: #8C827F;
+}
+
+.vid-sum-value {
+  font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+  font-size: 13px;
+  font-weight: 700;
+  color: #1F1B1A;
+  text-align: right;
+}
+
+.vid-summary-security-note {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+  font-size: 12px;
+  line-height: 1.45;
+  color: #7A7270;
+}
+
+.vid-summary-security-note i {
+  color: #8C827F;
+  font-size: 14px;
+  margin-top: 2px;
+}
+
+.vid-summary-security-note p {
+  margin: 0;
+}
+
+/* --------------------------------------------------------------------------
+   8. RODAPÉ DE AÇÕES
+   -------------------------------------------------------------------------- */
+
+.vid-bottom-actions-row {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 16px;
+  padding-top: 20px;
+  border-top: 1px solid #ECE7E2;
+  margin-top: 12px;
+}
+
+.vid-footer-buttons-right {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.vid-btn-rascunho {
+  background: #FFFFFF;
+  border: 1.5px solid #332E2D;
+  color: #1F1B1A;
+  border-radius: 24px;
+  padding: 12px 24px;
+  font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+  font-size: 13.5px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.vid-btn-rascunho:hover {
+  background-color: #F8F5F2;
+  transform: translateY(-1px);
+}
+
+.vid-btn-ir-gravacao {
+  background: #FF5A43;
+  border: none;
+  color: #FFFFFF;
+  border-radius: 24px;
+  padding: 12px 28px;
+  font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+  font-size: 13.5px;
+  font-weight: 700;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  box-shadow: 0 4px 14px rgba(255, 90, 67, 0.28);
+  transition: all 0.2s ease;
+}
+
+.vid-btn-ir-gravacao:hover {
+  background: #E84D37;
+  transform: translateY(-1px);
+  box-shadow: 0 6px 18px rgba(255, 90, 67, 0.35);
+}
+
+/* Toast */
+.vid-toast-banner {
+  position: fixed;
+  top: 24px;
+  right: 24px;
+  background: #1F1B1A;
+  color: #FFFFFF;
+  padding: 12px 20px;
+  border-radius: 10px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 13.5px;
+  font-weight: 600;
+  z-index: 999;
+}
+
+.vid-toast-banner i {
+  color: #10B981;
+}
+
+/* --------------------------------------------------------------------------
+   RESPONSIVIDADE
+   -------------------------------------------------------------------------- */
+
+@media (max-width: 860px) {
+  .video-ideation-container {
+    padding: 24px 16px 60px;
+  }
+
+  .vid-delivery-step-layout,
+  .vid-two-col-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .vid-deliv-trigger-cards-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .vid-bottom-actions-row {
+    flex-direction: column-reverse;
+    align-items: stretch;
+  }
+
+  .vid-footer-buttons-right {
+    flex-direction: column;
+  }
+
+  .vid-btn-rascunho,
+  .vid-btn-ir-gravacao {
+    width: 100%;
+    justify-content: center;
+  }
+}
