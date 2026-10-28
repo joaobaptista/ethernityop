@@ -497,6 +497,11 @@ export default function CapsulesView({ onNavigateTab, profile }) {
       photos: photos,
       removedContentItems: Array.isArray(cap.removedContentItems) ? cap.removedContentItems : [],
       quote: cap.description || cap.quote || 'Uma cápsula de amor e legado para o futuro.',
+      hasVoice: cap.hasVoice,
+      voiceAudio: cap.voiceAudio,
+      audios: cap.audios,
+      videos: cap.videos,
+      calibrationAudio: cap.calibrationAudio,
     });
     setCurrentPhotoIdx(0);
     setStoryText(photos[0]?.story || '');
@@ -593,8 +598,29 @@ export default function CapsulesView({ onNavigateTab, profile }) {
     ? (currentPhotosList[currentPhotoIdx] || currentPhotosList[0])
     : null;
 
+  // Grava a história e as emoções da foto atual (aparelho + servidor)
+  const persistCurrentStory = () => {
+    if (!curatingCapsule?.id || !activePhoto?.id) return;
+    const sameStory = (activePhoto.story || '') === storyText;
+    const sameEmotions = JSON.stringify(activePhoto.emotions || []) === JSON.stringify(selectedEmotions || []);
+    if (sameStory && sameEmotions) return;
+    const photoId = activePhoto.id;
+    setCuratingCapsule((prev) =>
+      prev
+        ? {
+            ...prev,
+            photos: (prev.photos || []).map((p) =>
+              p.id === photoId ? { ...p, story: storyText, emotions: selectedEmotions } : p
+            ),
+          }
+        : prev
+    );
+    capsulesService.updatePhotoStory(curatingCapsule.id, photoId, storyText, selectedEmotions).catch(() => {});
+  };
+
   const handleSelectPhoto = (idx) => {
     if (!currentPhotosList || currentPhotosList.length === 0) return;
+    persistCurrentStory();
     setCurrentPhotoIdx(idx);
     const photo = currentPhotosList[idx];
     setStoryText(photo?.story || '');
@@ -657,7 +683,13 @@ export default function CapsulesView({ onNavigateTab, profile }) {
   };
 
   const handleSaveAvatarVideo = (videoItem) => {
-    setToast('Vídeo do Avatar gerado e salvo com sucesso nesta cápsula!');
+    const updated = curatingCapsule?.id ? capsulesService.addCapsuleVideo(curatingCapsule.id, videoItem) : null;
+    if (updated) {
+      setCuratingCapsule((prev) => (prev ? { ...prev, videos: updated.videos } : prev));
+      setToast('Vídeo do Avatar salvo nesta cápsula e enviado ao cofre.');
+    } else {
+      setToast('Abra uma cápsula para salvar o vídeo do avatar.');
+    }
     setTimeout(() => setToast(null), 4000);
   };
 
@@ -665,11 +697,18 @@ export default function CapsulesView({ onNavigateTab, profile }) {
     if (savedAudio?.audioBlob) {
       setCurrentVoiceAudioBlob(savedAudio.audioBlob);
     }
+    if (curatingCapsule?.id && savedAudio) {
+      const updated = capsulesService.setCalibrationAudio(curatingCapsule.id, savedAudio);
+      if (updated) {
+        setCuratingCapsule((prev) => (prev ? { ...prev, calibrationAudio: updated.calibrationAudio } : prev));
+      }
+    }
     setToast('Áudio de narração e calibração salvo com sucesso!');
     setTimeout(() => setToast(null), 3500);
   };
 
   const handleSaveDraft = () => {
+    persistCurrentStory();
     setToast(t('capsulesView.draftSavedToast'));
     setTimeout(() => setToast(null), 3500);
   };
@@ -1591,6 +1630,7 @@ export default function CapsulesView({ onNavigateTab, profile }) {
                     className="curation-story-box"
                     value={storyText}
                     onChange={(e) => setStoryText(e.target.value)}
+                    onBlur={persistCurrentStory}
                     placeholder={t('capsulesView.storyPlaceholder')}
                   ></textarea>
                 </div>

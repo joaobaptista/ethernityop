@@ -5,6 +5,7 @@
  */
 import vaultRepository from '../infrastructure/vaultRepository.js';
 import { filterVaultItems, getVaultMetrics } from '../domain/vaultModel.js';
+import { API_BASE_URL } from '../../../core/api/apiUrl.js';
 
 export class VaultService {
   constructor(repository = vaultRepository) {
@@ -132,12 +133,8 @@ export class VaultService {
     let result = null;
     let backendError = null;
 
-    // Tentar endpoints possíveis do backend (relativo ou portas ativas)
-    const backendUrls = [
-      '/api/vault/media/upload',
-      'http://localhost:3333/api/vault/media/upload',
-      'http://localhost:8000/api/vault/media/upload',
-    ];
+    // Endereço único da API (VITE_API_URL): nunca relativo ao site nem localhost fixo
+    const backendUrls = [`${API_BASE_URL}/vault/media/upload`];
 
     for (const url of backendUrls) {
       try {

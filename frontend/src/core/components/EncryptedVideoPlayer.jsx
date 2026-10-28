@@ -11,6 +11,7 @@
  */
 import React, { useState, useRef, useEffect, useMemo, useCallback } from 'react';
 import './EncryptedVideoPlayer.css';
+import { resolveMediaUrl } from '../api/apiUrl.js';
 
 const AUTH_TOKEN_KEY = 'ethernity_auth_token';
 
@@ -56,14 +57,14 @@ export default function EncryptedVideoPlayer({
   const resolvedStreamUrl = useMemo(() => {
     const raw = propStreamUrl || (mediaId ? `/api/vault/media/${mediaId}/stream` : '');
     if (!raw) return '';
-    const cleanBase = raw.split('?')[0];
+    const cleanBase = resolveMediaUrl(raw.split('?')[0], null);
     return token ? `${cleanBase}?token=${encodeURIComponent(token)}` : cleanBase;
   }, [propStreamUrl, mediaId, token]);
 
   const resolvedPosterUrl = useMemo(() => {
     const raw = propPosterUrl || (mediaId ? `/api/vault/media/${mediaId}/poster` : '');
     if (!raw) return '';
-    const cleanBase = raw.split('?')[0];
+    const cleanBase = resolveMediaUrl(raw.split('?')[0], null);
     return token ? `${cleanBase}?token=${encodeURIComponent(token)}` : cleanBase;
   }, [propPosterUrl, mediaId, token]);
 

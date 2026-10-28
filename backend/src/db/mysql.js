@@ -125,6 +125,8 @@ export async function initDatabase() {
     await addCapsuleCol("ALTER TABLE capsules ADD COLUMN video_size_mb DECIMAL(10,2) NULL AFTER video_blob_url");
     await addCapsuleCol("ALTER TABLE capsules ADD COLUMN is_encrypted TINYINT(1) NOT NULL DEFAULT 1 AFTER video_size_mb");
     await addCapsuleCol("ALTER TABLE capsules ADD COLUMN encryption_hash VARCHAR(255) NULL AFTER is_encrypted");
+    // Campos de apresentação da cápsula (avatar, pessoa, áudios, vídeos...) que antes viviam só no navegador
+    await addCapsuleCol("ALTER TABLE capsules ADD COLUMN metadata JSON NULL AFTER encryption_hash");
     try {
       await conn.query("UPDATE capsules SET user_id = author_id WHERE (user_id IS NULL OR user_id = '') AND author_id IS NOT NULL;");
     } catch {

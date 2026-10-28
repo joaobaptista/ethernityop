@@ -252,7 +252,7 @@ describe('capsulesService', () => {
     const all = capsulesService.getCapsules();
     const found2 = all.find((c) => c.id === 'cap-voice-2');
     expect(found2.hasVoice).toBeFalsy();
-    expect(found2.voiceAudio).toBeUndefined();
+    expect(found2.voiceAudio).toBeFalsy();
   });
 
   it('ao excluir o item de voz de uma cápsula, realiza o expurgo definitivo de hasVoice e audios', () => {

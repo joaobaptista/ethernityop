@@ -173,7 +173,11 @@ export default function VoiceRecorderModal({ isOpen, onClose, onSave, defaultPer
           recipient: defaultPersonName,
           filename: recordMode === 'matrix_calibration' ? 'voz_matriz.wav' : `${title.trim() || 'gravacao'}.webm`,
         });
-        setUploadStatus('✨ Memória criptografada e salva no Cofre!');
+        setUploadStatus(
+          uploadResult?.offline
+            ? '⚠️ Servidor indisponível: salvo só neste aparelho. Tente enviar de novo quando estiver online.'
+            : '✨ Memória criptografada e salva no Cofre!'
+        );
       } catch (err) {
         console.warn('[VoiceRecorderModal] Erro ao enviar ao cofre:', err);
         setUploadStatus('Salvo localmente no dispositivo.');

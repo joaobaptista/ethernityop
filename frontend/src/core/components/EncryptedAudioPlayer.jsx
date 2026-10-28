@@ -11,6 +11,7 @@
  */
 import React, { useState, useRef, useEffect, useMemo, useCallback } from 'react';
 import './EncryptedAudioPlayer.css';
+import { resolveMediaUrl } from '../api/apiUrl.js';
 
 const AUTH_TOKEN_KEY = 'ethernity_auth_token';
 
@@ -57,14 +58,14 @@ export default function EncryptedAudioPlayer({
   const resolvedStreamUrl = useMemo(() => {
     const raw = propStreamUrl || (mediaId ? `/api/vault/media/${mediaId}/stream` : '');
     if (!raw) return '';
-    const cleanBase = raw.split('?')[0];
+    const cleanBase = resolveMediaUrl(raw.split('?')[0], null);
     return token ? `${cleanBase}?token=${encodeURIComponent(token)}` : cleanBase;
   }, [propStreamUrl, mediaId, token]);
 
   const resolvedWaveformUrl = useMemo(() => {
     const raw = propWaveformUrl || (mediaId ? `/api/vault/media/${mediaId}/waveform` : '');
     if (!raw) return '';
-    const cleanBase = raw.split('?')[0];
+    const cleanBase = resolveMediaUrl(raw.split('?')[0], null);
     return token ? `${cleanBase}?token=${encodeURIComponent(token)}` : cleanBase;
   }, [propWaveformUrl, mediaId, token]);
 

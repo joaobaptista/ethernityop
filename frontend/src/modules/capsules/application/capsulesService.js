@@ -2,12 +2,14 @@
  * capsulesService.js — Application Service para Gerenciamento de Cápsulas do Tempo e Mídias
  * 
  * Responsabilidades:
- * 1. Manter SEMPRE os cards padrão ("Cápsula: 18º Aniversário da Mariana" e "Legado Familiar & Palavras de Sabedoria")
- * 2. Unificar a persistência de novas cápsulas criadas a partir do reconhecimento facial ou criação manual
- * 3. Armazenar com segurança as fotos reais de cada cápsula (em memória e IndexedDB para suportar múltiplos MBs sem QuotaExceededError)
+ * 1. Unificar a persistência de novas cápsulas criadas a partir do reconhecimento facial ou criação manual
+ * 2. Cache local: metadados no localStorage e fotos/mídias no IndexedDB (sem QuotaExceededError)
+ * 3. Gravar tudo no servidor (cápsula, fotos no cofre cifrado, histórias, voz e vídeos), com reenvio
+ *    automático do que ficou pendente e restauração em outro aparelho
  * 4. Fornecer subscrição reativa para atualização instantânea da UI
  */
 import httpClient from '../../../core/api/httpClient.js';
+import { API_BASE_URL, resolveMediaUrl, backgroundRequest } from '../../../core/api/apiUrl.js';
 
 function getAuthToken() {
   try {
@@ -109,6 +111,41 @@ const IDB_NAME = 'Ethernity_Capsules_Media';
 const IDB_VERSION = 1;
 const IDB_STORE = 'capsule_photos';
 
+const PENDING_PREFIX = 'pending::';
+
+const isServerMediaUrl = (url) => typeof url === 'string' && url.includes('/vault/media/');
+
+/**
+ * Referência leve de mídia (voz, vídeo, calibração) para os metadados da cápsula.
+ * Blobs e URLs temporárias (blob:) nunca vão para o localStorage nem para o servidor.
+ */
+function sanitizeMediaRef(item) {
+  if (!item || typeof item !== 'object') return null;
+  const ref = {
+    id: item.id || `media-${Date.now()}`,
+    title: item.title || '',
+    duration: item.duration || '',
+    durationSeconds: item.durationSeconds || null,
+    date: item.date || item.createdAt || null,
+    kind: item.kind || item.type || null,
+    script: typeof item.script === 'string' ? item.script.slice(0, 20000) : undefined,
+    mediaId: item.mediaId || null,
+    memoryId: item.memoryId || null,
+  };
+  const url = item.url || item.previewUrl || item.streamUrl;
+  if (!ref.mediaId && typeof url === 'string' && !/^blob:/i.test(url) && !isServerMediaUrl(url)) {
+    ref.url = url;
+  }
+  return ref;
+}
+
+function hydrateMediaRef(ref, variantPath = 'stream') {
+  if (!ref || typeof ref !== 'object' || !ref.mediaId) return ref;
+  if (ref.url && !isServerMediaUrl(ref.url)) return ref;
+  const url = resolveMediaUrl(`/api/vault/media/${ref.mediaId}/${variantPath}`);
+  return { ...ref, url, streamUrl: url };
+}
+
 function openIndexedDB() {
   if (typeof window === 'undefined' || !window.indexedDB) {
     return Promise.resolve(null);
@@ -141,6 +178,10 @@ class CapsulesService {
           this.notify();
         }
       });
+      // A conexão voltou: envia o que ficou pendente no aparelho
+      window.addEventListener('online', () => {
+        this.syncPending().catch(() => {});
+      });
     }
   }
 
@@ -166,6 +207,14 @@ class CapsulesService {
       photosCount: countLabel,
       createdAt: cap.createdAt || Date.now(),
       removedContentItems: Array.isArray(cap.removedContentItems) ? cap.removedContentItems : [],
+      deliveryType: cap.deliveryType || 'date',
+      scheduledDate: cap.scheduledDate || cap.triggerDate || null,
+      hasVoice: Boolean(cap.hasVoice),
+      voiceAudio: sanitizeMediaRef(cap.voiceAudio),
+      audios: Array.isArray(cap.audios) ? cap.audios.map(sanitizeMediaRef).filter(Boolean) : [],
+      videos: Array.isArray(cap.videos) ? cap.videos.map(sanitizeMediaRef).filter(Boolean) : [],
+      calibrationAudio: sanitizeMediaRef(cap.calibrationAudio),
+      syncState: cap.syncState || 'pending',
     };
 
     return sanitized;
@@ -177,16 +226,22 @@ class CapsulesService {
   async setCapsulePhotos(capsuleId, photos = []) {
     if (!capsuleId || !Array.isArray(photos)) return;
 
-    const normalizedPhotos = photos.map((p, idx) => ({
-      id: p.id || `photo-${capsuleId}-${Date.now()}-${idx}`,
-      img: p.img || p.media_url || p.thumbnailUrl || p.url,
-      title: p.title || `Momento ${idx + 1}`,
-      dateLabel: p.dateLabel || 'Recente',
-      year: p.year || new Date().getFullYear(),
-      story: p.story || '',
-      audioDuration: p.audioDuration || '0:45',
-      emotions: p.emotions || ['Amor', 'Gratidão'],
-    })).filter((p) => Boolean(p.img));
+    const normalizedPhotos = photos.map((p, idx) => {
+      const rawImg = p.img || p.media_url || p.thumbnailUrl || p.url || null;
+      return {
+        id: p.id || `photo-${capsuleId}-${Date.now()}-${idx}`,
+        // Fotos já no servidor guardam só o mediaId; a URL (com token) é montada na leitura
+        img: p.mediaId && isServerMediaUrl(rawImg) ? null : rawImg,
+        mediaId: p.mediaId || null,
+        memoryId: p.memoryId || null,
+        title: p.title || `Momento ${idx + 1}`,
+        dateLabel: p.dateLabel || 'Recente',
+        year: p.year || new Date().getFullYear(),
+        story: p.story || '',
+        audioDuration: p.audioDuration || '0:45',
+        emotions: p.emotions || ['Amor', 'Gratidão'],
+      };
+    }).filter((p) => Boolean(p.img || p.mediaId));
 
     // 1. Armazena no Map em memória para acesso síncrono ultra-rápido
     this._photosByCapsuleId.set(capsuleId, normalizedPhotos);
@@ -206,7 +261,94 @@ class CapsulesService {
       }
     }
 
-    return normalizedPhotos;
+    return this._hydratePhotos(normalizedPhotos);
+  }
+
+  /**
+   * Monta a URL de exibição das fotos que estão no cofre do servidor.
+   */
+  _hydratePhotos(photos) {
+    if (!Array.isArray(photos)) return [];
+    return photos.map((p) =>
+      p && p.mediaId && (!p.img || isServerMediaUrl(p.img))
+        ? { ...p, img: resolveMediaUrl(`/api/vault/media/${p.mediaId}?variant=display`) }
+        : p
+    );
+  }
+
+  _hydrateCapsule(cap) {
+    if (!cap) return cap;
+    return {
+      ...cap,
+      voiceAudio: hydrateMediaRef(cap.voiceAudio),
+      audios: Array.isArray(cap.audios) ? cap.audios.map((a) => hydrateMediaRef(a)) : [],
+      videos: Array.isArray(cap.videos) ? cap.videos.map((v) => hydrateMediaRef(v)) : [],
+      calibrationAudio: hydrateMediaRef(cap.calibrationAudio),
+    };
+  }
+
+  /**
+   * Fotos da cápsula como estão guardadas localmente (sem montar URLs).
+   */
+  async _getStoredPhotos(capsuleId) {
+    if (this._photosByCapsuleId.has(capsuleId)) {
+      return this._photosByCapsuleId.get(capsuleId) || [];
+    }
+    const db = await openIndexedDB();
+    if (!db) return [];
+    try {
+      const record = await new Promise((resolve) => {
+        const tx = db.transaction(IDB_STORE, 'readonly');
+        const req = tx.objectStore(IDB_STORE).get(capsuleId);
+        req.onsuccess = (e) => resolve(e.target.result || null);
+        req.onerror = () => resolve(null);
+      });
+      if (record && Array.isArray(record.photos)) {
+        this._photosByCapsuleId.set(capsuleId, record.photos);
+        return record.photos;
+      }
+    } catch {}
+    return [];
+  }
+
+  // Blobs de voz/vídeo aguardando envio ao servidor (ex.: gravados sem conexão)
+  async _putPendingBlob(capsuleId, itemId, blob) {
+    if (!blob) return;
+    const db = await openIndexedDB();
+    if (!db) return;
+    try {
+      const tx = db.transaction(IDB_STORE, 'readwrite');
+      tx.objectStore(IDB_STORE).put({ capsuleId: `${PENDING_PREFIX}${capsuleId}::${itemId}`, blob, updatedAt: Date.now() });
+    } catch {}
+  }
+
+  async _getPendingBlob(capsuleId, itemId) {
+    const db = await openIndexedDB();
+    if (!db) return null;
+    try {
+      return await new Promise((resolve) => {
+        const tx = db.transaction(IDB_STORE, 'readonly');
+        const req = tx.objectStore(IDB_STORE).get(`${PENDING_PREFIX}${capsuleId}::${itemId}`);
+        req.onsuccess = (e) => resolve(e.target.result?.blob || null);
+        req.onerror = () => resolve(null);
+      });
+    } catch {
+      return null;
+    }
+  }
+
+  async _deletePendingBlob(capsuleId, itemId) {
+    const db = await openIndexedDB();
+    if (!db) return;
+    try {
+      const tx = db.transaction(IDB_STORE, 'readwrite');
+      tx.objectStore(IDB_STORE).delete(`${PENDING_PREFIX}${capsuleId}::${itemId}`);
+    } catch {}
+  }
+
+  _mediaRefsOf(cap) {
+    if (!cap) return [];
+    return [...(cap.audios || []), ...(cap.videos || []), cap.voiceAudio, cap.calibrationAudio].filter(Boolean);
   }
 
   /**
@@ -294,7 +436,7 @@ class CapsulesService {
     if (this._photosByCapsuleId.has(capsuleId)) {
       const inMemory = this._photosByCapsuleId.get(capsuleId);
       if (Array.isArray(inMemory)) {
-        return inMemory;
+        return this._hydratePhotos(inMemory);
       }
     }
 
@@ -311,11 +453,17 @@ class CapsulesService {
 
         if (idbRecord && Array.isArray(idbRecord.photos)) {
           this._photosByCapsuleId.set(capsuleId, idbRecord.photos);
-          return idbRecord.photos;
+          return this._hydratePhotos(idbRecord.photos);
         }
       } catch (e) {
         console.warn('[CapsulesService] Erro ao carregar fotos do IndexedDB:', e);
       }
+    }
+
+    // 2.1 Outro aparelho / navegador limpo: busca as fotos desta cápsula no servidor
+    const fromServer = await this._restorePhotosFromServer(capsuleId);
+    if (fromServer.length > 0) {
+      return fromServer;
     }
 
     // 3. Se a cápsula tiver fotos explicitamente atribuídas no seu próprio objeto
@@ -353,7 +501,7 @@ class CapsulesService {
     if (this._photosByCapsuleId.has(capsuleId)) {
       const photos = this._photosByCapsuleId.get(capsuleId);
       if (Array.isArray(photos)) {
-        return photos;
+        return this._hydratePhotos(photos);
       }
     }
 
@@ -422,7 +570,7 @@ class CapsulesService {
         const parsed = JSON.parse(stored);
         if (Array.isArray(parsed)) {
           const valid = parsed.filter((c) => c && c.id && !deletedIds.has(c.id));
-          return valid;
+          return valid.map((c) => this._hydrateCapsule(c));
         }
       }
     } catch (err) {
@@ -487,6 +635,11 @@ class CapsulesService {
   async deleteCapsule(capsuleId) {
     if (!capsuleId) return false;
 
+    const existing = this.getCapsules().find((c) => c.id === capsuleId);
+    for (const ref of this._mediaRefsOf(existing)) {
+      await this._deletePendingBlob(capsuleId, ref.id);
+    }
+
     // 1. Remove do cache em memória isoladamente apenas desta cápsula
     this._photosByCapsuleId.delete(capsuleId);
 
@@ -544,39 +697,318 @@ class CapsulesService {
     if (!token) return this.getCapsules();
 
     try {
-      const remoteCapsules = await httpClient.get('/capsules/', token);
-      if (Array.isArray(remoteCapsules) && remoteCapsules.length > 0) {
+      const remoteCapsules = await backgroundRequest('GET', '/capsules/', undefined, token);
+      if (Array.isArray(remoteCapsules)) {
         const deletedIds = this._getDeletedIds();
+
+        // Exclusões feitas sem conexão: repete o expurgo no servidor
+        for (const rc of remoteCapsules) {
+          if (rc && deletedIds.has(rc.id)) {
+            backgroundRequest('DELETE', `/capsules/${rc.id}`, undefined, token).catch(() => {});
+          }
+        }
+
+        const current = this.getCapsules();
         const formatted = remoteCapsules
           .filter((rc) => rc && !deletedIds.has(rc.id))
-          .map((rc) =>
-            this.sanitizeCapsule({
+          .map((rc) => {
+            const meta = rc.metadata || {};
+            const local = current.find((c) => c.id === rc.id) || {};
+            return {
+              ...local,
+              ...meta,
               id: rc.id,
               title: rc.title,
               recipient: rc.recipient,
-              avatar: rc.avatar || rc.recipientAvatar,
-              triggerLabel: rc.triggerLabel,
-              contentsSummary: rc.contentsSummary,
-              sealColor: rc.sealColor || '#F05A47',
-              statusText: rc.statusText || 'Bloqueada até a data',
-              photosCount: typeof rc.photosCount === 'number' ? `${rc.photosCount} fotos` : rc.photosCount,
-              createdAt: rc.createdAt ? new Date(rc.createdAt).getTime() : Date.now(),
+              avatar: rc.avatar || rc.recipientAvatar || local.avatar,
+              triggerLabel: rc.triggerLabel || meta.triggerLabel,
+              contentsSummary: meta.contentsSummary || rc.contentsSummary || local.contentsSummary,
+              sealColor: meta.sealColor || rc.sealColor || '#F05A47',
+              statusText: rc.statusText || meta.statusText || 'Bloqueada até a data',
+              photosCount: meta.photosCount || (typeof rc.photosCount === 'number' ? `${rc.photosCount} fotos` : rc.photosCount),
+              deliveryType: rc.deliveryType || 'date',
+              scheduledDate: rc.scheduledDate || null,
+              createdAt: meta.createdAt || (rc.createdAt ? new Date(rc.createdAt).getTime() : Date.now()),
               userId: rc.userId,
-            })
-          )
-          .filter(Boolean);
+              // Mudanças locais ainda não enviadas continuam pendentes
+              syncState: local.syncState === 'pending' ? 'pending' : 'synced',
+            };
+          });
 
-        if (formatted.length > 0) {
-          const current = this.getCapsules();
-          const localOnly = current.filter((c) => !formatted.some((fc) => fc.id === c.id));
-          const merged = [...formatted, ...localOnly];
-          this.saveCapsules(merged);
-        }
+        const localOnly = current.filter((c) => !formatted.some((fc) => fc.id === c.id));
+        this.saveCapsules([...formatted, ...localOnly]);
       }
     } catch (err) {
       console.warn('[CapsulesService] Erro ao sincronizar cápsulas da API:', err);
     }
+
+    // Envia o que foi criado/alterado só neste aparelho (inclui cápsulas antigas, anteriores à sincronização)
+    this.syncPending().catch(() => {});
     return this.getCapsules();
+  }
+
+  /**
+   * Envia ao servidor todas as cápsulas com alterações pendentes.
+   */
+  async syncPending() {
+    const pending = this.getCapsules().filter((c) => c.syncState !== 'synced');
+    for (const cap of pending) {
+      await this.syncCapsule(cap.id);
+    }
+  }
+
+  _enqueue(capsuleId, task) {
+    if (!this._syncQueues) this._syncQueues = new Map();
+    const previous = this._syncQueues.get(capsuleId) || Promise.resolve();
+    const next = previous.catch(() => {}).then(task);
+    this._syncQueues.set(capsuleId, next);
+    return next;
+  }
+
+  _updateCapsuleLocal(capsuleId, patch) {
+    const list = this.getCapsules();
+    let updated = null;
+    const next = list.map((c) => {
+      if (c.id !== capsuleId) return c;
+      updated = { ...c, ...(typeof patch === 'function' ? patch(c) : patch) };
+      return updated;
+    });
+    if (updated) this.saveCapsules(next);
+    return updated;
+  }
+
+  _capsulePayload(cap) {
+    return {
+      id: cap.id,
+      title: cap.title,
+      recipient: { name: cap.recipient, avatar: cap.avatar || null },
+      deliveryType: cap.deliveryType || 'date',
+      scheduledDate: cap.scheduledDate || null,
+      emotion: cap.emotion || 'love',
+      guardians: Array.isArray(cap.guardians) ? cap.guardians : undefined,
+      metadata: {
+        personId: cap.personId || null,
+        triggerLabel: cap.triggerLabel,
+        contentsSummary: cap.contentsSummary,
+        sealColor: cap.sealColor,
+        statusText: cap.statusText,
+        photosCount: cap.photosCount,
+        createdAt: cap.createdAt,
+        removedContentItems: cap.removedContentItems || [],
+        hasVoice: Boolean(cap.hasVoice),
+        voiceAudio: sanitizeMediaRef(cap.voiceAudio),
+        audios: (cap.audios || []).map(sanitizeMediaRef).filter(Boolean),
+        videos: (cap.videos || []).map(sanitizeMediaRef).filter(Boolean),
+        calibrationAudio: sanitizeMediaRef(cap.calibrationAudio),
+      },
+    };
+  }
+
+  /**
+   * Envia um arquivo ao cofre criptografado do servidor, vinculado à cápsula.
+   * Aceita Blob/File, data: URL, blob: URL ou URL http acessível.
+   */
+  async _uploadToVault(capsuleId, source, { title = '', description = '', filename = 'arquivo' } = {}, token = getAuthToken()) {
+    let blob = source;
+    if (!(typeof Blob !== 'undefined' && source instanceof Blob)) {
+      const res = await fetch(source);
+      if (!res.ok) throw new Error(`Não foi possível ler a mídia (${res.status})`);
+      blob = await res.blob();
+    }
+    const formData = new FormData();
+    formData.append('file', blob, filename);
+    formData.append('title', title || filename);
+    formData.append('description', description || '');
+    formData.append('capsuleId', capsuleId);
+
+    const response = await fetch(`${API_BASE_URL}/vault/media/upload`, {
+      method: 'POST',
+      headers: token ? { Authorization: `Bearer ${token}` } : {},
+      body: formData,
+    });
+    const data = await response.json().catch(() => ({}));
+    if (!response.ok || !data.mediaId) {
+      throw new Error(data.detail || `Falha no envio (${response.status})`);
+    }
+    return data;
+  }
+
+  /**
+   * Grava no servidor a cápsula, suas fotos e mídias ainda não enviadas.
+   * Idempotente: pode ser chamada várias vezes (retentativas, outro aparelho, volta da conexão).
+   */
+  async syncCapsule(capsuleId) {
+    const token = getAuthToken();
+    if (!token || !capsuleId) return false;
+
+    return this._enqueue(capsuleId, async () => {
+      let cap = this.getCapsules().find((c) => c.id === capsuleId);
+      if (!cap) return false;
+
+      try {
+        await backgroundRequest('POST', '/capsules/', this._capsulePayload(cap), token);
+      } catch (err) {
+        console.warn('[CapsulesService] Cápsula ficará pendente de envio:', err.message);
+        this._updateCapsuleLocal(capsuleId, { syncState: 'pending' });
+        return false;
+      }
+
+      let complete = true;
+
+      // Fotos ainda sem cópia no cofre do servidor
+      const photos = await this._getStoredPhotos(capsuleId);
+      let photosChanged = false;
+      const syncedPhotos = [];
+      for (const photo of photos) {
+        if (photo.mediaId || !photo.img || String(photo.id).endsWith('-avatar')) {
+          syncedPhotos.push(photo);
+          continue;
+        }
+        try {
+          const result = await this._uploadToVault(
+            capsuleId,
+            photo.img,
+            { title: photo.title, description: photo.story, filename: `${photo.id}.jpg` },
+            token
+          );
+          syncedPhotos.push({ ...photo, mediaId: result.mediaId, memoryId: result.id });
+          photosChanged = true;
+        } catch (err) {
+          console.warn('[CapsulesService] Foto pendente de envio:', err.message);
+          syncedPhotos.push(photo);
+          complete = false;
+        }
+      }
+      if (photosChanged) {
+        await this.setCapsulePhotos(capsuleId, syncedPhotos);
+      }
+
+      // Voz, vídeos e calibração gravados neste aparelho
+      cap = this.getCapsules().find((c) => c.id === capsuleId) || cap;
+      const uploaded = {};
+      for (const ref of this._mediaRefsOf(cap)) {
+        if (ref.mediaId || uploaded[ref.id]) continue;
+        const blob = await this._getPendingBlob(capsuleId, ref.id);
+        if (!blob) continue;
+        try {
+          const ext = (blob.type || '').includes('mp4') ? 'mp4' : 'webm';
+          const result = await this._uploadToVault(
+            capsuleId,
+            blob,
+            { title: ref.title, description: ref.script || '', filename: `${ref.id}.${ext}` },
+            token
+          );
+          uploaded[ref.id] = { mediaId: result.mediaId, memoryId: result.id };
+          await this._deletePendingBlob(capsuleId, ref.id);
+        } catch (err) {
+          console.warn('[CapsulesService] Mídia pendente de envio:', err.message);
+          complete = false;
+        }
+      }
+
+      if (Object.keys(uploaded).length > 0) {
+        const withIds = (ref) => (ref && uploaded[ref.id] ? { ...ref, ...uploaded[ref.id] } : ref);
+        cap = this._updateCapsuleLocal(capsuleId, (c) => ({
+          voiceAudio: withIds(c.voiceAudio),
+          audios: (c.audios || []).map(withIds),
+          videos: (c.videos || []).map(withIds),
+          calibrationAudio: withIds(c.calibrationAudio),
+        }));
+        try {
+          await backgroundRequest('POST', '/capsules/', this._capsulePayload(cap), token);
+        } catch {
+          complete = false;
+        }
+      }
+
+      this._updateCapsuleLocal(capsuleId, { syncState: complete ? 'synced' : 'pending' });
+      return complete;
+    });
+  }
+
+  /**
+   * Recupera do servidor as fotos de uma cápsula (outro aparelho ou navegador limpo).
+   */
+  async _restorePhotosFromServer(capsuleId) {
+    const token = getAuthToken();
+    if (!token || !capsuleId) return [];
+    try {
+      const detail = await backgroundRequest('GET', `/capsules/${capsuleId}`, undefined, token);
+      const images = (detail?.memories || []).filter((m) => m.type === 'IMAGE' && m.mediaId);
+      if (images.length === 0) return [];
+      const photos = images.map((m, idx) => ({
+        id: `photo-${capsuleId}-${m.memoryId}`,
+        mediaId: m.mediaId,
+        memoryId: m.memoryId,
+        img: null,
+        title: m.title || `Momento ${idx + 1}`,
+        story: m.story || '',
+      }));
+      return await this.setCapsulePhotos(capsuleId, photos);
+    } catch {
+      return [];
+    }
+  }
+
+  /**
+   * Salva a história (e emoções) escritas para uma foto da cápsula, no aparelho e no servidor.
+   */
+  async updatePhotoStory(capsuleId, photoId, story = '', emotions = null) {
+    if (!capsuleId || !photoId) return null;
+    const photos = await this._getStoredPhotos(capsuleId);
+    let target = null;
+    const updated = photos.map((p) => {
+      if (p.id !== photoId) return p;
+      target = { ...p, story, ...(Array.isArray(emotions) ? { emotions } : {}) };
+      return target;
+    });
+    if (!target) return null;
+    await this.setCapsulePhotos(capsuleId, updated);
+
+    const token = getAuthToken();
+    if (token && target.memoryId) {
+      backgroundRequest('PUT', `/memories/${target.memoryId}`, { content: story }, token).catch((err) => {
+        console.warn('[CapsulesService] História salva só neste aparelho por enquanto:', err.message);
+        this._updateCapsuleLocal(capsuleId, { syncState: 'pending' });
+      });
+    }
+    return this._hydratePhotos([target])[0];
+  }
+
+  /**
+   * Vincula um vídeo (ex.: avatar falante) à cápsula e o envia ao cofre do servidor.
+   */
+  addCapsuleVideo(capsuleId, videoItem) {
+    if (!capsuleId || !videoItem) return null;
+    const ref = sanitizeMediaRef({ ...videoItem, kind: 'video' });
+    const updated = this._updateCapsuleLocal(capsuleId, (c) => ({
+      videos: [ref, ...(c.videos || []).filter((v) => v.id !== ref.id)],
+      syncState: 'pending',
+    }));
+    if (!updated) return null;
+    this._putPendingBlob(capsuleId, ref.id, videoItem.videoBlob)
+      .then(() => this.syncCapsule(capsuleId))
+      .catch(() => {});
+    this.notify();
+    return updated;
+  }
+
+  /**
+   * Guarda a gravação de calibração da voz (voz matriz do avatar) na cápsula.
+   */
+  setCalibrationAudio(capsuleId, audioItem) {
+    if (!capsuleId || !audioItem) return null;
+    const previous = this.getCapsules().find((c) => c.id === capsuleId)?.calibrationAudio;
+    const ref = sanitizeMediaRef({ ...audioItem, kind: 'calibration' });
+    const updated = this._updateCapsuleLocal(capsuleId, { calibrationAudio: ref, syncState: 'pending' });
+    if (!updated) return null;
+    if (previous?.mediaId && previous.mediaId !== ref.mediaId) {
+      backgroundRequest('DELETE', `/vault/media/${previous.mediaId}`).catch(() => {});
+    }
+    this._putPendingBlob(capsuleId, ref.id, audioItem.audioBlob)
+      .then(() => this.syncCapsule(capsuleId))
+      .catch(() => {});
+    return updated;
   }
 
   /**
@@ -587,9 +1019,17 @@ class CapsulesService {
     if (!capsuleId || !photoId) return [];
 
     const currentPhotos = await this.getCapsulePhotos(capsuleId);
+    const removed = currentPhotos.find((p) => p.id === photoId);
     const updatedPhotos = currentPhotos.filter((p) => p.id !== photoId);
 
     await this.setCapsulePhotos(capsuleId, updatedPhotos);
+
+    // Expurgo definitivo também no cofre do servidor
+    if (removed?.mediaId && getAuthToken()) {
+      backgroundRequest('DELETE', `/vault/media/${removed.mediaId}`).catch((err) => {
+        console.warn('[CapsulesService] Falha ao expurgar foto no servidor:', err.message);
+      });
+    }
 
     // Atualiza contagem nos metadados da cápsula
     const capsules = this.getCapsules();
@@ -635,9 +1075,17 @@ class CapsulesService {
           removedContentItems: currentRemoved,
         };
         if (itemType === 'voice') {
+          const voiceRefs = [c.voiceAudio, ...(c.audios || [])].filter(Boolean);
+          for (const ref of voiceRefs) {
+            this._deletePendingBlob(capsuleId, ref.id);
+            if (ref.mediaId && getAuthToken()) {
+              backgroundRequest('DELETE', `/vault/media/${ref.mediaId}`).catch(() => {});
+            }
+          }
           updatedCapsule.hasVoice = false;
           updatedCapsule.voiceAudio = null;
           updatedCapsule.audios = [];
+          updatedCapsule.syncState = 'pending';
         }
         return updatedCapsule;
       }
@@ -645,6 +1093,7 @@ class CapsulesService {
     });
 
     this.saveCapsules(updated);
+    if (updatedCapsule) this.syncCapsule(capsuleId).catch(() => {});
     this.notify();
     return updatedCapsule;
   }
@@ -676,6 +1125,7 @@ class CapsulesService {
           voiceAudio: audioItem,
           audios: currentAudios,
           removedContentItems: removed,
+          syncState: 'pending',
         };
         return updatedCapsule;
       }
@@ -683,6 +1133,12 @@ class CapsulesService {
     });
 
     this.saveCapsules(updated);
+    if (updatedCapsule) {
+      // O áudio fica guardado no aparelho até chegar ao cofre do servidor
+      this._putPendingBlob(capsuleId, audioItem.id, audioItem.audioBlob)
+        .then(() => this.syncCapsule(capsuleId))
+        .catch(() => {});
+    }
     this.notify();
     return updatedCapsule;
   }
@@ -719,11 +1175,13 @@ class CapsulesService {
           ...c,
           photosCount: photosLabel,
           contentsSummary: `${photosLabel} • Mensagem de Amor`,
+          syncState: 'pending',
         };
       }
       return c;
     });
     this.saveCapsules(updated);
+    this.syncCapsule(capsuleId).catch(() => {});
     this.notify();
 
     return updatedPhotos;
@@ -750,7 +1208,7 @@ class CapsulesService {
     }
     
     // Adiciona as novas no início da lista, preservando as anteriores e as padrão
-    const merged = [...listToAdd, ...current];
+    const merged = [...listToAdd.map((cap) => (cap && cap.id ? { ...cap, syncState: 'pending' } : cap)), ...current];
     
     // Remove duplicatas por ID se houver
     const seen = new Set();
@@ -764,33 +1222,10 @@ class CapsulesService {
 
     const saved = this.saveCapsules(unique);
 
-    // Sincroniza assincronamente as novas cápsulas com a API MySQL (se autenticado)
-    const token = getAuthToken();
-    if (token) {
-      for (const cap of listToAdd) {
-        if (cap && cap.title && cap.id !== 'cap-1' && cap.id !== 'cap-2') {
-          const photosToSync = (Array.isArray(cap.photos) && cap.photos.length > 0)
-            ? cap.photos
-            : this.findOriginalUploadedPhotos();
-
-          httpClient.post('/capsules/', {
-            id: cap.id,
-            title: cap.title,
-            recipient: typeof cap.recipient === 'object' ? cap.recipient : { name: cap.recipient, avatar: cap.avatar },
-            deliveryType: cap.deliveryType || 'date',
-            scheduledDate: cap.scheduledDate || cap.triggerDate || null,
-            emotion: cap.emotion || 'love',
-            guardians: Array.isArray(cap.guardians) ? cap.guardians : [],
-            photos: (photosToSync || []).map((p) => ({
-              img: p.img || p.media_url,
-              title: p.title,
-              story: p.story,
-              audioDuration: p.audioDuration,
-            })),
-          }, token).catch((err) => {
-            console.warn('[CapsulesService] Aviso na sincronização de criação com API:', err);
-          });
-        }
+    // Grava no servidor (metadados, fotos e mídias); sem conexão fica pendente e é reenviada depois
+    for (const cap of listToAdd) {
+      if (cap && cap.id && cap.title) {
+        this.syncCapsule(cap.id).catch(() => {});
       }
     }
 

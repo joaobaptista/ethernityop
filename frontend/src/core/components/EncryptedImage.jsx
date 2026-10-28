@@ -11,6 +11,7 @@
  */
 import React, { useState, useEffect, useMemo } from 'react';
 import './EncryptedImage.css';
+import { resolveMediaUrl } from '../api/apiUrl.js';
 
 const AUTH_TOKEN_KEY = 'ethernity_auth_token';
 
@@ -49,7 +50,7 @@ export default function EncryptedImage({
       return { thumbUrl: src, displayUrl: src, exportUrl: src, isVaultMedia: false };
     }
 
-    const cleanBase = src.split('?')[0];
+    const cleanBase = resolveMediaUrl(src.split('?')[0], null);
     const tokenParam = token ? `&token=${encodeURIComponent(token)}` : '';
 
     return {

@@ -1,5 +1,9 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useI18n } from '../../../core/i18n/presentation/useI18n.js';
+import capsulesService from '../../capsules/application/capsulesService.js';
+import messagesRepository from '../../messages/infrastructure/messagesRepository.js';
+import { getStoredAuthToken } from '../../../core/api/apiUrl.js';
+import { buildCalendarEvents } from '../domain/calendarModel.js';
 import './LegacyCalendarView.css';
 
 export const CALENDAR_EVENTS = [];
@@ -33,7 +37,33 @@ export const SAMPLE_FIXTURE_CALENDAR_EVENTS = [
 
 export default function LegacyCalendarView() {
   const { t } = useI18n();
-  const [events] = useState(CALENDAR_EVENTS);
+  const [events, setEvents] = useState(CALENDAR_EVENTS);
+
+  useEffect(() => {
+    let active = true;
+    let messages = [];
+    const refresh = () => {
+      if (active) setEvents(buildCalendarEvents(capsulesService.getCapsules(), messages));
+    };
+
+    refresh();
+    capsulesService.fetchCapsulesFromApi().then(refresh).catch(() => {});
+    const token = getStoredAuthToken();
+    if (token) {
+      messagesRepository
+        .getMessages(token)
+        .then((list) => {
+          messages = Array.isArray(list) ? list : list?.items || [];
+          refresh();
+        })
+        .catch(() => {});
+    }
+    const unsubscribe = capsulesService.subscribe(refresh);
+    return () => {
+      active = false;
+      unsubscribe();
+    };
+  }, []);
 
   return (
     <div className="legacy-calendar-container fade-in">

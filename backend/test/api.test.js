@@ -59,6 +59,7 @@ test('GET /health reports healthy when MySQL responds', async () => {
   assert.equal(res.status, 200);
   assert.equal(res.body.status, 'healthy');
   assert.equal(res.body.database, 'up');
+  assert.match(res.body.version, /^\d+\.\d+\.\d+$/);
 });
 
 test('GET /metrics returns a Prometheus text body', async () => {

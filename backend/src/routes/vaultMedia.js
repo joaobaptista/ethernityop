@@ -27,6 +27,27 @@ const VAULT_DIR = config.vaultFolder || path.resolve(config.uploadFolder, 'vault
 fs.mkdir(VAULT_DIR, { recursive: true }).catch(() => {});
 
 /**
+ * Expurgo criptográfico dos arquivos de uma memória do cofre (sobrescreve com ruído e remove).
+ * Usado na exclusão individual e no expurgo da cápsula inteira.
+ */
+export async function shredVaultMediaFiles(userId, storageKey) {
+  if (!userId || !storageKey) return;
+  const mediaId = path.basename(storageKey);
+  const mediaDir = path.join(VAULT_DIR, userId, mediaId);
+  try {
+    const files = await fs.readdir(mediaDir);
+    for (const f of files) {
+      const fullPath = path.join(mediaDir, f);
+      const shredded = await vaultEncryptionService.cryptoShredFile(fullPath);
+      if (!shredded) {
+        await fs.unlink(fullPath).catch(() => {});
+      }
+    }
+    await fs.rm(mediaDir, { recursive: true, force: true }).catch(() => {});
+  } catch {}
+}
+
+/**
  * Auxiliar: Busca e valida autorização de acesso a uma memória do cofre
  */
 async function getAuthorizedMemory(memoryId, user) {
@@ -111,6 +132,14 @@ router.post(
       await fs.mkdir(mediaDir, { recursive: true });
 
       const capsuleId = req.body.capsuleId || 'capsule-default';
+      if (capsuleId !== 'capsule-default') {
+        // Não permite anexar mídia à cápsula de outro usuário
+        const [owner] = await pool.query('SELECT user_id FROM capsules WHERE id = ? LIMIT 1', [capsuleId]);
+        if (owner.length > 0 && owner[0].user_id !== userId) {
+          await fs.rm(mediaDir, { recursive: true, force: true }).catch(() => {});
+          return res.status(403).json({ detail: 'Esta cápsula pertence a outro usuário.' });
+        }
+      }
       const title = req.body.title || file.originalname || 'Arquivo no Cofre';
       const description = req.body.description || '';
 
@@ -588,21 +617,8 @@ router.delete('/vault/media/:id', requireAuth, async (req, res, next) => {
       return res.status(403).json({ detail: 'Apenas o autor pode expurgar esta memória do cofre.' });
     }
 
-    const mediaId = path.basename(memory.storage_key);
-    const mediaDir = path.join(VAULT_DIR, userId, mediaId);
-
     // Crypto-shredding seguro de todos os arquivos criptografados em disco
-    try {
-      const files = await fs.readdir(mediaDir);
-      for (const f of files) {
-        const fullPath = path.join(mediaDir, f);
-        const shredded = await vaultEncryptionService.cryptoShredFile(fullPath);
-        if (!shredded) {
-          await fs.unlink(fullPath).catch(() => {});
-        }
-      }
-      await fs.rm(mediaDir, { recursive: true, force: true }).catch(() => {});
-    } catch {}
+    await shredVaultMediaFiles(userId, memory.storage_key);
 
     // Expurgo definitivo da tabela memories
     await pool.query('DELETE FROM memories WHERE id = ? AND author_id = ?', [memory.id, userId]);

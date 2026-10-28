@@ -144,7 +144,11 @@ export default function VideoRecorderModal({ isOpen, onClose, onSave }) {
           recipient: 'Toda a família',
           filename: `${title.trim() || 'video'}.webm`,
         });
-        setUploadStatus('✨ Vídeo criptografado e salvo no Cofre!');
+        setUploadStatus(
+          uploadResult?.offline
+            ? '⚠️ Servidor indisponível: salvo só neste aparelho. Tente enviar de novo quando estiver online.'
+            : '✨ Vídeo criptografado e salvo no Cofre!'
+        );
       } catch (err) {
         console.warn('[VideoRecorderModal] Erro ao enviar ao cofre remoto:', err);
         setUploadStatus('Salvo localmente no dispositivo.');

@@ -9,9 +9,11 @@
  * DELETE /capsules/:id   -> Expurgo definitivo da cápsula e mídias vinculadas (CryptoShred)
  */
 import { Router } from 'express';
+import path from 'node:path';
 import { requireAuth } from '../auth.js';
 import { pool, DEMO_USER_ID } from '../db/mysql.js';
 import { uuid } from '../seed.js';
+import { shredVaultMediaFiles } from './vaultMedia.js';
 
 const router = Router();
 
@@ -19,7 +21,44 @@ const router = Router();
  * Normaliza o objeto de cápsula retornado do MySQL para um formato universal
  * consumível tanto pela Web (React) quanto pelo Mobile App (React Native).
  */
+function parseMetadata(raw) {
+  if (!raw) return {};
+  if (typeof raw === 'object') return raw;
+  try {
+    return JSON.parse(raw) || {};
+  } catch {
+    return {};
+  }
+}
+
+// Só URLs/caminhos do servidor viram memória; base64 e blob: chegam pelo upload do cofre.
+function isPersistableMediaUrl(url) {
+  return typeof url === 'string' && url.length <= 2048 && !/^(data|blob):/i.test(url);
+}
+
+/**
+ * Mídia vinculada à cápsula, com os ids que o cliente usa para montar URLs e editar a história.
+ */
+function formatCapsuleMemory(row) {
+  return {
+    id: row.id,
+    memoryId: row.id,
+    mediaId: row.storage_key ? path.basename(row.storage_key) : null,
+    type: row.type,
+    title: row.title,
+    story: row.content || '',
+    content: row.content || '',
+    media_url: row.media_url,
+    mediaUrl: row.media_url,
+    mimeType: row.mime_type,
+    durationSeconds: row.media_duration_seconds || null,
+    occurredAt: row.occurred_at,
+    createdAt: row.created_at,
+  };
+}
+
 function formatCapsule(row, guardians = [], photosCount = 0) {
+  const metadata = parseMetadata(row.metadata);
   let recipientData = row.recipient;
   if (typeof recipientData === 'string') {
     try {
@@ -46,8 +85,9 @@ function formatCapsule(row, guardians = [], photosCount = 0) {
     title: row.title,
     recipient: recipientName,
     recipientData: recipientData || { name: recipientName },
-    avatar: recipientAvatar,
-    recipientAvatar,
+    avatar: recipientAvatar || metadata.avatar || null,
+    recipientAvatar: recipientAvatar || metadata.avatar || null,
+    metadata,
     deliveryType: row.delivery_type || 'date',
     delivery_type: row.delivery_type || 'date',
     scheduledDate: row.scheduled_date || row.unlock_at || null,
@@ -183,11 +223,12 @@ router.get('/capsules/:id', requireAuth, async (req, res) => {
     ).catch(() => [[]]);
 
     const [memoriesRows] = await pool.query(
-      `SELECT id, type, title, content, media_url, is_encrypted, mime_type, file_size_bytes, occurred_at, created_at 
+      `SELECT id, type, title, content, media_url, storage_key, is_encrypted, mime_type, file_size_bytes,
+              media_duration_seconds, occurred_at, created_at 
        FROM memories 
-       WHERE capsule_id = ? 
-       ORDER BY occurred_at ASC, created_at ASC`,
-      [capsuleId]
+       WHERE capsule_id = ? AND author_id = ?
+       ORDER BY occurred_at ASC, created_at ASC, id ASC`,
+      [capsuleId, capsule.user_id]
     ).catch(() => [[]]);
 
     const formatted = formatCapsule(
@@ -196,7 +237,7 @@ router.get('/capsules/:id', requireAuth, async (req, res) => {
       memoriesRows ? memoriesRows.length : 0
     );
 
-    formatted.memories = memoriesRows || [];
+    formatted.memories = (memoriesRows || []).map(formatCapsuleMemory);
 
     return res.json(formatted);
   } catch (err) {
@@ -229,6 +270,23 @@ router.post('/capsules/', requireAuth, async (req, res) => {
 
   const emotion = body.emotion || 'love';
   const status = body.status || 'LOCKED';
+  const metadata = body.metadata && typeof body.metadata === 'object' ? JSON.stringify(body.metadata) : null;
+
+  // Reenvio da mesma cápsula (sincronização offline/retentativa) atualiza em vez de duplicar.
+  const [existingRows] = await pool.query('SELECT user_id FROM capsules WHERE id = ? LIMIT 1', [capsuleId]);
+  if (existingRows.length > 0) {
+    if (existingRows[0].user_id !== userId) {
+      return res.status(409).json({ detail: 'Identificador de cápsula já utilizado.' });
+    }
+    await pool.query(
+      `UPDATE capsules SET title = ?, recipient = ?, delivery_type = ?, scheduled_date = ?, emotion = ?,
+         metadata = COALESCE(?, metadata), updated_at = NOW(3)
+       WHERE id = ? AND user_id = ?`,
+      [title, recipient, deliveryType, scheduledDate, emotion, metadata, capsuleId, userId]
+    );
+    const [rows] = await pool.query('SELECT * FROM capsules WHERE id = ?', [capsuleId]);
+    return res.status(200).json(formatCapsule(rows[0]));
+  }
   const videoDurationSeconds = Number(body.videoDurationSeconds || body.video_duration_seconds || 0);
   const videoBlobUrl = body.videoBlobUrl || body.video_blob_url || null;
   const videoSizeMb = body.videoSizeMb || body.video_size_mb || null;
@@ -243,8 +301,8 @@ router.post('/capsules/', requireAuth, async (req, res) => {
       `INSERT INTO capsules (
         id, user_id, title, recipient, delivery_type, scheduled_date,
         emotion, status, video_duration_seconds, video_blob_url,
-        video_size_mb, is_encrypted, encryption_hash, created_at, updated_at
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW(3), NOW(3))`,
+        video_size_mb, is_encrypted, encryption_hash, metadata, created_at, updated_at
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW(3), NOW(3))`,
       [
         capsuleId,
         userId,
@@ -259,6 +317,7 @@ router.post('/capsules/', requireAuth, async (req, res) => {
         videoSizeMb,
         isEncrypted,
         encryptionHash,
+        metadata,
       ]
     );
 
@@ -282,11 +341,12 @@ router.post('/capsules/', requireAuth, async (req, res) => {
       ? body.photos || body.curatedPhotos
       : [];
 
+    let persistedPhotos = 0;
     for (const photo of photosList) {
-      const photoId = photo.id || `mem-${uuid().slice(0, 10)}`;
       const photoUrl = photo.img || photo.media_url || photo.url;
-      const photoTitle = photo.story || photo.title || 'Foto da Cápsula';
-      if (photoUrl) {
+      const photoTitle = photo.title || 'Foto da Cápsula';
+      if (isPersistableMediaUrl(photoUrl)) {
+        persistedPhotos += 1;
         await conn.query(
           `INSERT INTO memories (
             capsule_id, author_id, type, title, content, media_url, source, occurred_at, created_at, updated_at
@@ -304,7 +364,7 @@ router.post('/capsules/', requireAuth, async (req, res) => {
     const formatted = formatCapsule(
       createdRows[0],
       guardiansList.map((g) => (typeof g === 'string' ? g : g?.email)),
-      photosList.length
+      persistedPhotos
     );
 
     return res.status(201).json(formatted);
@@ -355,6 +415,12 @@ router.put('/capsules/:id', requireAuth, async (req, res) => {
 
     const newEmotion = body.emotion || current.emotion;
     const newStatus = body.status || current.status;
+    const newMetadata =
+      body.metadata && typeof body.metadata === 'object'
+        ? JSON.stringify(body.metadata)
+        : current.metadata && typeof current.metadata === 'object'
+        ? JSON.stringify(current.metadata)
+        : current.metadata;
 
     await pool.query(
       `UPDATE capsules SET
@@ -364,9 +430,10 @@ router.put('/capsules/:id', requireAuth, async (req, res) => {
         scheduled_date = ?,
         emotion = ?,
         status = ?,
+        metadata = ?,
         updated_at = NOW(3)
        WHERE id = ?`,
-      [newTitle, newRecipient, newDeliveryType, newScheduledDate, newEmotion, newStatus, capsuleId]
+      [newTitle, newRecipient, newDeliveryType, newScheduledDate, newEmotion, newStatus, newMetadata, capsuleId]
     );
 
     // Se guardiões foram enviados, sincroniza
@@ -421,6 +488,12 @@ router.delete('/capsules/:id', requireAuth, async (req, res) => {
       return res.status(404).json({ detail: 'Cápsula não encontrada ou acesso não autorizado.' });
     }
 
+    // Arquivos cifrados das mídias da cápsula: expurgados depois do commit
+    const [mediaRows] = await conn.query(
+      'SELECT storage_key FROM memories WHERE capsule_id = ? AND author_id = ? AND storage_key IS NOT NULL',
+      [capsuleId, userId]
+    );
+
     // 1. Remover guardiões associados
     await conn.query('DELETE FROM capsule_guardians WHERE capsule_id = ?', [capsuleId]);
 
@@ -432,6 +505,10 @@ router.delete('/capsules/:id', requireAuth, async (req, res) => {
 
     await conn.commit();
     conn.release();
+
+    for (const m of mediaRows) {
+      await shredVaultMediaFiles(userId, m.storage_key);
+    }
 
     return res.json({
       success: true,

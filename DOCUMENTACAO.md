@@ -37,6 +37,13 @@ npm run lint:frontend   # Oxlint
 npm run ci              # tudo acima, como no GitHub Actions
 ```
 
+**Versão:** o Ethernity usa Versionamento Semântico (SemVer), exibido como `v1.0.0`, `v1.1.0`, `v1.0.1`.
+- **MAJOR (`2.0.0`):** mudança incompatível (API, formato de dados).
+- **MINOR (`1.1.0`):** recurso novo compatível.
+- **PATCH (`1.0.1`):** só correções.
+
+A `v1.0.0` é a primeira versão estável. O número fica no campo `version` dos três `package.json` (raiz, `backend/`, `frontend/`), que devem andar juntos. O frontend mostra a versão na tela de login (`core/appVersion.js`, injetada pelo Vite), e o backend a devolve em `GET /health`. Cada lançamento deve ganhar a tag git correspondente (`v1.0.0`).
+
 A organização do frontend segue módulos por domínio (`frontend/src/modules/<domínio>/{domain,application,infrastructure,presentation}`) com um núcleo compartilhado em `frontend/src/core/` (api, components, hooks, i18n, services).
 
 ---
@@ -60,7 +67,10 @@ Resumo das regras de [AGENTS.md](AGENTS.md), que prevalecem em caso de conflito:
 - **`localStorage` → `ethernity_user_capsules`:** só campos leves (`id`, `title`, `recipient`, `avatar` 240×240, `photosCount`, `triggerLabel`, `sealColor`, `statusText`). É proibido guardar fotos em alta resolução aqui: o limite de ~5 MB gerava `QuotaExceededError`.
 - **IndexedDB → banco `Ethernity_Capsules_Media`, store `capsule_photos`:** fotos, áudios e vídeos completos de cada cápsula, sempre via `setCapsulePhotos(id, photos)` / `getCapsulePhotos(id)`.
 - **Cache em memória `_photosByCapsuleId` (`Map`):** navegação instantânea entre fotos durante a sessão.
-- Com usuário autenticado, cápsulas novas também são sincronizadas com a API (`/capsules/`).
+- **Servidor como fonte da verdade:** com usuário autenticado, `syncCapsule` grava a cápsula (`POST /capsules/`, idempotente, com os campos de tela em `metadata`), envia cada foto ao cofre cifrado (`/vault/media/upload` com `capsuleId`) e guarda `mediaId`/`memoryId` na foto. Voz, vídeo do avatar e voz de calibração seguem o mesmo caminho; enquanto não chegam ao servidor, os arquivos ficam no IndexedDB (`pending::…`).
+- **Sem conexão:** a cápsula fica com `syncState: 'pending'` e é reenviada em `syncPending()` (ao abrir Cápsulas/Calendário e no evento `online`). Exclusões feitas offline são repetidas no servidor na próxima sincronização.
+- **Outro aparelho / navegador limpo:** `fetchCapsulesFromApi` traz as cápsulas e `getCapsulePhotos` restaura as fotos de `GET /capsules/:id`; as URLs de exibição são montadas na leitura (`resolveMediaUrl`, com token).
+- **Histórias e emoções das fotos:** salvas ao trocar de foto, ao sair do campo e em "Salvar rascunho" (`updatePhotoStory` → `PUT /memories/:id`).
 
 ### 3.2 Avatar × foto original
 - `avatarUrl`: recorte facial 1:1 (240×240), só para perfis circulares, grade de pessoas e badges.
@@ -81,6 +91,8 @@ Resumo das regras de [AGENTS.md](AGENTS.md), que prevalecem em caso de conflito:
 ### 3.5 Outros módulos
 - **i18n:** pt, en e es em `frontend/src/core/i18n/infrastructure/locales/`, com paridade verificada por teste.
 - **PWA:** `frontend/public/sw.js` busca primeiro na rede (HTML com `cache: 'no-store'`), nunca intercepta rotas da API nem do cofre e usa `skipWaiting` + `clients.claim`. Ao mudar o SW, suba a versão de `CACHE_NAME` e a de `main.jsx` juntas.
+- **Calendário:** monta a linha do tempo com cápsulas e mensagens com data de entrega (`calendar/domain/calendarModel.js`); entregas póstumas não aparecem.
+- **URLs da API:** `core/api/apiUrl.js` centraliza `VITE_API_URL`; mídias do cofre (`/api/vault/media/...`) são resolvidas contra a origem da API, nunca contra o site.
 - **Mensagens:** editor TipTap em `NewMessageView`, em dois passos (ideação → entrega por data ou póstuma via guardião). Os dados vão para `/messages/` e para o cofre local cifrado (`localVaultService`, AES-256-GCM no IndexedDB).
 
 ---
@@ -120,6 +132,8 @@ FFmpeg e FFprobe vêm de `@ffmpeg-installer/*` e `sharp` traz binários próprio
 | `GET /vault/media/:id/poster` · `/waveform` · `/live-video` | Pôster, picos de áudio, vídeo da Live Photo |
 | `GET /vault/media/:id/export?format=print` | Exportação para impressão (300 DPI, TIFF/PNG) |
 | `DELETE /vault/media/:id` | Exclusão definitiva |
+
+Upload com `capsuleId` de cápsula de outro usuário é recusado (403). `DELETE /capsules/:id` expurga também os arquivos cifrados de todas as mídias da cápsula.
 
 As rotas também respondem sob `/api`. Tags `<img>`, `<video>` e `<audio>` podem passar o token por `?token=` (ver riscos na seção 9). Os arquivos ficam em `VAULT_FOLDER` (padrão `./vault_storage/<userId>/<mediaId>/`), nunca servidos como estáticos.
 
@@ -270,7 +284,6 @@ Redirecione a porta 80 para HTTPS e emita certificados com `certbot --nginx`.
   - PIX/Checkout Pro reais e cartão tokenizado no navegador (Card Payment Brick, sem número/CVV no servidor);
   - webhook com assinatura `x-signature` validada que ative o plano.
 - **Google Fotos em produção:** Client ID com escopo `photospicker.mediaitems.readonly` e as variáveis da seção 8.2.
-- **Cápsulas só no navegador:** os metadados e as mídias das cápsulas vivem no `localStorage`/IndexedDB do aparelho, então trocar de aparelho ou limpar o navegador perde o conteúdo. Sincronização completa com o servidor mexe na regra de persistência híbrida e precisa de aprovação.
 
 ### Escalabilidade
 - Arquivos do cofre em disco local → object storage (S3/R2), necessário para rodar mais de uma instância.

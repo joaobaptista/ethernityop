@@ -6,12 +6,16 @@
 import express from 'express';
 import cors from 'cors';
 import path from 'node:path';
+import { readFileSync } from 'node:fs';
 import config, { isAllowedOrigin } from './config.js';
 import api from './routes/index.js';
 import swaggerRouter from './docs/swagger.js';
 import { reseed } from './db.js';
 import { requireAdmin } from './auth.js';
 import { pool } from './db/mysql.js';
+
+// Versão do backend (SemVer), lida do package.json e exposta no /health
+const APP_VERSION = JSON.parse(readFileSync(new URL('../package.json', import.meta.url), 'utf-8')).version;
 
 export function createApp() {
   const app = express();
@@ -53,7 +57,8 @@ export function createApp() {
   app.use('/uploads', uploadsStatic);
   app.use('/api/uploads', uploadsStatic);
 
-  app.use(express.json());
+  // Cápsulas trazem o avatar (recorte 240×240 em base64) nos metadados; mídias vão por upload multipart.
+  app.use(express.json({ limit: '2mb' }));
 
   // Root banner: {"message":"Ethernity DMS API"}
   app.get('/', (_req, res) =>
@@ -67,9 +72,9 @@ export function createApp() {
         pool.query('SELECT 1'),
         new Promise((_, reject) => setTimeout(() => reject(new Error('timeout')), 2000)),
       ]);
-      return res.json({ status: 'healthy', database: 'up' });
+      return res.json({ status: 'healthy', database: 'up', version: APP_VERSION });
     } catch {
-      return res.status(503).json({ status: 'unhealthy', database: 'down' });
+      return res.status(503).json({ status: 'unhealthy', database: 'down', version: APP_VERSION });
     }
   });
 

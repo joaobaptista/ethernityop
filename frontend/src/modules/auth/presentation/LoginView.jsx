@@ -4,6 +4,7 @@ import { useI18n } from '../../../core/i18n/presentation/useI18n.js';
 import logoIcon from '../../../assets/logo-icon.svg';
 import logoText from '../../../assets/logo-text.svg';
 import './LoginView.css';
+import { APP_VERSION, APP_VERSION_LABEL } from '../../../core/appVersion.js';
 
 export default function LoginView({ onLoginSuccess }) {
   const { t } = useI18n();
@@ -326,6 +327,10 @@ export default function LoginView({ onLoginSuccess }) {
             </div>
 
           </form>
+
+          <p className="auth-version" aria-label={`Versão ${APP_VERSION}`}>
+            Ethernity {APP_VERSION_LABEL}
+          </p>
         </section>
       </main>
     </div>
