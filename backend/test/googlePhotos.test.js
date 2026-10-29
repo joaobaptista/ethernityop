@@ -82,7 +82,7 @@ test('GET /google-photos/photos lists photos with category and search filter', a
       capsuleId: 'cap-general',
       title: 'Foto Especial do Google Fotos',
       story: 'Registro sincronizado com segurança.',
-      mediaUrl: 'https://images.unsplash.com/photo-test-real',
+      mediaUrl: 'https://media.test/google-photo.jpg',
       type: 'IMAGE',
       source: 'GOOGLE_PHOTOS',
     });

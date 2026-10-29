@@ -9,6 +9,7 @@
  * 4. Fornecer subscrição reativa para atualização instantânea da UI
  */
 import httpClient from '../../../core/api/httpClient.js';
+import { describeCapsuleDelivery } from '../domain/capsulesModel.js';
 import { API_BASE_URL, resolveMediaUrl, backgroundRequest } from '../../../core/api/apiUrl.js';
 
 function getAuthToken() {
@@ -28,7 +29,7 @@ export const SAMPLE_FIXTURE_CAPSULES = [
     id: 'cap-1',
     title: 'Cápsula: 18º Aniversário da Mariana',
     recipient: 'Mariana Silva (Filha)',
-    avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=250',
+    avatar: null,
     triggerLabel: '12 de Outubro de 2032',
     contentsSummary: '2 Áudios • 1 Vídeo • 1 Álbum de Fotos • Carta de Amor',
     sealColor: '#F05A47',
@@ -38,7 +39,7 @@ export const SAMPLE_FIXTURE_CAPSULES = [
     id: 'cap-2',
     title: 'Legado Familiar & Palavras de Sabedoria',
     recipient: 'Antônio Silva (Pai)',
-    avatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&q=80&w=250',
+    avatar: null,
     triggerLabel: 'Liberação Póstuma (Guardião Responsável)',
     contentsSummary: '3 Áudios • 2 Vídeos • Documentos & Diretivas',
     sealColor: '#7E57C2',
@@ -51,7 +52,7 @@ export const DEFAULT_CURATION_PHOTOS = [];
 export const SAMPLE_FIXTURE_CURATION_PHOTOS = [
   {
     id: 'c-1',
-    img: 'https://images.unsplash.com/photo-1509099836639-18ba1795216d?auto=format&fit=crop&q=80&w=800',
+    img: null,
     dateLabel: 'Julho 2018',
     photoNumber: 1,
     story: 'Férias de verão na praia. O seu primeiro contato com as ondas do mar e aquele abraço quentinho ao entardecer.',
@@ -60,7 +61,7 @@ export const SAMPLE_FIXTURE_CURATION_PHOTOS = [
   },
   {
     id: 'c-2',
-    img: 'https://images.unsplash.com/photo-1523240795612-9a054b0db644?auto=format&fit=crop&q=80&w=800',
+    img: null,
     dateLabel: 'Dezembro 2021',
     photoNumber: 2,
     story: 'Dia de formatura e muita comemoração. Ver você conquistando seus sonhos com tanta dedicação enche meu coração.',
@@ -69,7 +70,7 @@ export const SAMPLE_FIXTURE_CURATION_PHOTOS = [
   },
   {
     id: 'c-3',
-    img: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=800',
+    img: null,
     dateLabel: 'Janeiro 2024',
     photoNumber: 3,
     story: 'Este foi o dia em que você me ensinou a andar de bicicleta. Eu caí tantas vezes, mas você sempre estava lá para me levantar. Nunca vou esquecer seu sorriso orgulhoso quando finalmente consegui.',
@@ -78,7 +79,7 @@ export const SAMPLE_FIXTURE_CURATION_PHOTOS = [
   },
   {
     id: 'c-4',
-    img: 'https://images.unsplash.com/photo-1556911220-e15b29be8c8f?auto=format&fit=crop&q=80&w=800',
+    img: null,
     dateLabel: 'Maio 2023',
     photoNumber: 4,
     story: 'Tarde de domingo na cozinha fazendo o bolo de cenoura com chocolate que você tanto pedia quando era pequena.',
@@ -87,7 +88,7 @@ export const SAMPLE_FIXTURE_CURATION_PHOTOS = [
   },
   {
     id: 'c-5',
-    img: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&q=80&w=800',
+    img: null,
     dateLabel: 'Outubro 2022',
     photoNumber: 5,
     story: 'Caminhada pelo parque em pleno outono. As conversas que tivemos nesse dia mudaram minha perspectiva sobre tantas coisas.',
@@ -96,7 +97,7 @@ export const SAMPLE_FIXTURE_CURATION_PHOTOS = [
   },
   {
     id: 'c-6',
-    img: 'https://images.unsplash.com/photo-1511895426328-dc8714191300?auto=format&fit=crop&q=80&w=800',
+    img: null,
     dateLabel: 'Novembro 2020',
     photoNumber: 6,
     story: 'Almoço de família reunida depois de meses sem podermos nos abraçar. Um dos dias mais alegres da nossa história.',
@@ -192,17 +193,19 @@ class CapsulesService {
   sanitizeCapsule(cap) {
     if (!cap || typeof cap !== 'object') return null;
 
-    const countLabel = cap.photosCount || (Array.isArray(cap.photos) ? `${cap.photos.length} fotos` : '1 foto');
+    const countLabel = cap.photosCount || (Array.isArray(cap.photos) ? `${cap.photos.length} ${cap.photos.length === 1 ? 'foto' : 'fotos'}` : '');
 
     const sanitized = {
       id: cap.id || `cap-${Date.now()}-${Math.random().toString(36).substr(2, 6)}`,
       title: cap.title || 'Cápsula do Tempo',
       recipient: cap.recipient || 'Pessoa Especial',
-      avatar: cap.avatar || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=250',
-      triggerLabel: cap.triggerLabel || '12 de Outubro de 2032',
-      contentsSummary: cap.contentsSummary || 'Mensagem de Amor',
+      avatar: cap.avatar || null,
+      ...describeCapsuleDelivery({
+        deliveryType: cap.deliveryType,
+        scheduledDate: cap.scheduledDate || cap.triggerDate || null,
+      }),
+      contentsSummary: countLabel,
       sealColor: cap.sealColor || '#F05A47',
-      statusText: cap.statusText || 'Bloqueada até a data',
       personId: cap.personId || null,
       photosCount: countLabel,
       createdAt: cap.createdAt || Date.now(),
@@ -280,6 +283,8 @@ class CapsulesService {
     if (!cap) return cap;
     return {
       ...cap,
+      ...describeCapsuleDelivery(cap),
+      contentsSummary: cap.photosCount || cap.contentsSummary || '',
       voiceAudio: hydrateMediaRef(cap.voiceAudio),
       audios: Array.isArray(cap.audios) ? cap.audios.map((a) => hydrateMediaRef(a)) : [],
       videos: Array.isArray(cap.videos) ? cap.videos.map((v) => hydrateMediaRef(v)) : [],
@@ -1040,7 +1045,7 @@ class CapsulesService {
         return {
           ...c,
           photosCount: photosLabel,
-          contentsSummary: `${photosLabel} • Mensagem de Amor`,
+          contentsSummary: photosLabel,
         };
       }
       return c;
@@ -1049,6 +1054,34 @@ class CapsulesService {
 
     this.notify();
     return updatedPhotos;
+  }
+
+  /**
+   * Atualiza título, destinatário e regra de entrega definidos pelo usuário e grava no servidor.
+   */
+  updateCapsuleDetails(capsuleId, { title, recipientName, relationship, deliveryType, scheduledDate } = {}) {
+    const capsules = this.getCapsules();
+    if (!capsules.some((c) => c.id === capsuleId)) return null;
+
+    const name = String(recipientName || '').trim();
+    const rel = String(relationship || '').trim();
+    const type = deliveryType === 'posthumous' ? 'posthumous' : 'date';
+
+    const updated = capsules.map((c) =>
+      c.id === capsuleId
+        ? {
+            ...c,
+            title: String(title || '').trim() || c.title,
+            recipient: name ? (rel ? `${name} (${rel})` : name) : c.recipient,
+            deliveryType: type,
+            scheduledDate: type === 'date' ? scheduledDate || null : null,
+            syncState: 'pending',
+          }
+        : c
+    );
+    this.saveCapsules(updated);
+    this.syncCapsule(capsuleId).catch(() => {});
+    return this.getCapsules().find((c) => c.id === capsuleId) || null;
   }
 
   /**
@@ -1174,7 +1207,6 @@ class CapsulesService {
         return {
           ...c,
           photosCount: photosLabel,
-          contentsSummary: `${photosLabel} • Mensagem de Amor`,
           syncState: 'pending',
         };
       }

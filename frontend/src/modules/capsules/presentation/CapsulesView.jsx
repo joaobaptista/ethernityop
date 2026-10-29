@@ -35,7 +35,7 @@ export const SAMPLE_FIXTURE_AVAILABLE_ALBUMS = [
 export const SAMPLE_FIXTURE_CURATION_PHOTOS = [
   {
     id: 'c-1',
-    img: 'https://images.unsplash.com/photo-1509099836639-18ba1795216d?auto=format&fit=crop&q=80&w=800',
+    img: null,
     dateLabel: 'Julho 2018',
     photoNumber: 1,
     story: 'Férias de verão na praia. O seu primeiro contato com as ondas do mar e aquele abraço quentinho ao entardecer.',
@@ -178,6 +178,7 @@ export default function CapsulesView({ onNavigateTab, profile }) {
   const [currentVoiceAudioBlob, setCurrentVoiceAudioBlob] = useState(null);
   const [importedPhotosDraft, setImportedPhotosDraft] = useState([]);
   const [capsuleToDelete, setCapsuleToDelete] = useState(null);
+  const [detailsDraft, setDetailsDraft] = useState(null);
   const [itemToDelete, setItemToDelete] = useState(null);
   const [isPlayingCapsuleVoice, setIsPlayingCapsuleVoice] = useState(false);
   const capsuleAudioRef = useRef(null);
@@ -407,10 +408,10 @@ export default function CapsulesView({ onNavigateTab, profile }) {
           setCuratingCapsule({
             title: `Cápsula para ${parsedCap.name}`,
             recipientName: parsedCap.name,
-            relationship: parsedCap.name.includes('Mariana') ? 'Filha' : 'Familiar',
-            avatar: parsedCap.avatar || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=250',
-            totalPhotos: parsedCap.photosCount || 48,
-            narratedPhotos: parsedCap.memoriesCount || 12,
+            relationship: parsedCap.relationship || 'Familiar',
+            avatar: parsedCap.avatar || null,
+            totalPhotos: parsedCap.photosCount || 0,
+            narratedPhotos: parsedCap.memoriesCount || 0,
           });
           setViewMode('detail');
         }
@@ -474,6 +475,57 @@ export default function CapsulesView({ onNavigateTab, profile }) {
     });
   };
 
+  const handleOpenEditDetails = () => {
+    if (!curatingCapsule) return;
+    setDetailsDraft({
+      title: curatingCapsule.title || '',
+      recipientName: curatingCapsule.recipientName || '',
+      relationship: curatingCapsule.relationship || '',
+      deliveryType: curatingCapsule.deliveryType === 'posthumous' ? 'posthumous' : 'date',
+      date: curatingCapsule.scheduledDate ? String(curatingCapsule.scheduledDate).slice(0, 10) : '',
+      error: '',
+    });
+  };
+
+  const handleSaveDetails = (e) => {
+    e.preventDefault();
+    if (!detailsDraft || !curatingCapsule) return;
+    const { title, recipientName, relationship, deliveryType, date } = detailsDraft;
+    if (!recipientName.trim()) {
+      setDetailsDraft((d) => ({ ...d, error: 'Informe o nome de quem vai receber a cápsula.' }));
+      return;
+    }
+    const today = new Date().toISOString().slice(0, 10);
+    if (deliveryType === 'date' && (!date || date <= today)) {
+      setDetailsDraft((d) => ({ ...d, error: 'Escolha uma data de entrega no futuro.' }));
+      return;
+    }
+    const scheduledDate = deliveryType === 'date' ? `${date}T12:00:00.000Z` : null;
+    const saved = capsulesService.updateCapsuleDetails(curatingCapsule.id, {
+      title,
+      recipientName,
+      relationship,
+      deliveryType,
+      scheduledDate,
+    });
+    if (!saved) {
+      setDetailsDraft((d) => ({ ...d, error: 'Não foi possível salvar. Tente novamente.' }));
+      return;
+    }
+    setCuratingCapsule((prev) => ({
+      ...prev,
+      title: saved.title,
+      recipientName: recipientName.trim(),
+      relationship: relationship.trim(),
+      deliveryType,
+      scheduledDate,
+    }));
+    setCapsules(capsulesService.getCapsules());
+    setDetailsDraft(null);
+    setToast('Detalhes da cápsula salvos.');
+    setTimeout(() => setToast(null), 3000);
+  };
+
   const handleOpenCapsule = async (cap) => {
     const rName = cap.recipient ? cap.recipient.split('(')[0].trim() : (profile?.name ? `Destinatário de ${profile.name}` : 'Meu Destinatário');
     const rRel = cap.recipient && cap.recipient.includes('(')
@@ -502,6 +554,8 @@ export default function CapsulesView({ onNavigateTab, profile }) {
       audios: cap.audios,
       videos: cap.videos,
       calibrationAudio: cap.calibrationAudio,
+      deliveryType: cap.deliveryType || 'date',
+      scheduledDate: cap.scheduledDate || null,
     });
     setCurrentPhotoIdx(0);
     setStoryText(photos[0]?.story || '');
@@ -559,10 +613,7 @@ export default function CapsulesView({ onNavigateTab, profile }) {
           title: `Cápsula: Presente para ${finalName}`,
           recipient: `${finalName} (${finalRel})`,
           avatar: p.avatar,
-          triggerLabel: '12 de Outubro de 2032',
-          contentsSummary: `${photosLabel} • Mensagem de Amor`,
           sealColor: idx % 2 === 0 ? '#F05A47' : '#7E57C2',
-          statusText: 'Bloqueada até a data',
           personId: p.id,
           photosCount: photosLabel,
           photos: personPhotos,
@@ -853,7 +904,13 @@ export default function CapsulesView({ onNavigateTab, profile }) {
                   <h3 className="capsule-card-title">{cap.title}</h3>
                   
                   <div className="capsule-guardian-recipient">
-                    <img src={cap.avatar} alt={cap.recipient} className="capsule-guardian-avatar" />
+                    {cap.avatar ? (
+                      <img src={cap.avatar} alt={cap.recipient} className="capsule-guardian-avatar" />
+                    ) : (
+                      <div className="capsule-guardian-avatar avatar-icon-placeholder" role="img" aria-label={cap.recipient}>
+                        <i className="fa-solid fa-user" aria-hidden="true" />
+                      </div>
+                    )}
                     <div className="capsule-guardian-info">
                       <span className="guardian-role-label">{t('capsulesView.recipientLabel')}</span>
                       <strong className="guardian-name-val">{cap.recipient}</strong>
@@ -865,9 +922,11 @@ export default function CapsulesView({ onNavigateTab, profile }) {
                     <span>{cap.triggerLabel}</span>
                   </div>
 
-                  <p className="capsule-contents-desc">
-                    <i className="fa-solid fa-box-archive"></i> {cap.contentsSummary}
-                  </p>
+                  {cap.contentsSummary && (
+                    <p className="capsule-contents-desc">
+                      <i className="fa-solid fa-box-archive"></i> {cap.contentsSummary}
+                    </p>
+                  )}
                 </div>
 
                 <div className="capsule-card-footer">
@@ -936,7 +995,13 @@ export default function CapsulesView({ onNavigateTab, profile }) {
 
           <div className="config-card">
             <div className="config-card-header">
-              <img src={currentPerson?.avatar} alt={currentPerson?.name} className="config-avatar-img" />
+              {currentPerson?.avatar ? (
+                <img src={currentPerson.avatar} alt={currentPerson.name} className="config-avatar-img" />
+              ) : (
+                <div className="config-avatar-img avatar-icon-placeholder" role="img" aria-label={currentPerson?.name}>
+                  <i className="fa-solid fa-user" aria-hidden="true" />
+                </div>
+              )}
               <div className="config-header-text">
                 <h2>{t('capsulesView.specialCapsuleFor', { name: currentPerson?.name })}</h2>
                 <span className="config-rel-badge">{t('capsulesView.guardianRecipient')} • {currentPerson?.relationship} ({currentPerson?.photosCount})</span>
@@ -1123,7 +1188,9 @@ export default function CapsulesView({ onNavigateTab, profile }) {
                   <h2 className="cd-recipient-name">{curatingCapsule.recipientName}</h2>
                   <span className="cd-rel-badge">{curatingCapsule.relationship}</span>
                   <span className="cd-status-badge">{t('capsulesView.inProduction')}</span>
-                  <button className="cd-btn-edit-details">{t('capsulesView.editDetails')}</button>
+                  <button type="button" className="cd-btn-edit-details" onClick={handleOpenEditDetails}>
+                    {t('capsulesView.editDetails')}
+                  </button>
                   <button
                     type="button"
                     className="cd-btn-delete-capsule"
@@ -1793,10 +1860,97 @@ export default function CapsulesView({ onNavigateTab, profile }) {
          ------------------------------------------------------------- */}
       {viewMode === 'record_video' && (
         <VideoIdeationView
-          recipientName={curatingCapsule?.recipientName || profile?.name || 'Destinatário'}
+          recipientName={curatingCapsule?.recipientName || 'Destinatário'}
           onNavigateTab={onNavigateTab}
           onBack={() => setViewMode('detail')}
+          onSaveToCapsule={handleSaveAvatarVideo}
         />
+      )}
+
+      {/* -------------------------------------------------------------
+          MODAL: EDITAR DETALHES E ENTREGA DA CÁPSULA
+         ------------------------------------------------------------- */}
+      {detailsDraft && (
+        <div className="capsule-delete-modal-overlay" onClick={() => setDetailsDraft(null)}>
+          <form
+            className="capsule-delete-modal-box capsule-details-modal"
+            onClick={(e) => e.stopPropagation()}
+            onSubmit={handleSaveDetails}
+          >
+            <h3 className="capsule-delete-title">Detalhes da cápsula</h3>
+
+            <label className="capsule-details-field">
+              <span>Título</span>
+              <input
+                type="text"
+                value={detailsDraft.title}
+                onChange={(e) => setDetailsDraft((d) => ({ ...d, title: e.target.value, error: '' }))}
+              />
+            </label>
+
+            <div className="capsule-details-row">
+              <label className="capsule-details-field">
+                <span>Destinatário</span>
+                <input
+                  type="text"
+                  required
+                  value={detailsDraft.recipientName}
+                  onChange={(e) => setDetailsDraft((d) => ({ ...d, recipientName: e.target.value, error: '' }))}
+                />
+              </label>
+              <label className="capsule-details-field">
+                <span>Parentesco</span>
+                <input
+                  type="text"
+                  value={detailsDraft.relationship}
+                  onChange={(e) => setDetailsDraft((d) => ({ ...d, relationship: e.target.value, error: '' }))}
+                />
+              </label>
+            </div>
+
+            <fieldset className="capsule-details-delivery">
+              <legend>Quando entregar</legend>
+              <label className="capsule-details-radio">
+                <input
+                  type="radio"
+                  name="capsule-delivery"
+                  checked={detailsDraft.deliveryType === 'date'}
+                  onChange={() => setDetailsDraft((d) => ({ ...d, deliveryType: 'date', error: '' }))}
+                />
+                Em uma data específica
+              </label>
+              {detailsDraft.deliveryType === 'date' && (
+                <input
+                  type="date"
+                  className="capsule-details-date"
+                  value={detailsDraft.date}
+                  min={new Date(Date.now() + 86400000).toISOString().slice(0, 10)}
+                  onChange={(e) => setDetailsDraft((d) => ({ ...d, date: e.target.value, error: '' }))}
+                />
+              )}
+              <label className="capsule-details-radio">
+                <input
+                  type="radio"
+                  name="capsule-delivery"
+                  checked={detailsDraft.deliveryType === 'posthumous'}
+                  onChange={() => setDetailsDraft((d) => ({ ...d, deliveryType: 'posthumous', error: '' }))}
+                />
+                Liberação póstuma, validada pelos guardiões
+              </label>
+            </fieldset>
+
+            {detailsDraft.error && <p className="capsule-details-error" role="alert">{detailsDraft.error}</p>}
+
+            <div className="capsule-delete-actions">
+              <button type="button" className="btn-cancel-delete" onClick={() => setDetailsDraft(null)}>
+                Cancelar
+              </button>
+              <button type="submit" className="btn-confirm-delete capsule-details-save">
+                Salvar
+              </button>
+            </div>
+          </form>
+        </div>
       )}
 
       {/* -------------------------------------------------------------

@@ -107,6 +107,44 @@ export default function VaultView({ onNavigateTab, profile }) {
     }
   };
 
+  const handleDeleteMedia = async (media) => {
+    const mediaId = (media.storageKey || media.mediaUrl || '').split('/').pop().split('?')[0];
+    if (!mediaId) return;
+    if (!window.confirm(`Excluir "${media.title || 'este arquivo'}" do cofre? A exclusão é definitiva.`)) return;
+    try {
+      const token =
+        typeof window !== 'undefined' && window.localStorage
+          ? localStorage.getItem(AUTH_TOKEN_KEY) || ''
+          : '';
+      const ownerCapsuleId = media.capsuleId;
+      const capsulePhoto = capsulesService.getCapsules().some((c) => c.id === ownerCapsuleId)
+        ? (await capsulesService.getCapsulePhotos(ownerCapsuleId)).find((p) => p.mediaId === mediaId)
+        : null;
+      if (capsulePhoto) {
+        await capsulesService.deleteCapsulePhoto(ownerCapsuleId, capsulePhoto.id);
+      } else {
+        await httpClient.delete(`/vault/media/${mediaId}`, token);
+      }
+      setVaultMediaList((prev) => prev.filter((m) => m.id !== media.id));
+      setUploadToast({ text: 'Arquivo excluído definitivamente do cofre.', type: 'success' });
+    } catch (err) {
+      setUploadToast({ text: `Erro ao excluir: ${err.message}`, type: 'error' });
+    }
+    setTimeout(() => setUploadToast(null), 4000);
+  };
+
+  const renderDeleteMediaBtn = (media) => (
+    <button
+      type="button"
+      className="vault-media-delete-btn"
+      onClick={() => handleDeleteMedia(media)}
+      title="Excluir do cofre"
+      aria-label={`Excluir ${media.title || 'arquivo'} do cofre`}
+    >
+      <i className="fa-regular fa-trash-can" aria-hidden="true"></i>
+    </button>
+  );
+
   // Upload direto para o cofre seguro
   const handleFileUpload = async (e) => {
     const file = e.target.files?.[0];
@@ -430,10 +468,13 @@ export default function VaultView({ onNavigateTab, profile }) {
                           durationSeconds={media.durationSeconds}
                         />
                         <div className="vault-card-info-block">
-                          <h4 className="vault-card-title">{media.title}</h4>
+                          <div className="vault-card-title-row">
+                            <h4 className="vault-card-title">{media.title}</h4>
+                            {renderDeleteMediaBtn(media)}
+                          </div>
                           <div className="vault-card-meta">
-                            <span>Vídeo MP4 Criptografado</span>
-                            <span>{media.date}</span>
+                            <span>Vídeo criptografado</span>
+                            <span>{media.dateLabel}</span>
                           </div>
                         </div>
                       </div>
@@ -450,6 +491,16 @@ export default function VaultView({ onNavigateTab, profile }) {
                           title={media.title}
                           durationSeconds={media.durationSeconds}
                         />
+                        <div className="vault-card-info-block">
+                          <div className="vault-card-title-row">
+                            <h4 className="vault-card-title">{media.title}</h4>
+                            {renderDeleteMediaBtn(media)}
+                          </div>
+                          <div className="vault-card-meta">
+                            <span>Áudio criptografado</span>
+                            <span>{media.dateLabel}</span>
+                          </div>
+                        </div>
                       </div>
                     );
                   }
@@ -467,10 +518,13 @@ export default function VaultView({ onNavigateTab, profile }) {
                         />
                       </div>
                       <div className="vault-card-info-block">
-                        <h4 className="vault-card-title">{media.title}</h4>
+                        <div className="vault-card-title-row">
+                          <h4 className="vault-card-title">{media.title}</h4>
+                          {renderDeleteMediaBtn(media)}
+                        </div>
                         <div className="vault-card-meta">
-                          <span>WebP Multi-Tier (300 DPI)</span>
-                          <span>{media.date}</span>
+                          <span>Foto criptografada</span>
+                          <span>{media.dateLabel}</span>
                         </div>
                       </div>
                     </div>

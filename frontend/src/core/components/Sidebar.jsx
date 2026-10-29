@@ -3,8 +3,8 @@ import logoIconSvg from '../../assets/logo-icon.svg';
 import { useI18n } from '../i18n/presentation/useI18n.js';
 import { getAbsolutePhotoUrl, getUserInitials, isUserAdmin as checkUserAdmin } from '../../modules/profile/domain/profileModel.js';
 import './Sidebar.css';
+import { APP_VERSION, APP_VERSION_LABEL } from '../appVersion.js';
 
-const APP_VERSION = '2.0';
 
 export default function Sidebar({
   activeTab,
@@ -87,11 +87,11 @@ export default function Sidebar({
 
   const navItems = isCurrentAdminMode ? adminNavItems : personalNavItems;
 
-  const userName = profile?.name || 'Roberta Silva';
-  const userPlan = profile?.plan || 'Plano Infinity';
+  const userName = profile?.name || profile?.email?.split('@')[0] || '';
+  const userPlan = profile?.plan || '';
   const [avatarError, setAvatarError] = useState(false);
 
-  const rawAvatar = profile?.avatar_url || profile?.photo_url || profile?.avatar || 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&q=80&w=200';
+  const rawAvatar = profile?.avatar_url || profile?.photo_url || profile?.avatar || null;
   const userAvatar = getAbsolutePhotoUrl(rawAvatar);
 
   useEffect(() => {
@@ -223,7 +223,7 @@ export default function Sidebar({
 
               <div className="user-card-meta-pill">
                 <span className="user-card-name-pill">{userName}</span>
-                <span className="user-card-plan-pill">{userPlan}</span>
+                {userPlan && <span className="user-card-plan-pill">{userPlan}</span>}
               </div>
 
               <button
@@ -254,7 +254,9 @@ export default function Sidebar({
                   </button>
                 ))}
               </div>
-              <span className="sidebar-version">v{APP_VERSION}</span>
+              <span className="sidebar-version" aria-label={`Versão ${APP_VERSION}`}>
+                Ethernity {APP_VERSION_LABEL}
+              </span>
             </div>
           </>
         ) : (

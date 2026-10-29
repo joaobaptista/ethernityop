@@ -128,3 +128,45 @@ test('Guardiões: Ciclo de Vida Completo (POST, GET, PUT, Anti-IDOR, DELETE)', a
   const checkRes = await request(app).get(`/guardians/${guardianId}`).set(headersA);
   assert.equal(checkRes.status, 404);
 });
+
+test('Guardiões: foto só existe se cadastrada após a criação, com dono validado e expurgo do arquivo', async () => {
+  const sharp = (await import('sharp')).default;
+  const fs = await import('node:fs');
+  const path = await import('node:path');
+  const config = (await import('../src/config.js')).default;
+
+  const created = await request(app)
+    .post('/guardians/')
+    .set(headersA)
+    .send({
+      name: 'Guardiã Sem Foto',
+      email: `foto_${Date.now()}@ethernity.com`,
+      avatar: 'https://example.com/foto-externa.jpg',
+    });
+  assert.equal(created.status, 201);
+  assert.equal(created.body.avatar, null, 'guardião nasce sem foto e não aceita URL externa');
+  assert.equal(created.body.phone, '', 'sem telefone inventado');
+  const id = created.body.id;
+
+  const png = await sharp({ create: { width: 40, height: 40, channels: 3, background: '#cc6644' } }).png().toBuffer();
+
+  const intruder = await request(app).post(`/guardians/${id}/photo`).set(headersB).attach('photo', png, { filename: 'a.png', contentType: 'image/png' });
+  assert.equal(intruder.status, 404);
+
+  const fake = await request(app).post(`/guardians/${id}/photo`).set(headersA).attach('photo', Buffer.from('não é imagem'), { filename: 'x.png', contentType: 'image/png' });
+  assert.equal(fake.status, 400);
+
+  const uploaded = await request(app).post(`/guardians/${id}/photo`).set(headersA).attach('photo', png, { filename: 'rosto.png', contentType: 'image/png' });
+  assert.equal(uploaded.status, 200);
+  assert.match(uploaded.body.avatar, /^\/uploads\/.+\/guardian-.+\.webp$/);
+  const filePath = path.join(config.uploadFolder, uploaded.body.avatar.slice('/uploads/'.length));
+  assert.ok(fs.existsSync(filePath));
+
+  const listed = await request(app).get('/guardians/').set(headersA);
+  assert.equal(listed.body.find((g) => g.id === id).avatar, uploaded.body.avatar);
+
+  const del = await request(app).delete(`/guardians/${id}`).set(headersA);
+  assert.equal(del.status, 200);
+  await new Promise((r) => setTimeout(r, 50));
+  assert.equal(fs.existsSync(filePath), false, 'arquivo da foto expurgado junto com o guardião');
+});

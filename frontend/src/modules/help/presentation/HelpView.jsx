@@ -23,7 +23,7 @@ export default function HelpView({ onNavigateTab }) {
     {
       question: 'Meus arquivos e fotos estão realmente protegidos?',
       answer:
-        'Sim. Todo o cofre utiliza criptografia ponta a ponta AES-256-GCM. Suas fotos e memórias só podem ser decifradas com a sua chave pessoal. O armazenamento local híbrido garante que mídias pesadas fiquem salvas no seu aparelho sem limite de tráfego desnecessário.',
+        'Sim. As mídias do cofre são gravadas no servidor cifradas com AES-256-GCM, trafegam por conexão segura (HTTPS) e só podem ser acessadas pela sua conta. Uma cópia local fica no seu aparelho para abrir mais rápido, e a exclusão de um item apaga as duas cópias.',
       category: 'security',
     },
     {

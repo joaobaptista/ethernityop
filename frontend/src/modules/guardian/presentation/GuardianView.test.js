@@ -19,7 +19,7 @@ describe('GuardianView Logic & Dead Man\'s Switch Presentation Tests', () => {
       expect(g.name).toBeTruthy();
       expect(g.email).toContain('@');
       expect(g.canTriggerDelivery).toBe(true);
-      expect(g.avatar).toBeTruthy();
+      expect(g.avatar ?? '').not.toContain('unsplash');
     });
   });
 

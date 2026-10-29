@@ -1,13 +1,15 @@
 import React, { useState, useRef, useEffect } from 'react';
 import messagesRepository from '../infrastructure/messagesRepository.js';
-import localVaultService from '../../../core/services/localVaultService.js';
+import { getStoredAuthToken } from '../../../core/api/apiUrl.js';
 import localAiService from '../../../core/services/localAiService.js';
 import RichTextEditor from '../../../core/components/RichTextEditor.jsx';
 import useAutoSaveDraft from '../../../core/hooks/useAutoSaveDraft.js';
 import VaultMediaPickerModal from './VaultMediaPickerModal.jsx';
+import usePrimaryGuardian from '../../guardian/presentation/usePrimaryGuardian.js';
 import './NewMessageView.css';
 
-export default function NewMessageView({ onNavigateTab, capsuleId = null, recipientName = 'Destinatário', onBack }) {
+export default function NewMessageView({ onNavigateTab, capsuleId = null, recipientName: initialRecipientName = '', onBack }) {
+  const primaryGuardian = usePrimaryGuardian();
   // Passos: 1 = Ideação, 2 = Entrega
   const [step, setStep] = useState(1);
 
@@ -23,6 +25,10 @@ export default function NewMessageView({ onNavigateTab, capsuleId = null, recipi
   const [isGeneratingAi, setIsGeneratingAi] = useState(false);
   const [isSavingMessage, setIsSavingMessage] = useState(false);
   const [toastMessage, setToastMessage] = useState(null);
+  const [recipientName, setRecipientName] = useState(initialRecipientName);
+  const [recipientEmail, setRecipientEmail] = useState('');
+  const [editingId, setEditingId] = useState(null);
+  const [savedMessages, setSavedMessages] = useState([]);
 
   // Estado da IA Local na Máquina do Usuário
   const [isLocalAiEnabled, setIsLocalAiEnabled] = useState(localAiService.isLocalAiEnabled());
@@ -34,7 +40,7 @@ export default function NewMessageView({ onNavigateTab, capsuleId = null, recipi
 
   // Estados de Entrega (Passo 2)
   const [deliveryType, setDeliveryType] = useState('date'); // 'date' | 'posthumous'
-  const [deliveryDate, setDeliveryDate] = useState('2026-12-25');
+  const [deliveryDate, setDeliveryDate] = useState('');
   const [deliveryTime, setDeliveryTime] = useState('09:00');
   const [emailNotification, setEmailNotification] = useState(true);
   const [whatsappNotification, setWhatsappNotification] = useState(false);
@@ -53,7 +59,7 @@ export default function NewMessageView({ onNavigateTab, capsuleId = null, recipi
   }, []);
 
   // 0. Auto-Save Inteligente isolado por Cápsula / Destinatário
-  const draftKey = `ethernity_message_draft_${capsuleId || recipientName.replace(/\s+/g, '_').toLowerCase()}`;
+  const draftKey = `ethernity_message_draft_${capsuleId || 'general'}`;
   const autoSaveData = {
     title,
     content,
@@ -88,8 +94,11 @@ export default function NewMessageView({ onNavigateTab, capsuleId = null, recipi
     } catch {}
 
     if (initialDraft && !hasRestoredDraft) {
-      const isMismatch = (initialDraft.recipientName && initialDraft.recipientName.trim().toLowerCase() !== recipientName.trim().toLowerCase()) ||
-                         (initialDraft.capsuleId && capsuleId && initialDraft.capsuleId !== capsuleId);
+      const isMismatch = Boolean(
+        capsuleId &&
+          initialDraft.recipientName &&
+          initialDraft.recipientName.trim().toLowerCase() !== recipientName.trim().toLowerCase()
+      );
 
       if (isMismatch) {
         // Se o rascunho pertencia a outra pessoa/cápsula diferente, descarta e limpa imediatamente
@@ -103,6 +112,7 @@ export default function NewMessageView({ onNavigateTab, capsuleId = null, recipi
       if (!title && !content) {
         if (initialDraft.title) setTitle(initialDraft.title);
         if (initialDraft.content) setContent(initialDraft.content);
+        if (!capsuleId && initialDraft.recipientName) setRecipientName(initialDraft.recipientName);
         if (initialDraft.deliveryType) setDeliveryType(initialDraft.deliveryType);
         if (initialDraft.deliveryDate) setDeliveryDate(initialDraft.deliveryDate);
         if (initialDraft.deliveryTime) setDeliveryTime(initialDraft.deliveryTime);
@@ -117,6 +127,106 @@ export default function NewMessageView({ onNavigateTab, capsuleId = null, recipi
   const showToast = (msg) => {
     setToastMessage(msg);
     setTimeout(() => setToastMessage(null), 3500);
+  };
+
+  const loadSavedMessages = async () => {
+    const token = getStoredAuthToken();
+    if (!token || capsuleId) return;
+    try {
+      const list = await messagesRepository.getMessages(token);
+      setSavedMessages(Array.isArray(list) ? list : list?.items || []);
+    } catch {
+      setSavedMessages([]);
+    }
+  };
+
+  useEffect(() => {
+    loadSavedMessages();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const resetEditor = () => {
+    setEditingId(null);
+    setTitle('');
+    setContent('');
+    setRecipientName(initialRecipientName);
+    setRecipientEmail('');
+    setDeliveryType('date');
+    setDeliveryDate('');
+    setDeliveryTime('09:00');
+    setVaultAttachments([]);
+    setMediaFiles([]);
+    setStep(1);
+  };
+
+  const handleEditSaved = (msg) => {
+    setEditingId(msg.id);
+    setTitle(msg.title || '');
+    setContent(msg.content || '');
+    setRecipientName(msg.recipientName || '');
+    setRecipientEmail(msg.recipientEmail || '');
+    setDeliveryType(msg.deliveryType === 'posthumous' ? 'posthumous' : 'date');
+    setDeliveryDate(msg.deliveryDate ? String(msg.deliveryDate).slice(0, 10) : '');
+    setDeliveryTime(msg.deliveryTime || '09:00');
+    setGuardianProtected(msg.guardianProtected !== false);
+    setStep(1);
+    if (typeof window !== 'undefined') window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const handleDeleteSaved = async (msg) => {
+    if (!window.confirm(`Excluir a mensagem "${msg.title}"? A exclusão é definitiva.`)) return;
+    try {
+      await messagesRepository.deleteMessage(getStoredAuthToken(), msg.id);
+      setSavedMessages((prev) => prev.filter((m) => m.id !== msg.id));
+      if (editingId === msg.id) {
+        clearDraft();
+        resetEditor();
+      }
+      showToast('Mensagem excluída definitivamente.');
+    } catch (err) {
+      showToast(`Erro ao excluir: ${err.message}`);
+    }
+  };
+
+  const describeDelivery = (msg) => {
+    if (msg.deliveryType === 'posthumous') return 'Entrega póstuma';
+    if (!msg.deliveryDate) return 'Entrega sem data';
+    const d = new Date(String(msg.deliveryDate).slice(0, 10) + 'T12:00:00Z');
+    return Number.isNaN(d.getTime()) ? 'Entrega sem data' : `Entrega em ${d.toLocaleDateString('pt-BR', { timeZone: 'UTC' })}`;
+  };
+
+  const buildPayload = (status) => ({
+    title: title.trim() || 'Rascunho de Mensagem',
+    content,
+    recipientName: recipientName.trim(),
+    recipientEmail: recipientEmail.trim(),
+    deliveryType,
+    deliveryDate: deliveryType === 'date' ? deliveryDate || null : null,
+    deliveryTime,
+    guardianProtected,
+    emailNotification,
+    whatsappNotification,
+    status,
+    category: 'Cartas de Amor',
+    mediaFiles: mediaFiles.map((f) => ({ name: f.name, size: f.size, type: f.type })),
+    vaultAttachments: vaultAttachments.map((v) => ({
+      id: v.id,
+      title: v.title || v.name,
+      type: v.type,
+      mediaUrl: v.mediaUrl || v.streamUrl,
+      category: v.category,
+    })),
+  });
+
+  const persistMessage = async (status) => {
+    const token = getStoredAuthToken();
+    if (!token) throw new Error('Sua sessão expirou. Entre novamente para salvar.');
+    const payload = buildPayload(status);
+    const saved = editingId
+      ? await messagesRepository.updateMessage(token, editingId, payload)
+      : await messagesRepository.createMessage(token, payload);
+    if (saved?.id) setEditingId(saved.id);
+    return saved;
   };
 
   // Sugestões Rápidas da IA
@@ -249,32 +359,16 @@ export default function NewMessageView({ onNavigateTab, capsuleId = null, recipi
   };
 
   const handleSaveDraft = async () => {
+    forceSaveNow();
+    setIsSavingMessage(true);
     try {
-      forceSaveNow();
-      const token = localStorage.getItem('ethernity_auth_token') || localStorage.getItem('ethernity_token') || '';
-      const draftPayload = {
-        title: title || 'Rascunho de Mensagem',
-        content,
-        recipientName,
-        status: 'draft',
-        deliveryType,
-        deliveryDate: deliveryType === 'date' ? deliveryDate : null,
-        deliveryTime,
-        vaultAttachments: vaultAttachments.map((v) => ({
-          id: v.id,
-          title: v.title || v.name,
-          type: v.type,
-          mediaUrl: v.mediaUrl || v.streamUrl,
-          category: v.category,
-        })),
-      };
-
-      // Salva na API/Backend se online
-      await messagesRepository.createMessage(token, draftPayload).catch(() => null);
-
-      showToast('💾 Rascunho salvo com sucesso!');
-    } catch {
-      showToast('Erro ao salvar rascunho.');
+      await persistMessage('draft');
+      await loadSavedMessages();
+      showToast('💾 Rascunho salvo.');
+    } catch (err) {
+      showToast(`Rascunho guardado só neste aparelho: ${err.message}`);
+    } finally {
+      setIsSavingMessage(false);
     }
   };
 
@@ -285,99 +379,33 @@ export default function NewMessageView({ onNavigateTab, capsuleId = null, recipi
     }
 
     if (step === 1) {
-      // Avança para o passo 2 (Entrega)
       setStep(2);
       return;
     }
 
+    if (!recipientName.trim()) {
+      showToast('Informe para quem é esta mensagem.');
+      return;
+    }
+    const today = new Date().toISOString().slice(0, 10);
+    if (deliveryType === 'date' && (!deliveryDate || deliveryDate <= today)) {
+      showToast('Escolha uma data de abertura no futuro.');
+      return;
+    }
+
     setIsSavingMessage(true);
-
     try {
-      const token = localStorage.getItem('ethernity_auth_token') || localStorage.getItem('ethernity_token') || '';
-      const payload = {
-        title: title.trim(),
-        content,
-        recipientName,
-        deliveryType,
-        deliveryDate: deliveryType === 'date' ? deliveryDate : null,
-        deliveryTime,
-        guardianProtected,
-        emailNotification,
-        whatsappNotification,
-        status: 'scheduled',
-        category: 'Cartas de Amor',
-        mediaFiles: mediaFiles.map((f) => ({ name: f.name, size: f.size, type: f.type })),
-        vaultAttachments: vaultAttachments.map((v) => ({
-          id: v.id,
-          title: v.title || v.name,
-          type: v.type,
-          mediaUrl: v.mediaUrl || v.streamUrl,
-          category: v.category,
-        })),
-      };
-
-      // 1. Persiste no backend / banco de dados via API
-      let savedResult = null;
-      try {
-        savedResult = await messagesRepository.createMessage(token, payload);
-      } catch (err) {
-        console.warn('[NewMessageView] Falha ao enviar para backend, usando localVault:', err);
-      }
-
-      // 2. Salva no cofre local criptografado (LocalVaultService / AES-256)
-      try {
-        await localVaultService.saveMessage({
-          id: savedResult?.id || `vault-msg-${Date.now()}`,
-          groupId: 'messages',
-          title: title.trim(),
-          recipient: recipientName,
-          content,
-          deliveryType,
-          deliveryDate: deliveryType === 'date' ? deliveryDate : 'Póstuma',
-          vaultAttachments: vaultAttachments.map((v) => ({
-            id: v.id,
-            title: v.title || v.name,
-            type: v.type,
-            mediaUrl: v.mediaUrl || v.streamUrl,
-          })),
-          timestamp: new Date().toISOString(),
-        });
-      } catch (e) {
-        console.warn('[LocalVaultService] Local storage fallback:', e);
-      }
-
-      // 3. Atualiza a lista do cofre e notifica a interface
-      const currentVault = JSON.parse(localStorage.getItem('ethernity_vault_items') || '[]');
-      const newItem = {
-        id: savedResult?.id || `vault-msg-${Date.now()}`,
-        title: title.trim(),
-        type: 'text',
-        category: 'Cartas de Amor',
-        recipient: recipientName,
-        description: content,
-        date: new Date().toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric' }),
-        duration: 'Carta Escrita',
-        size: '1.2 MB',
-        isEncrypted: true,
-        deliveryDate: deliveryType === 'date' ? deliveryDate : 'Póstuma',
-      };
-
-      localStorage.setItem('ethernity_vault_items', JSON.stringify([newItem, ...currentVault]));
-      window.dispatchEvent(new CustomEvent('ethernity_vault_updated'));
-
-      // Limpa rascunho automático após conclusão com sucesso
+      await persistMessage('scheduled');
       clearDraft();
-
-      showToast('🎉 Mensagem e agendamento de entrega salvos com sucesso!');
-      setTimeout(() => {
-        if (onBack) {
-          onBack();
-        } else if (onNavigateTab) {
-          onNavigateTab('vault');
-        }
-      }, 1000);
-    } catch {
-      showToast('Erro ao gravar mensagem no cofre.');
+      showToast('🎉 Mensagem e agendamento de entrega salvos.');
+      if (capsuleId) {
+        setTimeout(() => (onBack ? onBack() : onNavigateTab && onNavigateTab('capsules')), 1000);
+      } else {
+        resetEditor();
+        await loadSavedMessages();
+      }
+    } catch (err) {
+      showToast(`Não foi possível salvar a mensagem: ${err.message}`);
     } finally {
       setIsSavingMessage(false);
     }
@@ -408,20 +436,61 @@ export default function NewMessageView({ onNavigateTab, capsuleId = null, recipi
             Meu Cofre
           </span>
           <span className="nm-breadcrumb-sep">&gt;</span>
-          <span className="nm-breadcrumb-link" onClick={handleBreadcrumbClick}>
-            {recipientName}
-          </span>
-          <span className="nm-breadcrumb-sep">&gt;</span>
-          <span className="nm-breadcrumb-current">Nova Mensagem</span>
+          {recipientName.trim() && (
+            <>
+              <span className="nm-breadcrumb-link" onClick={handleBreadcrumbClick}>
+                {recipientName}
+              </span>
+              <span className="nm-breadcrumb-sep">&gt;</span>
+            </>
+          )}
+          <span className="nm-breadcrumb-current">{editingId ? 'Editar Mensagem' : 'Nova Mensagem'}</span>
         </nav>
 
         {/* 2. Título da Tela e Descrição */}
         <header className="nm-page-header">
-          <h1 className="nm-page-title">Criar Nova Mensagem</h1>
+          <h1 className="nm-page-title">{editingId ? 'Editar Mensagem' : 'Criar Nova Mensagem'}</h1>
           <p className="nm-page-subtitle">
             Escreva e prepare as memórias mais especiais que serão guardadas com total cuidado para a pessoa escolhida.
           </p>
         </header>
+
+        {!capsuleId && savedMessages.length > 0 && (
+          <section className="nm-saved-list" aria-label="Mensagens salvas">
+            <div className="nm-saved-header">
+              <h2>Mensagens salvas ({savedMessages.length})</h2>
+              {editingId && (
+                <button type="button" className="nm-saved-new-btn" onClick={() => { clearDraft(); resetEditor(); }}>
+                  <i className="fa-solid fa-plus" aria-hidden="true"></i> Nova mensagem
+                </button>
+              )}
+            </div>
+            <ul>
+              {savedMessages.map((msg) => (
+                <li key={msg.id} className={`nm-saved-item ${editingId === msg.id ? 'is-editing' : ''}`}>
+                  <div className="nm-saved-info">
+                    <strong>{msg.title}</strong>
+                    <span>
+                      {msg.recipientName ? `Para ${msg.recipientName} · ` : ''}
+                      {describeDelivery(msg)}
+                      {msg.status === 'draft' ? ' · Rascunho' : ''}
+                    </span>
+                  </div>
+                  <div className="nm-saved-actions">
+                    <button type="button" onClick={() => handleEditSaved(msg)} title="Editar mensagem">
+                      <i className="fa-solid fa-pen" aria-hidden="true"></i>
+                      <span>Editar</span>
+                    </button>
+                    <button type="button" className="danger" onClick={() => handleDeleteSaved(msg)} title="Excluir mensagem">
+                      <i className="fa-regular fa-trash-can" aria-hidden="true"></i>
+                      <span>Excluir</span>
+                    </button>
+                  </div>
+                </li>
+              ))}
+            </ul>
+          </section>
+        )}
 
         {/* 3. Stepper (1 Ideação ── 2 Entrega) */}
         <div className="nm-stepper-box">
@@ -741,7 +810,7 @@ export default function NewMessageView({ onNavigateTab, capsuleId = null, recipi
             <div className="nm-delivery-step-content">
               <h2 className="nm-section-title">Como e quando esta mensagem deve ser entregue?</h2>
               <p className="nm-section-subtitle">
-                Configure o momento e as condições de abertura para garantir a entrega segura a {recipientName}.
+                Configure o momento e as condições de abertura para garantir a entrega segura{recipientName.trim() ? ` a ${recipientName.trim()}` : ''}.
               </p>
 
               <div className="nm-delivery-options-grid">
@@ -770,6 +839,32 @@ export default function NewMessageView({ onNavigateTab, capsuleId = null, recipi
                 </div>
               </div>
 
+              <div className="nm-date-pickers-row">
+                <div className="nm-form-group" style={{ flex: 1 }}>
+                  <label className="nm-form-label" htmlFor="nm-recipient-name">Para quem é a mensagem</label>
+                  <input
+                    id="nm-recipient-name"
+                    type="text"
+                    className="nm-form-input"
+                    placeholder="Nome do destinatário"
+                    value={recipientName}
+                    onChange={(e) => setRecipientName(e.target.value)}
+                    required
+                  />
+                </div>
+                <div className="nm-form-group" style={{ flex: 1 }}>
+                  <label className="nm-form-label" htmlFor="nm-recipient-email">E-mail do destinatário</label>
+                  <input
+                    id="nm-recipient-email"
+                    type="email"
+                    className="nm-form-input"
+                    placeholder="email@exemplo.com"
+                    value={recipientEmail}
+                    onChange={(e) => setRecipientEmail(e.target.value)}
+                  />
+                </div>
+              </div>
+
               {deliveryType === 'date' && (
                 <div className="nm-date-pickers-row">
                   <div className="nm-form-group" style={{ flex: 1 }}>
@@ -777,6 +872,7 @@ export default function NewMessageView({ onNavigateTab, capsuleId = null, recipi
                     <input
                       type="date"
                       className="nm-form-input"
+                      min={new Date(Date.now() + 86400000).toISOString().slice(0, 10)}
                       value={deliveryDate}
                       onChange={(e) => setDeliveryDate(e.target.value)}
                     />
@@ -816,7 +912,7 @@ export default function NewMessageView({ onNavigateTab, capsuleId = null, recipi
                     checked={guardianProtected}
                     onChange={(e) => setGuardianProtected(e.target.checked)}
                   />
-                  <span>Proteger com validação do Guardião Responsável (Roberto Silva)</span>
+                  <span>Proteger com validação do Guardião Responsável{primaryGuardian ? ` (${primaryGuardian.name})` : ''}</span>
                 </label>
               </div>
             </div>
@@ -839,6 +935,7 @@ export default function NewMessageView({ onNavigateTab, capsuleId = null, recipi
                 type="button"
                 className="nm-btn-rascunho"
                 onClick={handleSaveDraft}
+                disabled={isSavingMessage}
               >
                 Salvar como Rascunho
               </button>
@@ -847,6 +944,7 @@ export default function NewMessageView({ onNavigateTab, capsuleId = null, recipi
                 type="button"
                 className="nm-btn-salvar"
                 onClick={handleSaveMessage}
+                disabled={isSavingMessage}
               >
                 {step === 1 ? 'Continuar para Entrega' : 'Salvar Mensagem'}
               </button>

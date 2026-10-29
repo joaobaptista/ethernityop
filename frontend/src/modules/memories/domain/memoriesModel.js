@@ -13,7 +13,7 @@ export const SAMPLE_FIXTURE_PHOTOS = [
   // Fixture estrita para execução de testes unitários isolados
   {
     id: 'photo-test-2024-1',
-    img: 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=800&q=80',
+    img: null,
     title: 'Abraço na Praia ao Pôr do Sol',
     dateLabel: 'Mar 2024',
     year: 2024,
@@ -22,7 +22,7 @@ export const SAMPLE_FIXTURE_PHOTOS = [
   },
   {
     id: 'photo-test-2024-2',
-    img: 'https://images.unsplash.com/photo-1523050854058-8df90110c9f1?auto=format&fit=crop&w=800&q=80',
+    img: null,
     title: 'Formatura e Conquista Especial',
     dateLabel: 'Jan 2024',
     year: 2024,
@@ -31,7 +31,7 @@ export const SAMPLE_FIXTURE_PHOTOS = [
   },
   {
     id: 'photo-test-2023-1',
-    img: 'https://images.unsplash.com/photo-1530103862676-de8c9debad1d?auto=format&fit=crop&w=800&q=80',
+    img: null,
     title: 'Aniversário Especial em Família com Bolo',
     dateLabel: 'Out 2023',
     year: 2023,
@@ -40,7 +40,7 @@ export const SAMPLE_FIXTURE_PHOTOS = [
   },
   {
     id: 'photo-test-2023-2',
-    img: 'https://images.unsplash.com/photo-1544717305-2782549b5136?auto=format&fit=crop&w=800&q=80',
+    img: null,
     title: 'Noite de Natal e Chocolate Quente',
     dateLabel: 'Dez 2023',
     year: 2023,

@@ -70,6 +70,8 @@ export function publicUser(user) {
     avatar_url: photo,
     avatar: photo,
     is_admin: user.is_admin ? 1 : 0,
+    plan_id: user.plan_id || null,
+    plan: user.plan || null,
   };
 }
 

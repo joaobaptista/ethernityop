@@ -43,7 +43,7 @@ const upload = multer({
 router.get('/profile', requireAuth, async (req, res) => {
   try {
     const userId = req.user?.id || DEMO_USER_ID;
-    const userEmail = req.user?.email || 'demo@ethernity.com';
+    const userEmail = req.user?.email || '';
     const [rows] = await pool.query(
       'SELECT id, name, email, phone, avatar_url, plan_id, is_admin FROM users WHERE id = ? OR email = ? LIMIT 1',
       [userId, userEmail]

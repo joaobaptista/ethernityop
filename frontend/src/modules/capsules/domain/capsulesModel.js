@@ -68,3 +68,18 @@ export function canDeliverCapsule(capsule, now = new Date()) {
 
   return false;
 }
+
+/**
+ * Rótulos de entrega derivados apenas do que o usuário definiu (sem datas presumidas).
+ */
+export function describeCapsuleDelivery(capsule = {}) {
+  if (capsule.deliveryType === 'posthumous') {
+    return { triggerLabel: 'Liberação póstuma (guardiões)', statusText: 'Aguardando o protocolo dos guardiões' };
+  }
+  const date = capsule.scheduledDate ? new Date(capsule.scheduledDate) : null;
+  if (date && !Number.isNaN(date.getTime())) {
+    const label = date.toLocaleDateString('pt-BR', { day: 'numeric', month: 'long', year: 'numeric', timeZone: 'UTC' });
+    return { triggerLabel: `Entrega em ${label}`, statusText: 'Bloqueada até a data' };
+  }
+  return { triggerLabel: 'Data de entrega a definir', statusText: 'Rascunho: defina a entrega' };
+}

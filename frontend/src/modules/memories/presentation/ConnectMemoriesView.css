@@ -992,6 +992,15 @@
   box-shadow: 0 5px 16px rgba(238, 89, 69, 0.38);
 }
 
+.btn-coral-pill:disabled,
+.btn-coral-pill:disabled:hover {
+  background-color: #EFE6DC;
+  color: #8C827F;
+  box-shadow: none;
+  transform: none;
+  cursor: not-allowed;
+}
+
 .btn-coral-pill.full-width-btn {
   width: 100%;
 }

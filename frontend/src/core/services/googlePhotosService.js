@@ -37,8 +37,8 @@ export const DEFAULT_GOOGLE_PHOTOS = [
     timestamp: '2024-07-15T16:30:00Z',
     location: 'Campos do Jordão, SP',
     dimensions: { width: 3840, height: 2160 },
-    thumbnailUrl: 'https://images.unsplash.com/photo-1511895426328-dc8714191300?auto=format&fit=crop&w=800&q=80',
-    fullUrl: 'https://images.unsplash.com/photo-1511895426328-dc8714191300?auto=format&fit=crop&w=2000&q=90',
+    thumbnailUrl: null,
+    fullUrl: null,
     tags: ['família', 'filhos', 'natureza', 'viagem'],
   },
   {
@@ -51,8 +51,8 @@ export const DEFAULT_GOOGLE_PHOTOS = [
     timestamp: '2023-10-22T10:15:00Z',
     location: 'Casa da Família, São Paulo',
     dimensions: { width: 3000, height: 2000 },
-    thumbnailUrl: 'https://images.unsplash.com/photo-1544717305-2782549b5136?auto=format&fit=crop&w=800&q=80',
-    fullUrl: 'https://images.unsplash.com/photo-1544717305-2782549b5136?auto=format&fit=crop&w=2000&q=90',
+    thumbnailUrl: null,
+    fullUrl: null,
     tags: ['bebê', 'filha', 'infância', 'amor'],
   },
   {
@@ -65,8 +65,8 @@ export const DEFAULT_GOOGLE_PHOTOS = [
     timestamp: '2024-04-04T18:00:00Z',
     location: 'Salão de Festas, SP',
     dimensions: { width: 3200, height: 2400 },
-    thumbnailUrl: 'https://images.unsplash.com/photo-1530103862676-de8c9debad1d?auto=format&fit=crop&w=800&q=80',
-    fullUrl: 'https://images.unsplash.com/photo-1530103862676-de8c9debad1d?auto=format&fit=crop&w=2000&q=90',
+    thumbnailUrl: null,
+    fullUrl: null,
     tags: ['aniversário', 'festa', 'alegria', 'primos'],
   },
   {
@@ -79,8 +79,8 @@ export const DEFAULT_GOOGLE_PHOTOS = [
     timestamp: '2025-01-12T11:45:00Z',
     location: 'Praia de Juquehy, Litoral Norte',
     dimensions: { width: 4000, height: 2250 },
-    thumbnailUrl: 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=800&q=80',
-    fullUrl: 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=2000&q=90',
+    thumbnailUrl: null,
+    fullUrl: null,
     tags: ['praia', 'avós', 'férias', 'mar'],
   },
   {
@@ -93,8 +93,8 @@ export const DEFAULT_GOOGLE_PHOTOS = [
     timestamp: '2017-11-18T19:30:00Z',
     location: 'Igreja Matriz, Gramado - RS',
     dimensions: { width: 3600, height: 2400 },
-    thumbnailUrl: 'https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&w=800&q=80',
-    fullUrl: 'https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&w=2000&q=90',
+    thumbnailUrl: null,
+    fullUrl: null,
     tags: ['casamento', 'amor', 'aliança', 'votos'],
   },
   {
@@ -107,8 +107,8 @@ export const DEFAULT_GOOGLE_PHOTOS = [
     timestamp: '1985-09-10T14:00:00Z',
     location: 'Acervo de Família',
     dimensions: { width: 2400, height: 3200 },
-    thumbnailUrl: 'https://images.unsplash.com/photo-1583521214690-73421a1829a9?auto=format&fit=crop&w=800&q=80',
-    fullUrl: 'https://images.unsplash.com/photo-1583521214690-73421a1829a9?auto=format&fit=crop&w=2000&q=90',
+    thumbnailUrl: null,
+    fullUrl: null,
     tags: ['carta', 'documento', 'vovô', 'história'],
   },
   {
@@ -121,8 +121,8 @@ export const DEFAULT_GOOGLE_PHOTOS = [
     timestamp: '2025-12-08T20:00:00Z',
     location: 'Teatro Municipal',
     dimensions: { width: 3500, height: 2333 },
-    thumbnailUrl: 'https://images.unsplash.com/photo-1523050854058-8df90110c9f1?auto=format&fit=crop&w=800&q=80',
-    fullUrl: 'https://images.unsplash.com/photo-1523050854058-8df90110c9f1?auto=format&fit=crop&w=2000&q=90',
+    thumbnailUrl: null,
+    fullUrl: null,
     tags: ['formatura', 'estudos', 'conquista'],
   },
   {
@@ -135,8 +135,8 @@ export const DEFAULT_GOOGLE_PHOTOS = [
     timestamp: '2026-02-20T13:30:00Z',
     location: 'Casa da Vó, SP',
     dimensions: { width: 3800, height: 2533 },
-    thumbnailUrl: 'https://images.unsplash.com/photo-1516738901171-8eb4fc13bd20?auto=format&fit=crop&w=800&q=80',
-    fullUrl: 'https://images.unsplash.com/photo-1516738901171-8eb4fc13bd20?auto=format&fit=crop&w=2000&q=90',
+    thumbnailUrl: null,
+    fullUrl: null,
     tags: ['almoço', 'domingo', 'família', 'reunião'],
   },
   {
@@ -149,8 +149,8 @@ export const DEFAULT_GOOGLE_PHOTOS = [
     timestamp: '2023-10-14T21:30:00Z',
     location: 'Allianz Parque, São Paulo',
     dimensions: { width: 3840, height: 2160 },
-    thumbnailUrl: 'https://images.unsplash.com/photo-1470225620780-dba8ba36b745?auto=format&fit=crop&w=800&q=80',
-    fullUrl: 'https://images.unsplash.com/photo-1470225620780-dba8ba36b745?auto=format&fit=crop&w=2000&q=90',
+    thumbnailUrl: null,
+    fullUrl: null,
     tags: ['show de rock', 'rock', 'concerto', 'música', 'festival', 'palco', 'guitarra', 'rolling stones'],
   },
   {
@@ -163,8 +163,8 @@ export const DEFAULT_GOOGLE_PHOTOS = [
     timestamp: '2024-09-08T19:00:00Z',
     location: 'Cidade do Rock, Rio de Janeiro',
     dimensions: { width: 4000, height: 2500 },
-    thumbnailUrl: 'https://images.unsplash.com/photo-1459749411175-04bf5292ceea?auto=format&fit=crop&w=800&q=80',
-    fullUrl: 'https://images.unsplash.com/photo-1459749411175-04bf5292ceea?auto=format&fit=crop&w=2000&q=90',
+    thumbnailUrl: null,
+    fullUrl: null,
     tags: ['show de rock', 'rock in rio', 'festival', 'rock', 'banda', 'música', 'multidão'],
   },
   {
@@ -177,8 +177,8 @@ export const DEFAULT_GOOGLE_PHOTOS = [
     timestamp: '2022-05-19T22:15:00Z',
     location: 'Estádio do Morumbi, SP',
     dimensions: { width: 3600, height: 2400 },
-    thumbnailUrl: 'https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?auto=format&fit=crop&w=800&q=80',
-    fullUrl: 'https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?auto=format&fit=crop&w=2000&q=90',
+    thumbnailUrl: null,
+    fullUrl: null,
     tags: ['show de rock', 'foo fighters', 'rock', 'guitarra', 'palco', 'música'],
   },
   {
@@ -191,8 +191,8 @@ export const DEFAULT_GOOGLE_PHOTOS = [
     timestamp: '2023-12-09T21:00:00Z',
     location: 'Maracanã, RJ',
     dimensions: { width: 3800, height: 2400 },
-    thumbnailUrl: 'https://images.unsplash.com/photo-1501386761578-eac5c94b800a?auto=format&fit=crop&w=800&q=80',
-    fullUrl: 'https://images.unsplash.com/photo-1501386761578-eac5c94b800a?auto=format&fit=crop&w=2000&q=90',
+    thumbnailUrl: null,
+    fullUrl: null,
     tags: ['show de rock', 'paul mccartney', 'rock', 'beatles', 'estádio', 'música'],
   },
 ];
@@ -555,7 +555,7 @@ class GooglePhotosService {
   async connectAccount(profile = {}) {
     const defaultEmail = 'usuario.google@gmail.com';
     const defaultName = 'Usuário Google Photos';
-    const defaultAvatar = 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=200&q=80';
+    const defaultAvatar = null;
 
     const current = this.getConnectionStatus();
     const updated = {

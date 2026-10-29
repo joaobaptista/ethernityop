@@ -1,7 +1,8 @@
 import React, { useState, useEffect, useRef, useMemo } from 'react';
 import localAiService from '../../../core/services/localAiService.js';
-import vaultService from '../../vault/application/vaultService.js';
 import capsulesService from '../../capsules/application/capsulesService.js';
+import GuardianAvatar from '../../guardian/presentation/GuardianAvatar.jsx';
+import usePrimaryGuardian from '../../guardian/presentation/usePrimaryGuardian.js';
 import './VoiceIdeationView.css';
 
 function formatHtmlToScript(html) {
@@ -33,6 +34,7 @@ export default function VoiceIdeationView({
   onBack,
   onSaveToCapsule,
 }) {
+  const primaryGuardian = usePrimaryGuardian();
   // Passos: 1 = Ideação, 2 = Gravação, 3 = Entrega
   const [step, setStep] = useState(1);
 
@@ -465,79 +467,38 @@ export default function VoiceIdeationView({
 
   // 3. Salvar definitivo na cápsula e no cofre
   const handleSaveVoiceMessage = async () => {
+    const chosenTake = selectedTake || takes[0];
+    if (!chosenTake?.blob) {
+      showToast('Grave sua mensagem de voz antes de salvar.');
+      return;
+    }
+    if (!capsuleId && !onSaveToCapsule) {
+      showToast('Abra uma cápsula para guardar esta mensagem de voz.');
+      return;
+    }
+
+    const audioItem = {
+      id: `voice-${Date.now()}`,
+      title: title || 'Mensagem de Voz',
+      script,
+      duration: chosenTake.duration,
+      durationSeconds: chosenTake.durationSeconds,
+      url: chosenTake.url,
+      audioBlob: chosenTake.blob,
+      type: 'audio',
+      recipient: recipientName,
+      deliveryTrigger: deliveryTrigger === 'posthumous' ? 'Após Falecimento' : 'Data Específica',
+      createdAt: new Date().toISOString(),
+    };
+
     try {
-      const chosenTake = selectedTake || takes[0];
-      const duration = chosenTake
-        ? chosenTake.duration
-        : recordingSeconds > 0
-        ? `${formatTimer(recordingSeconds)} min`
-        : '02:24 min';
-      const durationSeconds = chosenTake ? chosenTake.durationSeconds : recordingSeconds || 144;
-
-      let audioUrl = chosenTake?.url || null;
-      let audioBlob = chosenTake?.blob || null;
-
-      if (audioBlob) {
-        try {
-          const uploaded = await vaultService.uploadMedia(audioBlob, {
-            title: title || 'Mensagem de Voz Definitiva',
-            category: 'Histórias de Vida',
-            recipient: recipientName,
-            description: script,
-            deliveryTrigger: deliveryTrigger === 'posthumous' ? 'Após Falecimento' : 'Data Específica',
-          });
-          if (uploaded?.media_url) {
-            audioUrl = uploaded.media_url;
-          }
-        } catch (err) {
-          console.warn('Upload no vaultService opcional falhou, mantendo dados locais:', err);
-        }
-      }
-
-      const audioItem = {
-        id: `voice-${Date.now()}`,
-        title: title || 'Mensagem de Voz Definitiva',
-        script,
-        duration,
-        durationSeconds,
-        url: audioUrl,
-        audioBlob,
-        type: 'audio',
-        recipient: recipientName,
-        deliveryTrigger: deliveryTrigger === 'posthumous' ? 'Após Falecimento' : 'Data Específica',
-        createdAt: new Date().toISOString(),
-      };
-
-      // 1. Salvar no cofre geral
-      const currentVault = JSON.parse(localStorage.getItem('ethernity_vault_items') || '[]');
-      const newVaultItem = {
-        id: `vault-audio-${Date.now()}`,
-        title: title || 'Mensagem de Voz Definitiva',
-        type: 'audio',
-        category: 'Histórias de Vida',
-        recipient: recipientName,
-        description: script,
-        date: new Date().toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric' }),
-        duration,
-        size: chosenTake?.size || '2.4 MB',
-        isEncrypted: true,
-        deliveryTrigger: deliveryTrigger === 'posthumous' ? 'Após Falecimento' : 'Data Específica',
-        audioUrl,
-      };
-      localStorage.setItem('ethernity_vault_items', JSON.stringify([newVaultItem, ...currentVault]));
-      window.dispatchEvent(new CustomEvent('ethernity_vault_updated'));
-
-      // 2. Salvar na cápsula ativa
-      if (capsuleId) {
-        capsulesService.addCapsuleAudio(capsuleId, audioItem);
-      }
+      // A cápsula guarda o áudio no aparelho e o envia ao cofre do servidor na sincronização
       if (onSaveToCapsule) {
         onSaveToCapsule(audioItem);
+      } else {
+        capsulesService.addCapsuleAudio(capsuleId, audioItem);
       }
-
-      window.dispatchEvent(new CustomEvent('ethernity_capsules_updated'));
-
-      showToast('🎉 Mensagem de voz guardada na sua cápsula e no cofre com sucesso!');
+      showToast('🎉 Mensagem de voz guardada na cápsula.');
       setTimeout(() => {
         if (onBack) {
           onBack();
@@ -1147,17 +1108,23 @@ export default function VoiceIdeationView({
 
                 <div className="vi-guardian-assigned-box">
                   <div className="vi-guardian-left-info">
-                    <img
-                      src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&q=80&w=250"
-                      alt="Roberto Silva de Souza"
-                      className="vi-guardian-thumb"
-                    />
+                    <GuardianAvatar src={primaryGuardian?.avatar} name={primaryGuardian?.name} className="vi-guardian-thumb" />
                     <div className="vi-guardian-text">
-                      <h4 className="vi-guardian-name">Roberto Silva de Souza</h4>
+                      <h4 className="vi-guardian-name">{primaryGuardian ? primaryGuardian.name : 'Nenhum guardião cadastrado'}</h4>
                       <div className="vi-guardian-meta-line">
-                        <span>Cônjuge</span>
-                        <span className="vi-guardian-meta-sep">•</span>
-                        <span className="vi-guardian-status-green">ATIVO</span>
+                        {primaryGuardian ? (
+                          <>
+                            {primaryGuardian.relationship && <span>{primaryGuardian.relationship}</span>}
+                            {primaryGuardian.relationship && <span className="vi-guardian-meta-sep">•</span>}
+                            {primaryGuardian.status === 'active' ? (
+                              <span className="vi-guardian-status-green">ATIVO</span>
+                            ) : (
+                              <span>PENDENTE</span>
+                            )}
+                          </>
+                        ) : (
+                          <span>Cadastre um guardião para validar a entrega</span>
+                        )}
                       </div>
                     </div>
                   </div>
@@ -1167,7 +1134,7 @@ export default function VoiceIdeationView({
                     className="btn-alterar-guardiao"
                     onClick={() => onNavigateTab && onNavigateTab('guardian')}
                   >
-                    Alterar Guardião
+                    {primaryGuardian ? 'Alterar Guardião' : 'Cadastrar Guardião'}
                   </button>
                 </div>
               </div>
@@ -1285,7 +1252,7 @@ export default function VoiceIdeationView({
 
                   <div className="vi-sum-row">
                     <span className="vi-sum-label">Guardião Nomeado</span>
-                    <strong className="vi-sum-value">Roberto Silva de Souza</strong>
+                    <strong className="vi-sum-value">{primaryGuardian ? primaryGuardian.name : 'Nenhum guardião cadastrado'}</strong>
                   </div>
 
                   <div className="vi-sum-row">

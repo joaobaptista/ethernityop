@@ -1680,3 +1680,69 @@
     justify-content: center;
   }
 }
+
+.vid-camera-live {
+  background-color: #1A1312;
+  transform: scaleX(-1);
+}
+
+.vid-camera-error {
+  position: absolute;
+  inset: 0;
+  text-align: center;
+  padding: 24px;
+}
+
+.vid-rec-circle-icon {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background-color: #F05A47;
+}
+
+.vid-ctrl-stop-main-btn.is-idle {
+  background-color: #FFFFFF;
+  border: 3px solid #F05A47;
+}
+
+.vid-ctrl-circle-btn:disabled,
+.vid-ctrl-stop-main-btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.vid-soon-badge {
+  font-size: 11px;
+  font-weight: 700;
+  color: #8C827F;
+  background-color: #F3ECE4;
+  padding: 3px 10px;
+  border-radius: 999px;
+}
+
+.vid-takes-empty {
+  margin: 8px 0 0;
+  font-size: 14px;
+  color: #8C827F;
+}
+
+.vid-take-delete-btn {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: none;
+  background: transparent;
+  color: #8C827F;
+  cursor: pointer;
+}
+
+.vid-take-delete-btn:hover {
+  background-color: #FDF0ED;
+  color: #E05A47;
+}
+
+.vid-take-action-wrap {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}

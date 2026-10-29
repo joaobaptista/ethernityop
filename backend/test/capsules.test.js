@@ -56,7 +56,7 @@ test('Cápsulas: Ciclo de Vida Completo (POST, GET, PUT, Anti-IDOR, DELETE)', as
       guardians: ['guardiao.teste@ethernity.com'],
       photos: [
         {
-          img: 'https://images.unsplash.com/photo-1509099836639-18ba1795216d?auto=format&fit=crop&q=80&w=800',
+          img: 'https://media.test/capsule-photo.jpg',
           story: 'Momento inesquecível de infância',
         },
       ],

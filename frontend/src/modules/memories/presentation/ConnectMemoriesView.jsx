@@ -45,7 +45,6 @@ export default function ConnectMemoriesView({ onNavigateTab, profile }) {
   const [googleConnection, setGoogleConnection] = useState(() =>
     googlePhotosService.getConnectionStatus()
   );
-  const [isIcloudConnected, setIsIcloudConnected] = useState(false);
 
   const fileInputRef = useRef(null);
 
@@ -217,10 +216,7 @@ export default function ConnectMemoriesView({ onNavigateTab, profile }) {
           title: `Cápsula: Presente para ${finalName}`,
           recipient: `${finalName} (${finalRel})`,
           avatar: p.avatar,
-          triggerLabel: '12 de Outubro de 2032',
-          contentsSummary: `${photosCount} • Mensagem de Amor`,
           sealColor: idx % 2 === 0 ? '#F05A47' : '#7E57C2',
-          statusText: 'Bloqueada até a data',
           personId: p.id,
           photosCount: photosCount,
           photos: personPhotos,
@@ -257,10 +253,7 @@ export default function ConnectMemoriesView({ onNavigateTab, profile }) {
             title: `Cápsula: Presente para ${p.name || 'Pessoa Especial'}`,
             recipient: `${p.name || 'Pessoa Especial'} (${p.relationship || 'Familiar'})`,
             avatar: p.avatar,
-            triggerLabel: '12 de Outubro de 2032',
-            contentsSummary: `${personPhotos.length} fotos • Mensagem de Amor`,
             sealColor: idx % 2 === 0 ? '#F05A47' : '#7E57C2',
-            statusText: 'Bloqueada até a data',
             personId: p.id,
             photosCount: `${personPhotos.length} fotos`,
             photos: personPhotos,
@@ -427,14 +420,9 @@ export default function ConnectMemoriesView({ onNavigateTab, profile }) {
     processFile(0);
   };
 
-  // Conexão simulada Apple iCloud
   const handleConnectIcloud = () => {
     setIsAddSourcesModalOpen(false);
-    showToast(t('connectMemories.toastSyncingIcloud'), 'info');
-    setTimeout(() => {
-      setIsIcloudConnected(true);
-      showToast(t('connectMemories.toastIcloudConnected'));
-    }, 1200);
+    showToast(t('connectMemories.icloudUnavailable'), 'info');
   };
 
   return (
@@ -518,7 +506,7 @@ export default function ConnectMemoriesView({ onNavigateTab, profile }) {
               </div>
 
               {/* Card 2: iCloud Photos */}
-              <div className={`source-card-v2 ${isIcloudConnected ? 'is-connected' : ''}`}>
+              <div className="source-card-v2 is-unavailable">
                 <div>
                   <div className="source-card-v2-header">
                     <div className="source-icon-container icloud-icon-container">
@@ -534,24 +522,15 @@ export default function ConnectMemoriesView({ onNavigateTab, profile }) {
                     {t('memories.icloudDesc', 'Sincronize seus álbuns automaticamente. Nossa inteligência seleciona as melhores fotos para as suas cápsulas do tempo.')}
                   </p>
 
-                  {isIcloudConnected && (
-                    <div className="source-v2-connected-info">
-                      <span className="connected-badge-v2">
-                        <i className="fa-solid fa-circle-check"></i> {t('common.statusConnected', 'Conectado')}
-                      </span>
-                      <span className="connected-email-v2">142 fotos sincronizadas</span>
-                    </div>
-                  )}
                 </div>
 
                 <button
                   type="button"
                   className="btn-coral-pill"
-                  onClick={handleConnectIcloud}
+                  disabled
+                  aria-disabled="true"
                 >
-                  {isIcloudConnected
-                    ? t('connectMemories.icloudSynced', 'iCloud Sincronizado')
-                    : t('memories.icloudBtn', 'Conectar iCloud Photos')}
+                  {t('connectMemories.icloudSoon')}
                 </button>
               </div>
             </div>
@@ -681,18 +660,6 @@ export default function ConnectMemoriesView({ onNavigateTab, profile }) {
                 </div>
               </div>
 
-              {/* Item 2: Apple iCloud */}
-              <div className="connected-source-row">
-                <div className="connected-source-icon-wrap icloud-icon-wrap">
-                  <i className="fa-solid fa-cloud"></i>
-                </div>
-                <div className="connected-source-info">
-                  <h4 className="connected-source-name">Apple iCloud</h4>
-                  <span className="connected-source-status">
-                    {t('common.statusConnected', 'Conectado')}
-                  </span>
-                </div>
-              </div>
             </div>
 
             {/* Botões de Ação */}

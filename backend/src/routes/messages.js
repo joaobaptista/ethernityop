@@ -320,28 +320,37 @@ router.put('/messages/:id', requireAuth, async (req, res) => {
     store.messages[msgIndex] = updatedMessage;
   }
 
-  // Atualizar no MySQL
+  // Atualizar no MySQL: só os campos enviados, permitindo limpar a data ao trocar para entrega póstuma
   try {
+    const columns = {
+      title: updates.title !== undefined ? String(updates.title).trim() || null : undefined,
+      content: updates.content !== undefined ? updates.content : updates.message,
+      recipient_name: updates.recipientName,
+      recipient_email: updates.recipientEmail,
+      delivery_type: updates.deliveryType,
+      delivery_date: updates.deliveryDate !== undefined ? updates.deliveryDate || null : undefined,
+      delivery_time: updates.deliveryTime,
+      guardian_protected: updates.guardianProtected !== undefined ? (updates.guardianProtected ? 1 : 0) : undefined,
+      email_notification: updates.emailNotification !== undefined ? (updates.emailNotification ? 1 : 0) : undefined,
+      whatsapp_notification: updates.whatsappNotification !== undefined ? (updates.whatsappNotification ? 1 : 0) : undefined,
+      media_files: updates.mediaFiles !== undefined ? JSON.stringify(updates.mediaFiles || []) : undefined,
+      status: updates.status,
+      active: updates.active !== undefined ? (updates.active ? 1 : 0) : undefined,
+    };
+    const entries = Object.entries(columns).filter(([col, val]) => val !== undefined && !(col === 'title' && val === null));
+    const setSql = entries.map(([col]) => `${col} = ?`).concat('updated_at = NOW(3)').join(', ');
+
     const [result] = await pool.query(
-      `UPDATE messages SET
-        title = COALESCE(?, title),
-        content = COALESCE(?, content),
-        status = COALESCE(?, status),
-        active = COALESCE(?, active),
-        updated_at = NOW(3)
-       WHERE id = ? AND (user_id = ? OR device_id IN (?))`,
+      `UPDATE messages SET ${setSql} WHERE id = ? AND (user_id = ? OR device_id IN (?))`,
       [
-        updates.title || null,
-        updates.content || updates.message || null,
-        updates.status || null,
-        updates.active !== undefined ? (updates.active ? 1 : 0) : null,
+        ...entries.map(([, val]) => val),
         req.params.id,
         userId,
         userDeviceRawIds.length ? userDeviceRawIds : ['none'],
       ]
     );
 
-    if (result.affectedRows > 0 && !updatedMessage) {
+    if (result.affectedRows > 0) {
       const [rows] = await pool.query('SELECT * FROM messages WHERE id = ?', [req.params.id]);
       if (rows && rows[0]) {
         const r = rows[0];
@@ -351,14 +360,19 @@ router.put('/messages/:id', requireAuth, async (req, res) => {
           title: r.title,
           content: r.content,
           recipientName: r.recipient_name,
+          recipientEmail: r.recipient_email,
+          deliveryType: r.delivery_type,
+          deliveryDate: r.delivery_date,
+          deliveryTime: r.delivery_time,
+          guardianProtected: Boolean(r.guardian_protected),
           active: Boolean(r.active),
           status: r.status,
           updatedAt: r.updated_at,
         };
       }
     }
-  } catch {
-    // Fallback store
+  } catch (err) {
+    console.warn('[Messages] Falha ao atualizar mensagem no MySQL:', err.message);
   }
 
   if (!updatedMessage) {

@@ -134,6 +134,27 @@ describe('capsulesService — gravação no servidor', () => {
     expect(JSON.parse(put.body).content).toBe('O dia em que você aprendeu a andar');
   });
 
+  it('edita destinatário e data de entrega e envia ao servidor', async () => {
+    capsulesService.addCapsules([{ id: 'cap-edit', title: 'Para Lia', recipient: 'Lia (Filha)' }]);
+    expect(capsulesService.getCapsules().find((c) => c.id === 'cap-edit').triggerLabel).toBe('Data de entrega a definir');
+
+    capsulesService.updateCapsuleDetails('cap-edit', {
+      title: 'Formatura da Lia',
+      recipientName: 'Lia',
+      relationship: 'Filha',
+      deliveryType: 'date',
+      scheduledDate: '2031-12-10T12:00:00.000Z',
+    });
+
+    const cap = capsulesService.getCapsules().find((c) => c.id === 'cap-edit');
+    expect(cap.title).toBe('Formatura da Lia');
+    expect(cap.triggerLabel).toBe('Entrega em 10 de dezembro de 2031');
+    await vi.waitFor(() => {
+      const post = calls.filter((c) => c.url.endsWith('/capsules/') && c.method === 'POST').pop();
+      expect(JSON.parse(post.body).scheduledDate).toBe('2031-12-10T12:00:00.000Z');
+    });
+  });
+
   it('expurga no servidor a foto excluída da cápsula', async () => {
     await capsulesService.setCapsulePhotos('cap-del', [{ id: 'p-del', img: null, mediaId: 'mem-del', memoryId: 9 }]);
     await capsulesService.deleteCapsulePhoto('cap-del', 'p-del');

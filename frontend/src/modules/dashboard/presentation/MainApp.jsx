@@ -333,7 +333,6 @@ export default function MainApp({ token, onLogout }) {
             <Suspense fallback={<TabLoadingFallback />}>
               <NewMessageView
                 onNavigateTab={handleNavigateTab}
-                recipientName={profile?.name ? `Destinatário de ${profile.name}` : 'Destinatário'}
                 onBack={() => handleNavigateTab('capsules')}
               />
             </Suspense>

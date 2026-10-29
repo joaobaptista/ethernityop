@@ -217,6 +217,26 @@ test('PUT /messages/:id updates message fields', async () => {
   assert.equal(res.body.active, false);
 });
 
+test('PUT /messages/:id persiste destinatário e troca para entrega póstuma limpando a data', async () => {
+  const created = await request(app)
+    .post('/messages/')
+    .set(demoHeaders())
+    .send({ title: 'Carta editável', content: '<p>Oi</p>', recipientName: 'Ana', deliveryType: 'date', deliveryDate: '2031-05-01' });
+  assert.equal(created.status, 201);
+
+  const res = await request(app)
+    .put(`/messages/${created.body.id}`)
+    .set(demoHeaders())
+    .send({ recipientName: 'Bia', recipientEmail: 'bia@example.com', deliveryType: 'posthumous', deliveryDate: null });
+  assert.equal(res.status, 200);
+  assert.equal(res.body.recipientName, 'Bia');
+  assert.equal(res.body.recipientEmail, 'bia@example.com');
+  assert.equal(res.body.deliveryType, 'posthumous');
+  assert.equal(res.body.deliveryDate, null);
+
+  await request(app).delete(`/messages/${created.body.id}`).set(demoHeaders());
+});
+
 test('DELETE /messages/:id removes the message', async () => {
   const list = await request(app).get('/messages/').set(demoHeaders());
   const msg = list.body[0];

@@ -370,30 +370,87 @@
   border: 2px solid #FFFFFF;
 }
 
+.modal-avatar-wrapper {
+  position: relative;
+}
+
+.modal-avatar-wrapper.is-empty {
+  background: #EFE6DC;
+  box-shadow: 0 4px 14px rgba(126, 108, 102, 0.12);
+}
+
 .empty-avatar-placeholder {
   width: 100%;
   height: 100%;
   border-radius: 50%;
   background-color: #F8F4EE;
-  border: 2px dashed #D5C8BA;
+  border: 2px solid #FFFFFF;
   display: flex;
-  flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 4px;
-  color: #7E6C66;
+  overflow: hidden;
 }
 
 .empty-avatar-placeholder i {
-  font-size: 22px;
-  color: #F05A47;
+  font-size: 40px;
+  color: #C9B8AA;
+  transform: translateY(6px);
 }
 
-.empty-avatar-placeholder span {
-  font-size: 10px;
+.modal-avatar-edit-badge {
+  position: absolute;
+  right: -2px;
+  bottom: -2px;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background-color: #F05A47;
+  color: #FFFFFF;
+  border: 2px solid #FFFFFF;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  box-shadow: 0 2px 8px rgba(240, 90, 71, 0.35);
+  pointer-events: none;
+}
+
+.guardian-avatar-placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  background-color: #F3ECE4;
+  color: #C9B8AA;
+}
+
+.guardian-avatar-placeholder i {
+  font-size: 0.5em;
+  transform: translateY(12%);
+}
+
+.guardian-circle-avatar.guardian-avatar-placeholder { font-size: 40px; }
+.profile-avatar-ig.guardian-avatar-placeholder { font-size: 80px; }
+.sig-avatar.guardian-avatar-placeholder { font-size: 30px; }
+
+.btn-remove-avatar {
+  margin-top: 8px;
+  background: none;
+  border: none;
+  color: #7E6C66;
+  font-size: 12px;
   font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 8px;
+  border-radius: 8px;
+}
+
+.btn-remove-avatar:hover {
+  color: #E05A47;
+  background-color: #FDF0ED;
 }
 
 .modal-photos-badge {
@@ -813,6 +870,32 @@
 .profile-timeline-container {
   padding: 24px 16px;
   position: relative;
+}
+
+.profile-timeline-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  padding: 40px 24px;
+  text-align: center;
+  color: var(--text-secondary, #7E6C66);
+}
+
+.profile-timeline-empty::before {
+  display: none;
+}
+
+.profile-timeline-empty i {
+  font-size: 32px;
+  color: #C9B8AA;
+}
+
+.profile-timeline-empty p {
+  margin: 0;
+  max-width: 320px;
+  font-size: 14px;
+  line-height: 1.5;
 }
 
 .profile-timeline-container::before {

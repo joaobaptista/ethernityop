@@ -311,3 +311,25 @@ textarea:focus {
   max-height: 90vh !important;
   box-sizing: border-box !important;
 }
+
+.media-icon-placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  overflow: hidden;
+  background-color: #F3ECE4;
+  color: #C9B8AA;
+}
+
+.unlocked-photo-placeholder {
+  flex-direction: column;
+  min-height: 240px;
+  width: 100%;
+  border-radius: 16px;
+  font-size: 14px;
+}
+
+.unlocked-photo-placeholder i {
+  font-size: 40px;
+}

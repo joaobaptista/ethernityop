@@ -1,5 +1,7 @@
 import React, { useState, useEffect, useRef, useMemo } from 'react';
 import localAiService from '../../../core/services/localAiService.js';
+import GuardianAvatar from '../../guardian/presentation/GuardianAvatar.jsx';
+import usePrimaryGuardian from '../../guardian/presentation/usePrimaryGuardian.js';
 import './VideoIdeationView.css';
 
 function estimateVideoTime(words) {
@@ -10,8 +12,16 @@ function estimateVideoTime(words) {
   return `~${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')} min`;
 }
 
-export default function VideoIdeationView({ onNavigateTab, recipientName = 'Destinatário', onBack }) {
+const VIDEO_QUALITIES = {
+  1080: { width: 1920, height: 1080, label: 'Full HD 1080p (Recomendado)', badge: '1080p' },
+  720: { width: 1280, height: 720, label: 'HD 720p (Economia de Dados)', badge: '720p' },
+  2160: { width: 3840, height: 2160, label: 'Ultra HD 4K (se a câmera suportar)', badge: '4K' },
+};
+const MAX_RECORDING_SECONDS = 300;
+
+export default function VideoIdeationView({ onNavigateTab, recipientName = 'Destinatário', onBack, onSaveToCapsule }) {
   // Passos: 1 = Ideação, 2 = Gravação, 3 = Entrega
+  const primaryGuardian = usePrimaryGuardian();
   const [step, setStep] = useState(1);
 
   // Estados Passo 1: Ideação
@@ -21,7 +31,7 @@ export default function VideoIdeationView({ onNavigateTab, recipientName = 'Dest
   const [script, setScript] = useState(
     `[Cena 1: Plano médio olhando diretamente para a câmera, com postura acolhedora]\nOlá ${recipientName}, hoje gostaria de compartilhar com você algumas lições importantes que aprendi ao longo da vida.\n\n[Cena 2: Plano mais reflexivo e pausado]\n1. Escolha algo que alinhe sua curiosidade com seus valores reais.\n2. Cuide das relações humanas. No final das contas, o verdadeiro legado é feito de suporte mútuo e integridade.`
   );
-  const [useAvatarDigital, setUseAvatarDigital] = useState(true);
+  const [useAvatarDigital] = useState(false);
   const [isGeneratingAi, setIsGeneratingAi] = useState(false);
   const [isLocalAiEnabled, setIsLocalAiEnabled] = useState(() => localAiService.isLocalAiEnabled());
   const [toastMessage, setToastMessage] = useState(null);
@@ -30,10 +40,21 @@ export default function VideoIdeationView({ onNavigateTab, recipientName = 'Dest
   const [isRecording, setIsRecording] = useState(false);
   const [recordingSeconds, setRecordingSeconds] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
-  const [selectedVideoTake, setSelectedVideoTake] = useState(1);
-  const [cameraInput, setCameraInput] = useState('Câmera FaceTime HD Frontal');
-  const [videoQuality, setVideoQuality] = useState('Full HD 1080p (Recomendado)');
+  const [takes, setTakes] = useState([]);
+  const [selectedTakeId, setSelectedTakeId] = useState(null);
+  const [cameraDevices, setCameraDevices] = useState([]);
+  const [cameraInput, setCameraInput] = useState('');
+  const [videoQuality, setVideoQuality] = useState('1080');
+  const [cameraError, setCameraError] = useState('');
+  const [audioLevel, setAudioLevel] = useState(0);
   const timerRef = useRef(null);
+  const videoRef = useRef(null);
+  const streamRef = useRef(null);
+  const recorderRef = useRef(null);
+  const chunksRef = useRef([]);
+  const discardRef = useRef(false);
+  const secondsRef = useRef(0);
+  const takesRef = useRef([]);
 
   // Estados Passo 3: Configurar Entrega
   const [deliveryTrigger, setDeliveryTrigger] = useState('posthumous'); // 'date' | 'posthumous'
@@ -96,26 +117,207 @@ export default function VideoIdeationView({ onNavigateTab, recipientName = 'Dest
     };
   }, [isRecording, isPaused, step]);
 
-  const handleRestart = () => {
+  useEffect(() => {
+    secondsRef.current = recordingSeconds;
+  }, [recordingSeconds]);
+
+  useEffect(() => {
+    takesRef.current = takes;
+  }, [takes]);
+
+  useEffect(
+    () => () => {
+      takesRef.current.forEach((tk) => URL.revokeObjectURL(tk.url));
+    },
+    []
+  );
+
+  // Câmera e microfone reais enquanto a etapa de gravação está aberta
+  useEffect(() => {
+    if (step !== 2) return undefined;
+    if (typeof navigator === 'undefined' || !navigator.mediaDevices?.getUserMedia) {
+      setCameraError('Este navegador não permite gravar vídeo.');
+      return undefined;
+    }
+
+    let cancelled = false;
+    let audioCtx = null;
+    let rafId = null;
+    const quality = VIDEO_QUALITIES[videoQuality] || VIDEO_QUALITIES[1080];
+
+    navigator.mediaDevices
+      .getUserMedia({
+        video: {
+          deviceId: cameraInput ? { exact: cameraInput } : undefined,
+          width: { ideal: quality.width },
+          height: { ideal: quality.height },
+        },
+        audio: true,
+      })
+      .then(async (stream) => {
+        if (cancelled) {
+          stream.getTracks().forEach((track) => track.stop());
+          return;
+        }
+        streamRef.current = stream;
+        setCameraError('');
+        if (videoRef.current) {
+          videoRef.current.srcObject = stream;
+          videoRef.current.play().catch(() => {});
+        }
+
+        const devices = await navigator.mediaDevices.enumerateDevices();
+        if (!cancelled) {
+          setCameraDevices(
+            devices
+              .filter((d) => d.kind === 'videoinput')
+              .map((d, i) => ({ id: d.deviceId, label: d.label || `Câmera ${i + 1}` }))
+          );
+        }
+
+        const AudioCtx = window.AudioContext || window.webkitAudioContext;
+        if (AudioCtx && stream.getAudioTracks().length > 0) {
+          audioCtx = new AudioCtx();
+          const analyser = audioCtx.createAnalyser();
+          analyser.fftSize = 256;
+          audioCtx.createMediaStreamSource(stream).connect(analyser);
+          const samples = new Uint8Array(analyser.fftSize);
+          let lastUpdate = 0;
+          const tick = (ts) => {
+            if (ts - lastUpdate > 100) {
+              analyser.getByteTimeDomainData(samples);
+              let sum = 0;
+              for (const v of samples) {
+                const x = (v - 128) / 128;
+                sum += x * x;
+              }
+              setAudioLevel(Math.min(1, Math.sqrt(sum / samples.length) * 4));
+              lastUpdate = ts;
+            }
+            rafId = requestAnimationFrame(tick);
+          };
+          rafId = requestAnimationFrame(tick);
+        }
+      })
+      .catch((err) => {
+        if (cancelled) return;
+        setCameraError(
+          err?.name === 'NotAllowedError'
+            ? 'Permita o acesso à câmera e ao microfone no navegador para gravar.'
+            : 'Não foi possível acessar a câmera. Verifique se ela está conectada e livre.'
+        );
+      });
+
+    return () => {
+      cancelled = true;
+      if (rafId) cancelAnimationFrame(rafId);
+      if (audioCtx) audioCtx.close().catch(() => {});
+      if (recorderRef.current && recorderRef.current.state !== 'inactive') {
+        discardRef.current = true;
+        recorderRef.current.stop();
+      }
+      if (streamRef.current) {
+        streamRef.current.getTracks().forEach((track) => track.stop());
+        streamRef.current = null;
+      }
+      setAudioLevel(0);
+    };
+  }, [step, cameraInput, videoQuality]);
+
+  const startRecording = () => {
+    const stream = streamRef.current;
+    if (!stream || typeof MediaRecorder === 'undefined') {
+      showToast(cameraError || 'A câmera ainda não está pronta para gravar.');
+      return;
+    }
+    const mimeType =
+      ['video/webm;codecs=vp9,opus', 'video/webm;codecs=vp8,opus', 'video/webm', 'video/mp4'].find((type) =>
+        MediaRecorder.isTypeSupported(type)
+      ) || '';
+    const recorder = new MediaRecorder(stream, mimeType ? { mimeType } : undefined);
+    chunksRef.current = [];
+    discardRef.current = false;
+
+    recorder.ondataavailable = (e) => {
+      if (e.data && e.data.size > 0) chunksRef.current.push(e.data);
+    };
+    recorder.onstop = () => {
+      setIsRecording(false);
+      setIsPaused(false);
+      const chunks = chunksRef.current;
+      chunksRef.current = [];
+      if (discardRef.current) return;
+      const blob = new Blob(chunks, { type: recorder.mimeType || 'video/webm' });
+      if (!blob.size) return;
+      const take = {
+        id: `take-${Date.now()}`,
+        blob,
+        url: URL.createObjectURL(blob),
+        durationSeconds: secondsRef.current,
+        createdAt: new Date(),
+      };
+      setTakes((prev) => [take, ...prev]);
+      setSelectedTakeId(take.id);
+      showToast('⏹️ Gravação salva nas tentativas.');
+    };
+
+    recorderRef.current = recorder;
+    recorder.start(1000);
     setRecordingSeconds(0);
     setIsRecording(true);
     setIsPaused(false);
-    showToast('🔄 Gravação de vídeo reiniciada.');
   };
 
   const handleStop = () => {
-    setIsRecording(false);
-    setIsPaused(false);
-    showToast('⏹️ Gravação de vídeo salva com sucesso nas tentativas!');
+    const recorder = recorderRef.current;
+    if (recorder && recorder.state !== 'inactive') recorder.stop();
+  };
+
+  const handleRecordToggle = () => {
+    if (isRecording) {
+      handleStop();
+    } else {
+      startRecording();
+    }
+  };
+
+  const handleRestart = () => {
+    const recorder = recorderRef.current;
+    if (!isRecording || !recorder || recorder.state === 'inactive') return;
+    discardRef.current = true;
+    recorder.stop();
+    setRecordingSeconds(0);
+    showToast('Gravação atual descartada.');
   };
 
   const handlePauseResume = () => {
-    setIsPaused((prev) => {
-      const next = !prev;
-      showToast(next ? '⏸️ Gravação pausada.' : '▶️ Gravação retomada.');
-      return next;
-    });
+    const recorder = recorderRef.current;
+    if (!isRecording || !recorder) return;
+    if (recorder.state === 'recording') {
+      recorder.pause();
+      setIsPaused(true);
+    } else if (recorder.state === 'paused') {
+      recorder.resume();
+      setIsPaused(false);
+    }
   };
+
+  const handleDeleteTake = (takeId) => {
+    setTakes((prev) => {
+      const target = prev.find((tk) => tk.id === takeId);
+      if (target) URL.revokeObjectURL(target.url);
+      return prev.filter((tk) => tk.id !== takeId);
+    });
+    if (selectedTakeId === takeId) setSelectedTakeId(null);
+  };
+
+  useEffect(() => {
+    if (isRecording && recordingSeconds >= MAX_RECORDING_SECONDS) {
+      handleStop();
+      showToast('Limite de 5 minutos atingido. Gravação salva.');
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isRecording, recordingSeconds]);
 
   const formatTimer = (secs) => {
     const mins = Math.floor(secs / 60);
@@ -191,36 +393,37 @@ export default function VideoIdeationView({ onNavigateTab, recipientName = 'Dest
   };
 
   const handleSaveVideoMessage = () => {
-    try {
-      const currentVault = JSON.parse(localStorage.getItem('ethernity_vault_items') || '[]');
-      const newItem = {
-        id: `vault-video-${Date.now()}`,
-        title: title.trim() || 'Mensagem de Vídeo Gravada',
-        type: 'video',
-        category: 'Marcos de Família',
-        recipient: recipientName,
-        description: script,
-        date: new Date().toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric' }),
-        duration: '03:15 min',
-        size: '180 MB',
-        isEncrypted: true,
-        deliveryTrigger: deliveryTrigger === 'posthumous' ? 'Após Falecimento' : 'Data Específica',
-      };
-
-      localStorage.setItem('ethernity_vault_items', JSON.stringify([newItem, ...currentVault]));
-      window.dispatchEvent(new CustomEvent('ethernity_vault_updated'));
-
-      showToast('🎉 Mensagem de vídeo salva no seu Cofre com sucesso!');
-      setTimeout(() => {
-        if (onBack) {
-          onBack();
-        } else if (onNavigateTab) {
-          onNavigateTab('vault');
-        }
-      }, 900);
-    } catch {
-      showToast('Erro ao gravar vídeo no cofre.');
+    const take = takes.find((tk) => tk.id === selectedTakeId) || takes[0];
+    if (!take) {
+      showToast('Grave o vídeo antes de guardar.');
+      setStep(2);
+      return;
     }
+    if (!onSaveToCapsule) {
+      showToast('Abra uma cápsula para guardar este vídeo.');
+      return;
+    }
+    // A cápsula guarda o vídeo no aparelho e o envia ao cofre do servidor na sincronização
+    onSaveToCapsule({
+      id: `video-${Date.now()}`,
+      title: title.trim() || 'Mensagem de vídeo',
+      description: script,
+      script,
+      duration: formatTimer(take.durationSeconds),
+      durationSeconds: take.durationSeconds,
+      videoBlob: take.blob,
+      url: take.url,
+      type: 'video',
+      date: new Date().toISOString(),
+    });
+    showToast('🎉 Vídeo guardado na cápsula.');
+    setTimeout(() => {
+      if (onBack) {
+        onBack();
+      } else if (onNavigateTab) {
+        onNavigateTab('capsules');
+      }
+    }, 900);
   };
 
   const handleBreadcrumbClick = () => {
@@ -483,15 +686,10 @@ export default function VideoIdeationView({ onNavigateTab, recipientName = 'Dest
               <div className="vid-white-card vid-avatar-toggle-card">
                 <div className="vid-avatar-toggle-header">
                   <h3 className="vid-avatar-toggle-title">Usar Avatar Digital</h3>
-                  <div
-                    className={`vid-ios-toggle ${useAvatarDigital ? 'active' : ''}`}
-                    onClick={() => setUseAvatarDigital(!useAvatarDigital)}
-                  >
-                    <div className="vid-ios-toggle-knob"></div>
-                  </div>
+                  <span className="vid-soon-badge">Em breve</span>
                 </div>
                 <p className="vid-avatar-toggle-desc">
-                  Ative para gerar o vídeo automaticamente usando o seu clone de Inteligência Artificial.
+                  Gerar o vídeo automaticamente com o seu avatar digital ainda está em desenvolvimento.
                 </p>
               </div>
             </div>
@@ -509,16 +707,21 @@ export default function VideoIdeationView({ onNavigateTab, recipientName = 'Dest
                 <div className="vid-video-player-card">
                   <div className="vid-camera-feed-box">
                     <div className="vid-video-top-badges">
-                      <span className="vid-rec-badge">
-                        <span className="vid-rec-dot"></span> GRAVANDO
-                      </span>
-                      <span className="vid-quality-badge">1080p FPS: 30</span>
+                      {isRecording && (
+                        <span className="vid-rec-badge">
+                          <span className="vid-rec-dot"></span> {isPaused ? 'PAUSADO' : 'GRAVANDO'}
+                        </span>
+                      )}
+                      <span className="vid-quality-badge">{(VIDEO_QUALITIES[videoQuality] || VIDEO_QUALITIES[1080]).badge}</span>
                     </div>
 
-                    <div className="vid-camera-feed-placeholder">
-                      <i className="fa-solid fa-video"></i>
-                      <span>{isRecording ? 'Gravando feed da câmera...' : 'Câmera pronta para gravação em HD'}</span>
-                    </div>
+                    <video ref={videoRef} className="vid-camera-feed-img vid-camera-live" muted playsInline autoPlay />
+                    {cameraError && (
+                      <div className="vid-camera-feed-placeholder vid-camera-error">
+                        <i className="fa-solid fa-video-slash"></i>
+                        <span>{cameraError}</span>
+                      </div>
+                    )}
 
                     <div className="vid-video-bottom-overlay">
                       <div className="vid-timer-badge">
@@ -555,7 +758,11 @@ export default function VideoIdeationView({ onNavigateTab, recipientName = 'Dest
                     <span className="vid-audio-signal-label">Sinal de Áudio de Entrada</span>
                     <div className="vid-waveform-visual">
                       {[8, 14, 22, 18, 30, 26, 36, 24, 32, 28, 34, 22, 30, 16, 24, 12, 18, 10].map((h, i) => (
-                        <span key={i} className="vid-wave-bar" style={{ height: `${h}px` }}></span>
+                        <span
+                          key={i}
+                          className="vid-wave-bar"
+                          style={{ height: `${Math.max(3, Math.round(h * Math.min(1, 0.1 + audioLevel)))}px` }}
+                        ></span>
                       ))}
                     </div>
                   </div>
@@ -566,25 +773,31 @@ export default function VideoIdeationView({ onNavigateTab, recipientName = 'Dest
                       type="button"
                       className="vid-ctrl-circle-btn"
                       onClick={handleRestart}
-                      title="Reiniciar Gravação"
+                      disabled={!isRecording}
+                      title="Descartar gravação atual"
+                      aria-label="Descartar gravação atual"
                     >
                       <i className="fa-solid fa-rotate-left"></i>
                     </button>
 
                     <button
                       type="button"
-                      className="vid-ctrl-stop-main-btn"
-                      onClick={handleStop}
-                      title="Parar e Salvar Gravação"
+                      className={`vid-ctrl-stop-main-btn ${isRecording ? '' : 'is-idle'}`}
+                      onClick={handleRecordToggle}
+                      disabled={!isRecording && Boolean(cameraError)}
+                      title={isRecording ? 'Parar e salvar gravação' : 'Começar a gravar'}
+                      aria-label={isRecording ? 'Parar e salvar gravação' : 'Começar a gravar'}
                     >
-                      <div className="vid-stop-square-icon"></div>
+                      <div className={isRecording ? 'vid-stop-square-icon' : 'vid-rec-circle-icon'}></div>
                     </button>
 
                     <button
                       type="button"
                       className="vid-ctrl-circle-btn"
                       onClick={handlePauseResume}
+                      disabled={!isRecording}
                       title={isPaused ? 'Continuar' : 'Pausar'}
+                      aria-label={isPaused ? 'Continuar' : 'Pausar'}
                     >
                       <i className={`fa-solid ${isPaused ? 'fa-play' : 'fa-pause'}`}></i>
                     </button>
@@ -600,10 +813,14 @@ export default function VideoIdeationView({ onNavigateTab, recipientName = 'Dest
                           className="vid-custom-select"
                           value={cameraInput}
                           onChange={(e) => setCameraInput(e.target.value)}
+                          disabled={isRecording}
                         >
-                          <option value="Câmera FaceTime HD Frontal">Câmera FaceTime HD Frontal</option>
-                          <option value="Câmera Externa 4K">Câmera Externa 4K (Logitech Brio)</option>
-                          <option value="OBS Virtual Camera">OBS Virtual Camera</option>
+                          <option value="">Câmera padrão do aparelho</option>
+                          {cameraDevices.map((cam) => (
+                            <option key={cam.id} value={cam.id}>
+                              {cam.label}
+                            </option>
+                          ))}
                         </select>
                         <i className="fa-solid fa-chevron-down vid-select-arrow"></i>
                       </div>
@@ -617,10 +834,13 @@ export default function VideoIdeationView({ onNavigateTab, recipientName = 'Dest
                           className="vid-custom-select"
                           value={videoQuality}
                           onChange={(e) => setVideoQuality(e.target.value)}
+                          disabled={isRecording}
                         >
-                          <option value="Full HD 1080p (Recomendado)">Full HD 1080p (Recomendado)</option>
-                          <option value="Ultra HD 4K">Ultra HD 4K (3840×2160)</option>
-                          <option value="HD 720p (Economia de Dados)">HD 720p (Economia de Dados)</option>
+                          {Object.entries(VIDEO_QUALITIES).map(([key, q]) => (
+                            <option key={key} value={key}>
+                              {q.label}
+                            </option>
+                          ))}
                         </select>
                         <i className="fa-solid fa-chevron-down vid-select-arrow"></i>
                       </div>
@@ -631,15 +851,10 @@ export default function VideoIdeationView({ onNavigateTab, recipientName = 'Dest
                   <div className="vid-avatar-toggle-inner-card">
                     <div className="vid-avatar-toggle-top-row">
                       <h4 className="vid-avatar-toggle-inner-title">Usar Avatar Digital</h4>
-                      <div
-                        className={`vid-ios-toggle ${useAvatarDigital ? 'active' : ''}`}
-                        onClick={() => setUseAvatarDigital(!useAvatarDigital)}
-                      >
-                        <div className="vid-ios-toggle-knob"></div>
-                      </div>
+                      <span className="vid-soon-badge">Em breve</span>
                     </div>
                     <p className="vid-avatar-toggle-inner-desc">
-                      Gera o vídeo a partir do script usando sua contraparte sintética de IA.
+                      Gerar o vídeo a partir do roteiro com o seu avatar digital ainda está em desenvolvimento.
                     </p>
                   </div>
                 </div>
@@ -650,75 +865,70 @@ export default function VideoIdeationView({ onNavigateTab, recipientName = 'Dest
             <div className="vid-saved-takes-section">
               <h3 className="vid-saved-title">Gravações de Vídeo Salvas</h3>
 
-              <div className="vid-takes-list">
-                {/* Take 2 */}
-                <div
-                  className={`vid-take-card ${selectedVideoTake === 2 ? 'is-selected' : ''}`}
-                  onClick={() => setSelectedVideoTake(2)}
-                >
-                  <div className="vid-take-thumb-wrapper">
-                    <img
-                      src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&q=80&w=200"
-                      alt="Tentativa 2"
-                      className="vid-take-thumb-img"
-                    />
-                    <div className="vid-take-play-mini">
-                      <i className="fa-solid fa-play"></i>
-                    </div>
-                  </div>
+              {takes.length === 0 ? (
+                <p className="vid-takes-empty">
+                  Nenhuma gravação ainda. Clique no botão vermelho para começar a gravar.
+                </p>
+              ) : (
+                <div className="vid-takes-list">
+                  {takes.map((take, idx) => {
+                    const isSelected = (selectedTakeId || takes[0]?.id) === take.id;
+                    return (
+                      <div
+                        key={take.id}
+                        className={`vid-take-card ${isSelected ? 'is-selected' : ''}`}
+                        onClick={() => setSelectedTakeId(take.id)}
+                      >
+                        <div className="vid-take-thumb-wrapper">
+                          <video src={take.url} className="vid-take-thumb-img" muted playsInline preload="metadata" />
+                          <div className="vid-take-play-mini">
+                            <i className="fa-solid fa-play"></i>
+                          </div>
+                        </div>
 
-                  <div className="vid-take-info">
-                    <h4 className="vid-take-name">Tentativa de Vídeo 2</h4>
-                    <p className="vid-take-details">Hoje às 14:32 • 02:15 min • 180 MB</p>
-                  </div>
+                        <div className="vid-take-info">
+                          <h4 className="vid-take-name">Tentativa {takes.length - idx}</h4>
+                          <p className="vid-take-details">
+                            {take.createdAt.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })} •{' '}
+                            {formatTimer(take.durationSeconds)} min • {(take.blob.size / (1024 * 1024)).toFixed(1)} MB
+                          </p>
+                        </div>
 
-                  <div className="vid-take-action-wrap">
-                    {selectedVideoTake === 2 ? (
-                      <button type="button" className="btn-take-coral-selected">
-                        Selecionado
-                      </button>
-                    ) : (
-                      <button type="button" className="btn-take-outline-action">
-                        Usar este
-                      </button>
-                    )}
-                  </div>
+                        <div className="vid-take-action-wrap">
+                          {isSelected ? (
+                            <button type="button" className="btn-take-coral-selected">
+                              Selecionado
+                            </button>
+                          ) : (
+                            <button
+                              type="button"
+                              className="btn-take-outline-action"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                setSelectedTakeId(take.id);
+                              }}
+                            >
+                              Usar este
+                            </button>
+                          )}
+                          <button
+                            type="button"
+                            className="vid-take-delete-btn"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleDeleteTake(take.id);
+                            }}
+                            title="Excluir esta tentativa"
+                            aria-label={`Excluir tentativa ${takes.length - idx}`}
+                          >
+                            <i className="fa-regular fa-trash-can"></i>
+                          </button>
+                        </div>
+                      </div>
+                    );
+                  })}
                 </div>
-
-                {/* Take 1 */}
-                <div
-                  className={`vid-take-card ${selectedVideoTake === 1 ? 'is-selected' : ''}`}
-                  onClick={() => setSelectedVideoTake(1)}
-                >
-                  <div className="vid-take-thumb-wrapper">
-                    <img
-                      src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=200"
-                      alt="Tentativa 1"
-                      className="vid-take-thumb-img"
-                    />
-                    <div className="vid-take-play-mini">
-                      <i className="fa-solid fa-play"></i>
-                    </div>
-                  </div>
-
-                  <div className="vid-take-info">
-                    <h4 className="vid-take-name">Tentativa de Vídeo 1</h4>
-                    <p className="vid-take-details">Ontem às 18:15 • 01:58 min • 154 MB</p>
-                  </div>
-
-                  <div className="vid-take-action-wrap">
-                    {selectedVideoTake === 1 ? (
-                      <button type="button" className="btn-take-coral-selected">
-                        Selecionado
-                      </button>
-                    ) : (
-                      <button type="button" className="btn-take-outline-action">
-                        Usar este
-                      </button>
-                    )}
-                  </div>
-                </div>
-              </div>
+              )}
             </div>
           </div>
         )}
@@ -822,17 +1032,23 @@ export default function VideoIdeationView({ onNavigateTab, recipientName = 'Dest
 
                 <div className="vid-guardian-assigned-box">
                   <div className="vid-guardian-left-info">
-                    <img
-                      src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&q=80&w=250"
-                      alt="Roberto Silva"
-                      className="vid-guardian-thumb"
-                    />
+                    <GuardianAvatar src={primaryGuardian?.avatar} name={primaryGuardian?.name} className="vid-guardian-thumb" />
                     <div className="vid-guardian-text">
-                      <h4 className="vid-guardian-name">Roberto Silva de Souza</h4>
+                      <h4 className="vid-guardian-name">{primaryGuardian ? primaryGuardian.name : 'Nenhum guardião cadastrado'}</h4>
                       <div className="vid-guardian-meta-line">
-                        <span>Cônjuge</span>
-                        <span className="vid-guardian-meta-sep">•</span>
-                        <span className="vid-guardian-status-green">ATIVO</span>
+                        {primaryGuardian ? (
+                          <>
+                            {primaryGuardian.relationship && <span>{primaryGuardian.relationship}</span>}
+                            {primaryGuardian.relationship && <span className="vid-guardian-meta-sep">•</span>}
+                            {primaryGuardian.status === 'active' ? (
+                              <span className="vid-guardian-status-green">ATIVO</span>
+                            ) : (
+                              <span>PENDENTE</span>
+                            )}
+                          </>
+                        ) : (
+                          <span>Cadastre um guardião para validar a entrega</span>
+                        )}
                       </div>
                     </div>
                   </div>
@@ -842,7 +1058,7 @@ export default function VideoIdeationView({ onNavigateTab, recipientName = 'Dest
                     className="btn-alterar-guardiao"
                     onClick={() => onNavigateTab && onNavigateTab('guardian')}
                   >
-                    Alterar Guardião
+                    {primaryGuardian ? 'Alterar Guardião' : 'Cadastrar Guardião'}
                   </button>
                 </div>
               </div>
@@ -944,7 +1160,7 @@ export default function VideoIdeationView({ onNavigateTab, recipientName = 'Dest
 
                   <div className="vid-sum-row">
                     <span className="vid-sum-label">Guardião Nomeado</span>
-                    <strong className="vid-sum-value">Roberto Silva de Souza</strong>
+                    <strong className="vid-sum-value">{primaryGuardian ? primaryGuardian.name : 'Nenhum guardião cadastrado'}</strong>
                   </div>
                 </div>
 
@@ -1018,7 +1234,7 @@ export default function VideoIdeationView({ onNavigateTab, recipientName = 'Dest
                 className="vid-btn-ir-gravacao"
                 onClick={handleSaveVideoMessage}
               >
-                <span>Confirmar e Guardar no Meu Cofre</span>
+                <span>Confirmar e Guardar na Cápsula</span>
                 <i className="fa-solid fa-arrow-right"></i>
               </button>
             )}

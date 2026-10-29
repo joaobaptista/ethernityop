@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { useI18n } from '../../../core/i18n/presentation/useI18n.js';
-import EncryptedImage from '../../../core/components/EncryptedImage.jsx';
 import EncryptedVideoPlayer from '../../../core/components/EncryptedVideoPlayer.jsx';
 import EncryptedAudioPlayer from '../../../core/components/EncryptedAudioPlayer.jsx';
 import guardianRepository from '../infrastructure/guardianRepository.js';
+import { getAbsolutePhotoUrl } from '../../profile/domain/profileModel.js';
+import GuardianAvatar from './GuardianAvatar.jsx';
 import {
   calculateGuardianQuorum,
   createAuditLogEntry,
@@ -23,7 +24,7 @@ export const SAMPLE_FIXTURE_GUARDIANS = [
     status: 'active',
     canTriggerDelivery: true,
     photoCount: 312,
-    avatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&q=80&w=250',
+    avatar: null,
   },
   {
     id: 'g-2',
@@ -34,7 +35,7 @@ export const SAMPLE_FIXTURE_GUARDIANS = [
     status: 'active',
     canTriggerDelivery: true,
     photoCount: 184,
-    avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&q=80&w=250',
+    avatar: null,
   },
   {
     id: 'g-3',
@@ -45,7 +46,7 @@ export const SAMPLE_FIXTURE_GUARDIANS = [
     status: 'pending',
     canTriggerDelivery: true,
     photoCount: 96,
-    avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=250',
+    avatar: null,
   },
 ];
 
@@ -68,7 +69,15 @@ export default function GuardianView({ onNavigateTab }) {
   const [formEmail, setFormEmail] = useState('');
   const [formPhone, setFormPhone] = useState('');
   const [formAvatar, setFormAvatar] = useState('');
-  const [formPhotoCount, setFormPhotoCount] = useState(0);
+  const [formFile, setFormFile] = useState(null);
+  const [ownerName] = useState(() => {
+    try {
+      return JSON.parse(localStorage.getItem('ethernity_user') || '{}').name || '';
+    } catch {
+      return '';
+    }
+  });
+  const [isSaving, setIsSaving] = useState(false);
 
   // Estados do Protocolo Dead Man's Switch, Quórum e Auditoria (100% autêntico sem assinaturas fictícias)
   const [confirmedGuardianIds, setConfirmedGuardianIds] = useState([]);
@@ -119,7 +128,7 @@ export default function GuardianView({ onNavigateTab }) {
     setFormEmail('');
     setFormPhone('');
     setFormAvatar('');
-    setFormPhotoCount(0);
+    setFormFile(null);
     setViewMode('form');
   };
 
@@ -130,7 +139,7 @@ export default function GuardianView({ onNavigateTab }) {
     setFormEmail(g.email || '');
     setFormPhone(g.phone || '');
     setFormAvatar(g.avatar || '');
-    setFormPhotoCount(g.photoCount || 0);
+    setFormFile(null);
     setViewMode('form');
   };
 
@@ -139,12 +148,37 @@ export default function GuardianView({ onNavigateTab }) {
     setViewMode('profile');
   };
 
+  const getToken = () =>
+    typeof window !== 'undefined' && window.localStorage ? localStorage.getItem('ethernity_auth_token') : null;
+
   const handleAvatarFileChange = (e) => {
     const file = e.target.files?.[0];
-    if (file) {
-      const url = URL.createObjectURL(file);
-      setFormAvatar(url);
-      setFormPhotoCount((prev) => (prev > 0 ? prev : 1));
+    e.target.value = '';
+    if (!file) return;
+    if (!file.type.startsWith('image/')) {
+      showToast(t('guardianView.invalidImage'));
+      return;
+    }
+    if (formAvatar.startsWith('blob:')) URL.revokeObjectURL(formAvatar);
+    setFormFile(file);
+    setFormAvatar(URL.createObjectURL(file));
+  };
+
+  const handleRemovePhoto = async () => {
+    if (formFile) {
+      if (formAvatar.startsWith('blob:')) URL.revokeObjectURL(formAvatar);
+      setFormFile(null);
+      setFormAvatar(editingGuardian?.avatar || '');
+      return;
+    }
+    if (!editingGuardian?.avatar) return;
+    try {
+      const saved = await guardianRepository.deleteGuardianPhoto(getToken(), editingGuardian.id);
+      setGuardians((prev) => prev.map((g) => (g.id === saved.id ? { ...g, ...saved } : g)));
+      setEditingGuardian((prev) => ({ ...prev, avatar: null }));
+      setFormAvatar('');
+    } catch (err) {
+      showToast(err.message || t('guardianView.saveFailed'));
     }
   };
 
@@ -167,71 +201,48 @@ export default function GuardianView({ onNavigateTab }) {
     }
   };
 
-  const handleSave = (e) => {
+  const handleSave = async (e) => {
     e.preventDefault();
     if (!formName.trim() || !formEmail.trim()) {
       alert(t('guardianView.validationAlert'));
       return;
     }
 
-    const token =
-      typeof window !== 'undefined' && window.localStorage
-        ? localStorage.getItem('ethernity_auth_token')
-        : null;
-
-    if (editingGuardian) {
-      const payload = {
-        name: formName,
-        relationship: formRel || 'Familiar',
-        email: formEmail,
-        phone: formPhone,
-        avatar: formAvatar || editingGuardian.avatar,
-        photoCount: formPhotoCount,
-      };
-
-      setGuardians((prev) =>
-        prev.map((g) =>
-          g.id === editingGuardian.id
-            ? {
-                ...g,
-                ...payload,
-              }
-            : g
-        )
-      );
-
-      if (token) {
-        guardianRepository.updateGuardian(token, editingGuardian.id, payload).catch((err) => {
-          console.warn('[GuardianView] Falha ao atualizar guardião na API:', err);
-        });
-      }
-    } else {
-      const newG = {
-        id: `g-${Date.now()}`,
-        name: formName,
-        relationship: formRel || 'Familiar',
-        email: formEmail,
-        phone: formPhone || '+55 (11) 90000-0000',
-        status: 'pending',
-        canTriggerDelivery: true,
-        photoCount: formPhotoCount || 0,
-        avatar: formAvatar || 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&q=80&w=250',
-      };
-      setGuardians((prev) => [...prev, newG]);
-
-      if (token) {
-        guardianRepository.createGuardian(token, newG)
-          .then((created) => {
-            if (created && created.id) {
-              setGuardians((prev) => prev.map((g) => (g.id === newG.id ? { ...g, ...created } : g)));
-            }
-          })
-          .catch((err) => {
-            console.warn('[GuardianView] Falha ao salvar guardião na API:', err);
-          });
-      }
+    const token = getToken();
+    if (!token) {
+      showToast(t('guardianView.saveFailed'));
+      return;
     }
-    setViewMode('list');
+
+    const payload = {
+      name: formName.trim(),
+      relationship: formRel,
+      email: formEmail.trim(),
+      phone: formPhone.trim(),
+    };
+
+    setIsSaving(true);
+    try {
+      if (editingGuardian) {
+        let saved = await guardianRepository.updateGuardian(token, editingGuardian.id, payload);
+        if (formFile) {
+          saved = await guardianRepository.uploadGuardianPhoto(token, editingGuardian.id, formFile);
+          if (formAvatar.startsWith('blob:')) URL.revokeObjectURL(formAvatar);
+          setFormFile(null);
+        }
+        setGuardians((prev) => prev.map((g) => (g.id === saved.id ? { ...g, ...saved } : g)));
+        setViewMode('list');
+      } else {
+        const created = await guardianRepository.createGuardian(token, payload);
+        setGuardians((prev) => [...prev, created]);
+        showToast(t('guardianView.createdAddPhoto'));
+        handleOpenEdit(created);
+      }
+    } catch (err) {
+      showToast(err.message || t('guardianView.saveFailed'));
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   // Handlers do Dead Man's Switch e Quórum
@@ -432,7 +443,7 @@ export default function GuardianView({ onNavigateTab }) {
                         style={{ cursor: 'pointer' }}
                         title="Ver perfil de memórias"
                       >
-                        <img src={g.avatar} alt={g.name} className="guardian-circle-avatar" />
+                        <GuardianAvatar src={g.avatar} name={g.name} className="guardian-circle-avatar" />
                         <div className="guardian-name-rel">
                           <h3 className="guardian-person-name">{g.name}</h3>
                           <span className="guardian-rel-tag">{g.relationship}</span>
@@ -499,15 +510,15 @@ export default function GuardianView({ onNavigateTab }) {
 
               <div className="profile-header-ig">
                 <div className="profile-avatar-wrap-ig">
-                  <img src={selectedProfile.avatar} alt={selectedProfile.name} className="profile-avatar-ig" />
+                  <GuardianAvatar src={selectedProfile.avatar} name={selectedProfile.name} className="profile-avatar-ig" />
                 </div>
                 <div className="profile-stats-ig">
                   <div className="stat-ig">
-                    <strong>{selectedProfile.photoCount}</strong>
+                    <strong>{selectedProfile.photoCount || 0}</strong>
                     <span>{t('guardianView.memoriesStat')}</span>
                   </div>
                   <div className="stat-ig">
-                    <strong>12</strong>
+                    <strong>—</strong>
                     <span>{t('guardianView.vaultsStat')}</span>
                   </div>
                   <div className="stat-ig">
@@ -527,10 +538,10 @@ export default function GuardianView({ onNavigateTab }) {
                   <button className="btn-ig-action btn-ig-edit" onClick={() => handleOpenEdit(selectedProfile)}>
                     {t('guardianView.editBtn')}
                   </button>
-                  <button className="btn-ig-action btn-ig-share" onClick={() => alert(t('guardianView.vaultsStat'))}>
+                  <button className="btn-ig-action btn-ig-share" onClick={() => onNavigateTab && onNavigateTab('capsules')}>
                     {t('guardianView.vaultsBtn')}
                   </button>
-                  <button className="btn-ig-action btn-ig-primary" onClick={() => alert(t('guardianView.addPhotosBtn'))}>
+                  <button className="btn-ig-action btn-ig-primary" onClick={() => handleOpenEdit(selectedProfile)}>
                     {t('guardianView.addPhotosBtn')}
                   </button>
                 </div>
@@ -541,54 +552,9 @@ export default function GuardianView({ onNavigateTab }) {
                 <div className="tab-ig"><i className="fa-solid fa-clapperboard"></i></div>
               </div>
 
-              <div className="profile-timeline-container">
-                <div className="timeline-year-group">
-                  <div className="timeline-year-marker">
-                    <span className="year-circle">2024</span>
-                  </div>
-                  <div className="timeline-year-content">
-                    <div className="timeline-year-header">
-                      <h3>2024</h3>
-                      <span className="timeline-stats">· 78 fotos · <span className="text-primary">12 selecionadas</span></span>
-                    </div>
-                    <div className="timeline-grid">
-                      {[
-                        'https://images.unsplash.com/photo-1511895426328-dc8714191300?w=400&h=400&fit=crop',
-                        'https://images.unsplash.com/photo-1529156069898-49953eb1b5ce?w=400&h=400&fit=crop',
-                        'https://images.unsplash.com/photo-1506869640319-ce1a44f07a7e?w=400&h=400&fit=crop'
-                      ].map((src, i) => (
-                        <div className="timeline-grid-item" key={i}>
-                          <img src={src} alt="Memory" />
-                          <div className={`selection-checkmark ${i !== 2 ? 'active' : ''}`}><i className="fa-solid fa-check"></i></div>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                </div>
-
-                <div className="timeline-year-group">
-                  <div className="timeline-year-marker">
-                    <span className="year-circle">2023</span>
-                  </div>
-                  <div className="timeline-year-content">
-                    <div className="timeline-year-header">
-                      <h3>2023</h3>
-                      <span className="timeline-stats">· 94 fotos · <span className="text-primary">21 selecionadas</span></span>
-                    </div>
-                    <div className="timeline-grid">
-                      {[
-                        'https://images.unsplash.com/photo-1516738901171-8eb4fc13bd20?w=400&h=400&fit=crop',
-                        'https://images.unsplash.com/photo-1476703993599-0035a21b173d?w=400&h=400&fit=crop',
-                        'https://images.unsplash.com/photo-1502086223501-7ea6ecd79368?w=400&h=400&fit=crop'
-                      ].map((src, i) => (
-                        <div className="timeline-grid-item" key={i}>
-                          <img src={src} alt="Memory" />
-                          <div className={`selection-checkmark ${i !== 1 ? 'active' : ''}`}><i className="fa-solid fa-check"></i></div>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                </div>
+              <div className="profile-timeline-container profile-timeline-empty">
+                <i className="fa-regular fa-images" aria-hidden="true"></i>
+                <p>{t('guardianView.timelineEmpty')}</p>
               </div>
             </div>
           )}
@@ -617,7 +583,12 @@ export default function GuardianView({ onNavigateTab }) {
 
               <div className="special-person-card">
                 <div className="modal-person-top">
-                  <label className="modal-avatar-wrapper clickable" title={t('guardianView.photoPlaceholder', 'Clique para escolher foto')}>
+                  {editingGuardian ? (
+                  <label
+                    className={`modal-avatar-wrapper clickable ${formAvatar ? '' : 'is-empty'}`}
+                    title={t('guardianView.photoPlaceholder', 'Clique para escolher foto')}
+                    aria-label={t('guardianView.photoPlaceholder', 'Clique para escolher foto')}
+                  >
                     <input
                       type="file"
                       accept="image/*"
@@ -626,20 +597,40 @@ export default function GuardianView({ onNavigateTab }) {
                     />
                     {formAvatar ? (
                       <img
-                        src={formAvatar}
-                        alt="Pessoa Especial"
+                        src={getAbsolutePhotoUrl(formAvatar)}
+                        alt={formName}
                         className="modal-avatar-image"
                       />
                     ) : (
                       <div className="empty-avatar-placeholder">
-                        <i className="fa-solid fa-camera"></i>
-                        <span>{t('vaultView.filterPhotos')}</span>
+                        <i className="fa-solid fa-user" aria-hidden="true"></i>
                       </div>
                     )}
+                    <span className="modal-avatar-edit-badge" aria-hidden="true">
+                      <i className="fa-solid fa-camera"></i>
+                    </span>
                   </label>
+                  ) : (
+                    <div className="modal-avatar-wrapper is-empty" aria-hidden="true">
+                      <div className="empty-avatar-placeholder">
+                        <i className="fa-solid fa-user"></i>
+                      </div>
+                    </div>
+                  )}
                   <div className="modal-photos-badge">
-                    <span>{formPhotoCount > 0 ? t('guardianView.photoCountTogether', { count: formPhotoCount }) : t('guardianView.newContact')}</span>
+                    <span>
+                      {!editingGuardian
+                        ? t('guardianView.photoAfterSave')
+                        : formAvatar
+                          ? t('guardianView.changePhoto')
+                          : t('guardianView.photoPlaceholder')}
+                    </span>
                   </div>
+                  {editingGuardian && formAvatar && (
+                    <button type="button" className="btn-remove-avatar" onClick={handleRemovePhoto}>
+                      <i className="fa-regular fa-trash-can" aria-hidden="true"></i> {t('guardianView.removePhoto')}
+                    </button>
+                  )}
                 </div>
 
                 <div className="modal-person-heading">
@@ -733,7 +724,7 @@ export default function GuardianView({ onNavigateTab }) {
                     >
                       {t('guardianView.skipPerson')}
                     </button>
-                    <button type="submit" className="btn-next-person">
+                    <button type="submit" className="btn-next-person" disabled={isSaving}>
                       {editingGuardian ? t('guardianView.saveChanges') : t('guardianView.nextPerson')} <i className="fa-solid fa-arrow-right"></i>
                     </button>
                   </div>
@@ -853,7 +844,7 @@ export default function GuardianView({ onNavigateTab }) {
                   const isPrimary = g.status === 'active';
                   return (
                     <div key={g.id} className="guardian-signature-row">
-                      <img src={g.avatar} alt={g.name} className="sig-avatar" />
+                      <GuardianAvatar src={g.avatar} name={g.name} className="sig-avatar" />
                       <div className="sig-info">
                         <strong className="sig-name">{g.name}</strong>
                         <span className="sig-rel">{g.relationship} • {g.email}</span>
@@ -1053,7 +1044,6 @@ export default function GuardianView({ onNavigateTab }) {
                       <EncryptedVideoPlayer
                         mediaId="mem-video-guardian-1"
                         streamUrl="/api/vault/media/mem-video-1/stream"
-                        posterUrl="https://images.unsplash.com/photo-1516738901171-8eb4fc13bd20?w=800"
                         title={t('guardianView.videoTitle')}
                         durationSeconds={245}
                       />
@@ -1130,14 +1120,10 @@ export default function GuardianView({ onNavigateTab }) {
 
                     {/* Regra 1 Mandatória: object-fit: contain e tamanho natural preservado */}
                     <div className="unlocked-photo-wrapper">
-                      <EncryptedImage
-                        src="https://images.unsplash.com/photo-1511895426328-dc8714191300?w=1200"
-                        alt={t('guardianView.photoTitle')}
-                        showSecurityBadge={true}
-                        allowPrintExport={true}
-                        dpi={300}
-                        style={{ maxHeight: '420px', width: '100%', objectFit: 'contain' }}
-                      />
+                      <div className="unlocked-photo-placeholder media-icon-placeholder">
+                        <i className="fa-regular fa-image" aria-hidden="true"></i>
+                        <span>{t('guardianView.photoTitle')}</span>
+                      </div>
                     </div>
 
                     <div className="unlocked-card-body">
@@ -1179,7 +1165,7 @@ export default function GuardianView({ onNavigateTab }) {
                       </p>
                       <div className="letter-sign-block">
                         <strong>Com amor eterno,</strong>
-                        <span>Roberta Silva</span>
+                        {ownerName && <span>{ownerName}</span>}
                         <small className="letter-crypto-seal">Selo Digital SHA-256: 8a7c1b...f92d4</small>
                       </div>
                     </div>

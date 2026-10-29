@@ -1097,3 +1097,115 @@
   color: #EE5945;
 }
 
+
+/* Lista de mensagens salvas */
+.nm-saved-list {
+  background: var(--bg-surface, #FFFFFF);
+  border: 1px solid #EFE6DC;
+  border-radius: 16px;
+  padding: 16px 18px;
+  margin-bottom: 20px;
+}
+
+.nm-saved-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 10px;
+}
+
+.nm-saved-header h2 {
+  font-size: 15px;
+  font-weight: 700;
+  margin: 0;
+}
+
+.nm-saved-new-btn {
+  border: none;
+  background: #FDF0ED;
+  color: #E05A47;
+  font-weight: 600;
+  font-size: 13px;
+  padding: 6px 12px;
+  border-radius: 999px;
+  cursor: pointer;
+}
+
+.nm-saved-list ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  max-height: 280px;
+  overflow-y: auto;
+}
+
+.nm-saved-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 6px;
+  border-top: 1px solid #F3ECE4;
+}
+
+.nm-saved-item:first-child {
+  border-top: none;
+}
+
+.nm-saved-item.is-editing {
+  background: #FFF8F6;
+  border-radius: 10px;
+}
+
+.nm-saved-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.nm-saved-info strong {
+  font-size: 14px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.nm-saved-info span {
+  font-size: 12px;
+  color: var(--text-muted, #8C827F);
+}
+
+.nm-saved-actions {
+  display: flex;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+.nm-saved-actions button {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  border: 1px solid #EFE6DC;
+  background: transparent;
+  border-radius: 8px;
+  padding: 6px 10px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  color: inherit;
+}
+
+.nm-saved-actions button.danger:hover {
+  color: #E05A47;
+  border-color: #F5C6BE;
+}
+
+@media (max-width: 560px) {
+  .nm-saved-actions button span {
+    display: none;
+  }
+}

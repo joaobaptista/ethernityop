@@ -7,15 +7,36 @@
  * POST   /guardians/                    -> Adiciona um novo guardião (com validação de duplicidade)
  * PUT    /guardians/:id                 -> Atualiza os dados de um guardião
  * DELETE /guardians/:id                 -> Expurgo definitivo do guardião (CryptoShred e desassociação)
+ * POST   /guardians/:id/photo           -> Cadastra a foto do guardião (somente após criado)
+ * DELETE /guardians/:id/photo           -> Remove a foto cadastrada
  * GET    /guardians/circle/connections  -> Lista conexões do círculo familiar
  * POST   /guardians/circle/invite       -> Gera código de convite familiar
  */
 import { Router } from 'express';
+import multer from 'multer';
+import path from 'node:path';
+import fs from 'node:fs';
+import sharp from 'sharp';
 import { requireAuth } from '../auth.js';
 import { pool, DEMO_USER_ID } from '../db/mysql.js';
 import { uuid } from '../seed.js';
+import config from '../config.js';
 
 const router = Router();
+
+const PHOTO_TYPES = new Set(['image/jpeg', 'image/png', 'image/webp', 'image/heic', 'image/heif']);
+const photoUpload = multer({
+  storage: multer.memoryStorage(),
+  limits: { fileSize: config.maxUploadBytes, files: 1 },
+});
+
+function removeGuardianPhotoFile(avatarUrl) {
+  if (!avatarUrl || !avatarUrl.startsWith('/uploads/')) return;
+  const root = path.resolve(config.uploadFolder);
+  const target = path.resolve(root, avatarUrl.slice('/uploads/'.length));
+  if (!target.startsWith(root + path.sep)) return;
+  fs.rm(target, { force: true }, () => {});
+}
 
 function formatGuardian(row) {
   return {
@@ -27,6 +48,8 @@ function formatGuardian(row) {
     phone: row.phone,
     relation: row.relation,
     relationship: row.relation,
+    avatar: row.avatar_url || null,
+    avatar_url: row.avatar_url || null,
     status: row.status,
     canTriggerDelivery: Boolean(row.can_trigger_delivery),
     can_trigger_delivery: Boolean(row.can_trigger_delivery),
@@ -110,7 +133,7 @@ router.post('/guardians/', requireAuth, async (req, res) => {
   const name = String(body.name || '').trim();
   const email = String(body.email || '').trim().toLowerCase();
   const phone = String(body.phone || '').trim();
-  const relation = String(body.relation || body.relationship || 'Familiar').trim();
+  const relation = String(body.relation || body.relationship || '').trim();
   const notes = body.notes ? String(body.notes).trim() : null;
   const canTriggerDelivery = body.canTriggerDelivery !== undefined ? (body.canTriggerDelivery ? 1 : 0) : 1;
 
@@ -232,6 +255,7 @@ router.delete('/guardians/:id', requireAuth, async (req, res) => {
     );
 
     await connection.commit();
+    removeGuardianPhotoFile(guardian.avatar_url);
     return res.json({
       status: 'success',
       message: 'Guardião expurgado definitivamente.',
@@ -243,6 +267,67 @@ router.delete('/guardians/:id', requireAuth, async (req, res) => {
     return res.status(500).json({ detail: 'Erro ao excluir guardião no banco de dados.' });
   } finally {
     connection.release();
+  }
+});
+
+// 7. POST /guardians/:id/photo — Cadastra a foto do guardião já criado (apenas o dono)
+router.post('/guardians/:id/photo', requireAuth, photoUpload.single('photo'), async (req, res, next) => {
+  const userId = req.user?.id || req.user?.sub || DEMO_USER_ID;
+  const guardianId = req.params.id;
+  const file = req.file;
+
+  if (!file) {
+    return res.status(422).json({ detail: 'Envie a foto no campo "photo".' });
+  }
+  if (!PHOTO_TYPES.has(file.mimetype)) {
+    return res.status(400).json({ detail: 'Formato de foto não suportado. Use JPEG, PNG, WebP ou HEIC.' });
+  }
+
+  try {
+    const [rows] = await pool.query('SELECT * FROM guardians WHERE id = ? AND user_id = ? LIMIT 1', [guardianId, userId]);
+    if (!rows || rows.length === 0) {
+      return res.status(404).json({ detail: 'Guardião não encontrado ou acesso não autorizado.' });
+    }
+
+    let buffer;
+    try {
+      // Reencode em WebP: valida que é imagem de verdade e descarta metadados (EXIF/GPS).
+      buffer = await sharp(file.buffer).rotate().resize(800, 800, { fit: 'inside', withoutEnlargement: true }).webp({ quality: 88 }).toBuffer();
+    } catch {
+      return res.status(400).json({ detail: 'Arquivo de imagem inválido.' });
+    }
+
+    const userDir = path.join(config.uploadFolder, userId);
+    fs.mkdirSync(userDir, { recursive: true });
+    const filename = `guardian-${uuid()}.webp`;
+    fs.writeFileSync(path.join(userDir, filename), buffer);
+    const avatarUrl = `/uploads/${userId}/${filename}`;
+
+    await pool.query('UPDATE guardians SET avatar_url = ?, updated_at = NOW(3) WHERE id = ? AND user_id = ?', [avatarUrl, guardianId, userId]);
+    removeGuardianPhotoFile(rows[0].avatar_url);
+
+    const [updated] = await pool.query('SELECT * FROM guardians WHERE id = ? LIMIT 1', [guardianId]);
+    return res.json(formatGuardian(updated[0]));
+  } catch (err) {
+    return next(err);
+  }
+});
+
+// 8. DELETE /guardians/:id/photo — Remove a foto cadastrada (expurgo do arquivo)
+router.delete('/guardians/:id/photo', requireAuth, async (req, res, next) => {
+  const userId = req.user?.id || req.user?.sub || DEMO_USER_ID;
+  const guardianId = req.params.id;
+
+  try {
+    const [rows] = await pool.query('SELECT * FROM guardians WHERE id = ? AND user_id = ? LIMIT 1', [guardianId, userId]);
+    if (!rows || rows.length === 0) {
+      return res.status(404).json({ detail: 'Guardião não encontrado ou acesso não autorizado.' });
+    }
+    await pool.query('UPDATE guardians SET avatar_url = NULL, updated_at = NOW(3) WHERE id = ? AND user_id = ?', [guardianId, userId]);
+    removeGuardianPhotoFile(rows[0].avatar_url);
+    return res.json(formatGuardian({ ...rows[0], avatar_url: null }));
+  } catch (err) {
+    return next(err);
   }
 });
 

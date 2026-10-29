@@ -163,7 +163,7 @@ export default function VideoRecorderModal({ isOpen, onClose, onSave }) {
         typeLabel: 'Vídeo / Gravação',
         iconColor: '#EA4335',
         previewType: 'video_still',
-        previewUrl: uploadResult?.vaultItem?.posterUrl || uploadResult?.posterUrl || videoUrl || 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=600&q=80',
+        previewUrl: uploadResult?.vaultItem?.posterUrl || uploadResult?.posterUrl || videoUrl || null,
         streamUrl: uploadResult?.vaultItem?.streamUrl || uploadResult?.streamUrl,
         posterUrl: uploadResult?.vaultItem?.posterUrl || uploadResult?.posterUrl,
         duration: durationText,

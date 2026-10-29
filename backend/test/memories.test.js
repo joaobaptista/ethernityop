@@ -51,7 +51,7 @@ test('Memórias: Ciclo de Vida Completo (POST, GET, PUT, Anti-IDOR, DELETE)', as
       capsuleId: 'cap-general',
       title: uniqueTitle,
       story: 'Passeio inesquecível pelas montanhas ao entardecer.',
-      mediaUrl: 'https://images.unsplash.com/photo-1506744038136-46273834b3fb',
+      mediaUrl: 'https://media.test/memory-photo.jpg',
       type: 'IMAGE',
       source: 'UPLOAD',
     });

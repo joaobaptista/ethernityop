@@ -1,5 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import {
+  describeCapsuleDelivery,
   CAPSULE_STATUS,
   CAPSULE_TRIGGERS,
   validateCapsule,
@@ -59,3 +60,21 @@ describe('capsulesModel Domain Rules', () => {
     expect(canDeliverCapsule(futureCapsule)).toBe(false);
   });
 });
+
+
+describe('describeCapsuleDelivery', () => {
+  it('não inventa data quando a entrega não foi definida', () => {
+    expect(describeCapsuleDelivery({}).triggerLabel).toBe('Data de entrega a definir');
+  });
+
+  it('usa a data escolhida pelo usuário', () => {
+    expect(describeCapsuleDelivery({ deliveryType: 'date', scheduledDate: '2031-05-01T12:00:00.000Z' }).triggerLabel).toBe(
+      'Entrega em 1 de maio de 2031'
+    );
+  });
+
+  it('descreve a liberação póstuma', () => {
+    expect(describeCapsuleDelivery({ deliveryType: 'posthumous' }).triggerLabel).toMatch(/póstuma/);
+  });
+});
+

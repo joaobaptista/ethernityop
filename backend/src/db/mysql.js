@@ -322,6 +322,7 @@ export async function initDatabase() {
         KEY idx_guardians_email (email)
       ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
     `);
+    await addCapsuleCol('ALTER TABLE guardians ADD COLUMN avatar_url VARCHAR(512) NULL AFTER relation');
 
     // 4.5 Garantir tabela device_tokens
     await conn.query(`
@@ -384,7 +385,7 @@ export async function initDatabase() {
           'Vagner Ibas',
           'demo@ethernity.com',
           '(11) 98765-4321',
-          'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=120&q=80',
+          null,
           'infinity',
           1,
           NOW(3),

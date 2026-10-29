@@ -204,6 +204,18 @@
   border: 1px solid #FFFFFF;
 }
 
+.avatar-icon-placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  background-color: #F3ECE4;
+  color: #C9B8AA;
+}
+
+.capsule-guardian-avatar.avatar-icon-placeholder { font-size: 14px; }
+.config-avatar-img.avatar-icon-placeholder { font-size: 24px; }
+
 .capsule-guardian-info {
   display: flex;
   flex-direction: column;
@@ -2483,3 +2495,79 @@
 
 
 
+
+/* Modal: detalhes e entrega da cápsula */
+.capsule-details-modal {
+  text-align: left;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  max-width: 460px;
+  width: 100%;
+}
+
+.capsule-details-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.capsule-details-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-secondary, #6B5E59);
+}
+
+.capsule-details-field input,
+.capsule-details-date {
+  padding: 10px 12px;
+  border: 1px solid #E5DDD4;
+  border-radius: 10px;
+  font-size: 14px;
+  font-family: inherit;
+  color: var(--text-primary, #1F1B1A);
+  background: var(--bg-surface, #FFFFFF);
+}
+
+.capsule-details-delivery {
+  border: 1px solid #EFE6DC;
+  border-radius: 12px;
+  padding: 12px 14px;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.capsule-details-delivery legend {
+  font-size: 13px;
+  font-weight: 700;
+  padding: 0 4px;
+}
+
+.capsule-details-radio {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.capsule-details-error {
+  margin: 0;
+  color: #C0392B;
+  font-size: 13px;
+}
+
+.btn-confirm-delete.capsule-details-save {
+  background-color: #F05A47;
+}
+
+@media (max-width: 520px) {
+  .capsule-details-row {
+    grid-template-columns: 1fr;
+  }
+}

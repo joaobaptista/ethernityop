@@ -37,6 +37,22 @@ export const guardianRepository = {
   },
 
   /**
+   * Cadastra (ou troca) a foto de um guardião já criado
+   */
+  async uploadGuardianPhoto(token, id, file) {
+    const form = new FormData();
+    form.append('photo', file);
+    return httpClient.post(`/guardians/${id}/photo`, form, token);
+  },
+
+  /**
+   * Remove a foto cadastrada do guardião
+   */
+  async deleteGuardianPhoto(token, id) {
+    return httpClient.delete(`/guardians/${id}/photo`, token);
+  },
+
+  /**
    * Busca conexões do círculo familiar
    */
   async getCircleConnections(token) {
